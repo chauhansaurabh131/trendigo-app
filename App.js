@@ -15,8 +15,8 @@ const App = () => {
     <GestureHandlerRootView style={{flex: 1}}>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="DemoCodeScreen" component={DemoCodeScreen} />
           <Stack.Screen name="StartingScreen" component={StartingScreen} />
+          <Stack.Screen name="DemoCodeScreen" component={DemoCodeScreen} />
 
           {/*<Stack.Screen name="DemoCodeScreen" component={DemoCodeScreen} />*/}
           <Stack.Screen name="MainTabs" component={MainTabNavigator} />
