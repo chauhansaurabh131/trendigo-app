@@ -31,8 +31,11 @@ const HomeScreen = () => {
             justifyContent: 'space-between',
           }}>
           <ColorTrendiGo />
+
           <Touchable
-            onPress={() => console.log(' === Profile Icon Press ===> ')}>
+            onPress={() => {
+              navigation.navigate('MyOrderScreen');
+            }}>
             <ProfileIcon />
           </Touchable>
         </View>

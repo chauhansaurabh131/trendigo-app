@@ -1,14 +1,20 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Text, View} from 'react-native';
+import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import LinearGradient from 'react-native-linear-gradient';
 
+// Screens
 import HomeScreen from '../screens/homeScreen';
 import SearchScreen from '../screens/searchScreen';
 import CategoryScreen from '../screens/categoryScreen';
 import ChatScreen from '../screens/chatScreen';
 import BagScreen from '../screens/bagScreen';
+import MyOrderScreen from '../screens/myOrderScreen';
+
+// Icons
 import {
   ColorHomeIcon,
   HomeIcon,
@@ -20,10 +26,13 @@ import {
   ChatIcon,
   ColorBagIcon,
   BagIcon,
-} from '../assets'; // ✅ Make sure these are SVG components
+} from '../assets';
+
+// Utils
 import {fontFamily, fontSize, hp, isIOS} from '../utils/helpers';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 // ✅ Gradient Text Component
 const GradientText = ({text}) => (
@@ -58,80 +67,142 @@ const GradientText = ({text}) => (
   </MaskedView>
 );
 
+/* --------------------------
+   STACKS FOR EACH TAB
+--------------------------- */
+const HomeStackScreen = () => {
+  return (
+    <Stack.Navigator screenOptions={{headerShown: false}}>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      {/* ✅ MyOrderScreen inside HomeStack so tab bar stays visible */}
+      <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
+    </Stack.Navigator>
+  );
+};
+
+const SearchStackScreen = () => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="SearchScreen" component={SearchScreen} />
+  </Stack.Navigator>
+);
+
+const CategoryStackScreen = () => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="CategoryScreen" component={CategoryScreen} />
+  </Stack.Navigator>
+);
+
+const ChatStackScreen = () => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="ChatScreen" component={ChatScreen} />
+  </Stack.Navigator>
+);
+
+const BagStackScreen = () => (
+  <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Screen name="BagScreen" component={BagScreen} />
+  </Stack.Navigator>
+);
+
+/* --------------------------
+   MAIN TAB NAVIGATOR
+--------------------------- */
 const MainTabNavigator = () => {
   return (
     <Tab.Navigator
-      screenOptions={({route}) => ({
-        headerShown: false,
-        tabBarStyle: {height: isIOS ? hp(75) : hp(70), paddingTop: 5},
-        tabBarIcon: ({focused}) => {
-          const iconSizeStyles = {
-            Home: {width: hp(15), height: hp(16)},
-            Search: {width: hp(16), height: hp(16)},
-            Category: {width: hp(16), height: hp(16)},
-            Chat: {width: hp(16), height: hp(16)},
-            Bag: {width: hp(13), height: hp(16)},
-          };
+      screenOptions={({route}) => {
+        // Get the nested route name inside the current tab
+        const childRouteName = getFocusedRouteNameFromRoute(route) ?? '';
 
-          let IconComponent;
-          switch (route.name) {
-            case 'Home':
-              IconComponent = focused ? ColorHomeIcon : HomeIcon;
-              break;
-            case 'Search':
-              IconComponent = focused ? ColorSearchIcon : SearchIcon;
-              break;
-            case 'Category':
-              IconComponent = focused ? ColorCategoryIcon : CategoryIcon;
-              break;
-            case 'Chat':
-              IconComponent = focused ? ColorChatIcon : ChatIcon;
-              break;
-            case 'Bag':
-              IconComponent = focused ? ColorBagIcon : BagIcon;
-              break;
-            default:
-              IconComponent = HomeIcon;
-          }
+        // Determine if we're on the main tab screen
+        const isMainScreen =
+          (route.name === 'HomeStack' &&
+            (childRouteName === '' || childRouteName === 'HomeScreen')) ||
+          (route.name === 'SearchStack' &&
+            (childRouteName === '' || childRouteName === 'SearchScreen')) ||
+          (route.name === 'CategoryStack' &&
+            (childRouteName === '' || childRouteName === 'CategoryScreen')) ||
+          (route.name === 'ChatStack' &&
+            (childRouteName === '' || childRouteName === 'ChatScreen')) ||
+          (route.name === 'BagStack' &&
+            (childRouteName === '' || childRouteName === 'BagScreen'));
 
-          const sizeStyle = iconSizeStyles[route.name] || {
-            width: hp(20),
-            height: hp(20),
-          };
+        return {
+          headerShown: false,
+          tabBarStyle: {height: isIOS ? hp(75) : hp(70), paddingTop: 5},
+          tabBarIcon: ({focused}) => {
+            const iconSizeStyles = {
+              HomeStack: {width: hp(15), height: hp(16)},
+              SearchStack: {width: hp(16), height: hp(16)},
+              CategoryStack: {width: hp(16), height: hp(16)},
+              ChatStack: {width: hp(16), height: hp(16)},
+              BagStack: {width: hp(13), height: hp(16)},
+            };
 
-          return (
-            <View style={{width: sizeStyle.width, height: sizeStyle.height}}>
-              <IconComponent
-                width={sizeStyle.width}
-                height={sizeStyle.height}
-              />
-            </View>
-          );
-        },
+            let IconComponent;
+            switch (route.name) {
+              case 'HomeStack':
+                IconComponent =
+                  focused && isMainScreen ? ColorHomeIcon : HomeIcon;
+                break;
+              case 'SearchStack':
+                IconComponent =
+                  focused && isMainScreen ? ColorSearchIcon : SearchIcon;
+                break;
+              case 'CategoryStack':
+                IconComponent =
+                  focused && isMainScreen ? ColorCategoryIcon : CategoryIcon;
+                break;
+              case 'ChatStack':
+                IconComponent =
+                  focused && isMainScreen ? ColorChatIcon : ChatIcon;
+                break;
+              case 'BagStack':
+                IconComponent =
+                  focused && isMainScreen ? ColorBagIcon : BagIcon;
+                break;
+              default:
+                IconComponent = HomeIcon;
+            }
 
-        tabBarLabel: ({focused}) =>
-          focused ? (
-            <GradientText text={route.name} />
-          ) : (
-            <View>
-              <Text
-                style={{
-                  fontSize: fontSize(12),
-                  fontFamily: fontFamily.poppins400,
-                  color: 'black',
-                  textAlign: 'center',
-                  lineHeight: hp(18),
-                }}>
-                {route.name}
-              </Text>
-            </View>
-          ),
-      })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Search" component={SearchScreen} />
-      <Tab.Screen name="Category" component={CategoryScreen} />
-      <Tab.Screen name="Chat" component={ChatScreen} />
-      <Tab.Screen name="Bag" component={BagScreen} />
+            const sizeStyle = iconSizeStyles[route.name] || {
+              width: hp(20),
+              height: hp(20),
+            };
+
+            return (
+              <View style={{width: sizeStyle.width, height: sizeStyle.height}}>
+                <IconComponent
+                  width={sizeStyle.width}
+                  height={sizeStyle.height}
+                />
+              </View>
+            );
+          },
+          tabBarLabel: ({focused}) =>
+            focused && isMainScreen ? (
+              <GradientText text={route.name.replace('Stack', '')} />
+            ) : (
+              <View>
+                <Text
+                  style={{
+                    fontSize: fontSize(12),
+                    fontFamily: fontFamily.poppins400,
+                    color: 'black',
+                    textAlign: 'center',
+                    lineHeight: hp(18),
+                  }}>
+                  {route.name.replace('Stack', '')}
+                </Text>
+              </View>
+            ),
+        };
+      }}>
+      <Tab.Screen name="HomeStack" component={HomeStackScreen} />
+      <Tab.Screen name="SearchStack" component={SearchStackScreen} />
+      <Tab.Screen name="CategoryStack" component={CategoryStackScreen} />
+      <Tab.Screen name="ChatStack" component={ChatStackScreen} />
+      <Tab.Screen name="BagStack" component={BagStackScreen} />
     </Tab.Navigator>
   );
 };

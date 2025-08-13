@@ -80,4 +80,6 @@ export const images = {
   shopClothImage: require('./images/shop_cloth_img.png'),
   gradientCircleImage: require('./images/gradient_circle_image.png'),
   emptyLikeImage: require('./images/empty_like_img.png'),
+  star_fulfil_icon: require('./images/star_fulfil_icon.png'),
+  star_icon: require('./images/star_icon.png'),
 };

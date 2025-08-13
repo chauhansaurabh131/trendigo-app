@@ -46,7 +46,7 @@ const StarRating = ({rating, onChange, max = TOTAL_STARS}) => {
 };
 
 // Main screen
-const DemoCodeScreen = () => {
+const RatingStatComponent = () => {
   const [rating, setRating] = useState(0);
 
   const handleChange = useCallback(value => {
@@ -55,10 +55,10 @@ const DemoCodeScreen = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{padding: hp(16)}}>
+    <SafeAreaView>
       <StarRating rating={rating} onChange={handleChange} />
     </SafeAreaView>
   );
 };
 
-export default DemoCodeScreen;
+export default RatingStatComponent;
