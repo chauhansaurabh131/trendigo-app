@@ -34,7 +34,7 @@ const HomeScreen = () => {
 
           <Touchable
             onPress={() => {
-              navigation.navigate('MyOrderScreen');
+              navigation.navigate('ProfileScreen');
             }}>
             <ProfileIcon />
           </Touchable>

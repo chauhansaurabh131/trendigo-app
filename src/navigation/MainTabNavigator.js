@@ -30,6 +30,8 @@ import {
 
 // Utils
 import {fontFamily, fontSize, hp, isIOS} from '../utils/helpers';
+import ProfileScreen from '../screens/profileScreen';
+import BasicInfoScreen from '../screens/basicInfoScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -75,6 +77,8 @@ const HomeStackScreen = () => {
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       {/* ✅ MyOrderScreen inside HomeStack so tab bar stays visible */}
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+      {/*<Stack.Screen name="BasicInfoScreen" component={BasicInfoScreen} />*/}
       <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
     </Stack.Navigator>
   );
