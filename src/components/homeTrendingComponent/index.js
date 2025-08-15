@@ -207,10 +207,7 @@ const styles = StyleSheet.create({
   ratingBox: {
     backgroundColor: '#8225AF',
     paddingHorizontal: 5,
-    // paddingVertical: 2,
     borderRadius: 16,
-    // marginRight: 6,
-    // alignItems: 'center',
     width: hp(42),
     height: hp(18),
     justifyContent: 'center',

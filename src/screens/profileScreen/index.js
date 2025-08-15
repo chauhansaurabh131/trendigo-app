@@ -43,7 +43,7 @@ const ProfileScreen = () => {
         <View style={styles.blackContainer}>
           <TouchableOpacity
             style={styles.boxWrapper}
-            onPress={() => navigation.navigate('Basic Info')}>
+            onPress={() => navigation.navigate('BasicInfo')}>
             <View style={[styles.box, {backgroundColor: '#F6FBFF'}]}>
               <Image
                 source={require('../../assets/images/basic_info.png')}
@@ -67,7 +67,7 @@ const ProfileScreen = () => {
 
           <TouchableOpacity
             style={styles.boxWrapper}
-            onPress={() => handlePress('My Orders')}>
+            onPress={() => navigation.navigate('MyOrderScreen')}>
             <View style={[styles.box, {backgroundColor: '#FCF6FF'}]}>
               <Image
                 source={require('../../assets/images/my_order_icon.png')}
@@ -91,7 +91,7 @@ const ProfileScreen = () => {
 
           <TouchableOpacity
             style={styles.boxWrapper}
-            onPress={() => handlePress('Saved Items')}>
+            onPress={() => navigation.navigate('WishlistScreen')}>
             <View style={[styles.box, {backgroundColor: '#F6FAFF'}]}>
               <Image
                 source={require('../../assets/images/saved_item.png')}

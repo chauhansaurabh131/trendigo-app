@@ -21,6 +21,7 @@ import CancelIcon from './svgIcons/cancel_icon.svg';
 import SellerShopIcon from './svgIcons/seller_shop_icon.svg';
 import BackIcon from './svgIcons/back_icon.svg';
 import SearchFilterIcon from './svgIcons/seach_filter_icon.svg';
+import GradientFullFillLike from './svgIcons/gradient_fulfill_like.svg';
 
 export {
   WhiteTrendiGo,
@@ -46,6 +47,7 @@ export {
   SellerShopIcon,
   BackIcon,
   SearchFilterIcon,
+  GradientFullFillLike,
 };
 
 export const images = {
@@ -82,10 +84,16 @@ export const images = {
   emptyLikeImage: require('./images/empty_like_img.png'),
   star_fulfil_icon: require('./images/star_fulfil_icon.png'),
   star_icon: require('./images/star_icon.png'),
+  search_black_icon: require('./images/seach_black_icon.png'),
+  user_one: require('./images/user_1.png'),
+  user_two: require('./images/user_2.png'),
+  user_three: require('./images/user_3.png'),
+  user_four: require('./images/user_4.png'),
+  address_icon: require('./images/address_icon_info.png'),
+  edit_icon: require('./images/edit_icon.png'),
   check_icon: require('./images/check_green_icon.png'),
   edit_address_icon: require('./images/adress_icon.png'),
   delete_icon: require('./images/delete_address_icon.png'),
-  check_icon: require('./images/check_right_icon.png'),
   location_icon: require('./images/location_address_icon.png'),
 
 };

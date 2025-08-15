@@ -13,6 +13,9 @@ import CategoryScreen from '../screens/categoryScreen';
 import ChatScreen from '../screens/chatScreen';
 import BagScreen from '../screens/bagScreen';
 import MyOrderScreen from '../screens/myOrderScreen';
+import ProfileScreen from '../screens/profileScreen';
+import BasicInfoScreen from '../screens/basicInfoScreen';
+import WishlistScreen from '../screens/WishlistScreen';
 
 // Icons
 import {
@@ -30,8 +33,6 @@ import {
 
 // Utils
 import {fontFamily, fontSize, hp, isIOS} from '../utils/helpers';
-import ProfileScreen from '../screens/profileScreen';
-import BasicInfoScreen from '../screens/basicInfoScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -78,8 +79,9 @@ const HomeStackScreen = () => {
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       {/* ✅ MyOrderScreen inside HomeStack so tab bar stays visible */}
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-      {/*<Stack.Screen name="BasicInfoScreen" component={BasicInfoScreen} />*/}
+      <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
       <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
+      <Stack.Screen name="WishlistScreen" component={WishlistScreen} />
     </Stack.Navigator>
   );
 };
@@ -115,7 +117,6 @@ const MainTabNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({route}) => {
-        // Get the nested route name inside the current tab
         const childRouteName = getFocusedRouteNameFromRoute(route) ?? '';
 
         // Determine if we're on the main tab screen
@@ -202,7 +203,16 @@ const MainTabNavigator = () => {
             ),
         };
       }}>
-      <Tab.Screen name="HomeStack" component={HomeStackScreen} />
+      <Tab.Screen
+        name="HomeStack"
+        component={HomeStackScreen}
+        listeners={({navigation}) => ({
+          tabPress: e => {
+            e.preventDefault(); // prevent default tab behavior
+            navigation.navigate('HomeStack', {screen: 'HomeScreen'}); // always go to HomeScreen
+          },
+        })}
+      />
       <Tab.Screen name="SearchStack" component={SearchStackScreen} />
       <Tab.Screen name="CategoryStack" component={CategoryStackScreen} />
       <Tab.Screen name="ChatStack" component={ChatStackScreen} />

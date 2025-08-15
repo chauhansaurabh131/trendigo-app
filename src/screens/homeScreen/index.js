@@ -55,7 +55,7 @@ const HomeScreen = () => {
           <Touchable
             style={{flexDirection: 'row', alignItems: 'center'}}
             activeOpacity={0.6}
-            onPress={() => navigation.navigate('Search')}>
+            onPress={() => navigation.navigate('SearchStack')}>
             <GradientColorSearchIcon width={hp(16)} height={hp(16)} />
             <Text
               style={{
