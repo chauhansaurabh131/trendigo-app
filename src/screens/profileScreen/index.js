@@ -19,13 +19,17 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Fixed Header */}
       <View style={styles.profileContainer}>
-        <Image source={arrow_back} style={styles.arrowIcon} />
+        {/* Back Button */}
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}>
+          <Image source={arrow_back} style={styles.arrowIcon} />
+        </TouchableOpacity>
+
         <Text style={styles.profileText}>Profile</Text>
       </View>
 
-      {/* Scrollable content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* User Info */}
         <View style={styles.userContainer}>
@@ -35,7 +39,7 @@ const ProfileScreen = () => {
           <Text style={styles.nameText}>Riya Shah</Text>
         </View>
 
-        {/* Boxes */}
+        {/* Menu Grid */}
         <View style={styles.blackContainer}>
           <TouchableOpacity
             style={styles.boxWrapper}
@@ -51,7 +55,7 @@ const ProfileScreen = () => {
 
           <TouchableOpacity
             style={styles.boxWrapper}
-            onPress={() => handlePress('Account')}>
+            onPress={() => navigation.navigate('Account')}>
             <View style={[styles.box, {backgroundColor: '#F9F9FF'}]}>
               <Image
                 source={require('../../assets/images/account_info.png')}
@@ -75,7 +79,7 @@ const ProfileScreen = () => {
 
           <TouchableOpacity
             style={styles.boxWrapper}
-            onPress={() => handlePress('Address')}>
+            onPress={() => navigation.navigate('Address')}>
             <View style={[styles.box, {backgroundColor: '#F6FFF7'}]}>
               <Image
                 source={require('../../assets/images/address_icon_info.png')}
@@ -128,13 +132,15 @@ const ProfileScreen = () => {
             <Text style={styles.about}>Help Center</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => handlePress('Grievance Redressal')}>
-            <Text style={styles.about}>Grievance Redressal</Text>
+            <Text style={[styles.about, {marginBottom: 0}]}>
+              Grievance Redressal
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Logout */}
         <TouchableOpacity
-          style={styles.logoutContainer}
+          style={[styles.logoutContainer, {marginTop: hp(15)}]}
           onPress={() => handlePress('Log Out')}>
           <Text style={styles.logoutBtn}>Log Out</Text>
         </TouchableOpacity>
@@ -148,8 +154,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  backButton: {
+    position: 'absolute',
+    left: wp(18),
+    zIndex: 2,
+    padding: 5,
+  },
   profileContainer: {
-    height: hp(57),
+    height: hp(58),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -158,17 +170,17 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   profileText: {
-    fontFamily: fontFamily.poppins500,
-    fontSize: fontSize(18),
-    lineHeight: hp(18),
+    marginRight: 30,
+    flex: 1,
     textAlign: 'center',
-    color: '#333',
+    fontFamily: fontFamily.poppins500,
+    fontSize: wp(18),
+    color: '#000',
+    marginRight: 30,
   },
   arrowIcon: {
     width: wp(18),
     height: hp(18),
-    position: 'absolute',
-    left: wp(18),
     resizeMode: 'contain',
   },
   scrollContent: {
@@ -251,7 +263,6 @@ const styles = StyleSheet.create({
     borderRadius: wp(100),
     backgroundColor: '#F3F3F3',
     justifyContent: 'center',
-    marginTop: hp(40),
   },
   logoutBtn: {
     fontFamily: fontFamily.poppins400,

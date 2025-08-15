@@ -82,4 +82,10 @@ export const images = {
   emptyLikeImage: require('./images/empty_like_img.png'),
   star_fulfil_icon: require('./images/star_fulfil_icon.png'),
   star_icon: require('./images/star_icon.png'),
+  check_icon: require('./images/check_green_icon.png'),
+  edit_address_icon: require('./images/adress_icon.png'),
+  delete_icon: require('./images/delete_address_icon.png'),
+  check_icon: require('./images/check_right_icon.png'),
+  location_icon: require('./images/location_address_icon.png'),
+
 };

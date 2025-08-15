@@ -10,6 +10,8 @@ import DemoCodeScreen from './src/screens/demoCodeScreen';
 import ProductDetailsScreen from './src/screens/productDetailsScreen';
 import ProfileScreen from './src/screens/profileScreen';
 import BasicInfoScreen from './src/screens/basicInfoScreen';
+import AccountScreen from './src/screens/accountScreen';
+import AddressScreen from './src/screens/addressScreen';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -24,8 +26,10 @@ const App = () => {
             name="ProductDetails"
             component={ProductDetailsScreen}
           />
-          {/*<Stack.Screen name="Profile" component={ProfileScreen} />*/}
+          <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
           <Stack.Screen name="Basic Info" component={BasicInfoScreen} />
+          <Stack.Screen name="Account" component={AccountScreen} />
+          <Stack.Screen name="Address" component={AddressScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

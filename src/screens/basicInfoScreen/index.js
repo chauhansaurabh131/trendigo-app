@@ -1,71 +1,159 @@
+
+
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert
+} from 'react-native';
 import { fontFamily, hp, wp } from '../../utils/helpers';
 import arrow_back from '../../assets/images/arrow_back.png';
+import GradientButton from '../../components/gradientButton';
+import { useNavigation } from '@react-navigation/native';
+
+const GenderButton = ({ label, isActive, onPress, style }) => {
+  return (
+    <TouchableOpacity
+      style={[styles.genderBtn, style, isActive && styles.genderBtnActive]}
+      onPress={onPress}
+    >
+      <Text style={[styles.genderText, isActive && styles.genderTextActive]}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
 const BasicInfoScreen = () => {
+  const navigation = useNavigation();
   const [gender, setGender] = useState('Male');
+  const [name, setName] = useState('');
+  const [dob, setDob] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [email, setEmail] = useState('');
+
+  const validate = () => {
+    // Name validation
+    if (!name.trim()) {
+      Alert.alert('Validation Error', 'Please enter your name.');
+      return false;
+    }
+    // Mobile validation
+    if (!/^\d{10}$/.test(mobile)) {
+      Alert.alert('Validation Error', 'Please enter a valid 10-digit mobile number.');
+      return false;
+    }
+    // Email validation
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      Alert.alert('Validation Error', 'Please enter a valid email.');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSave = () => {
+    if (validate()) {
+      Alert.alert('Success', 'Your basic info has been saved.');
+     
+    }
+  };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
-      {/* Header */}
-      <View style={styles.basicinfoContainer}>
-        <Image source={arrow_back} style={styles.arrowIcon} />
-        <Text style={styles.basicinfoText}>Basic Info</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Image source={arrow_back} style={styles.arrowIcon} />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Basic Info</Text>
       </View>
 
-      {/* Profile Circle */}
-      <View style={styles.profileCircle}>
-        <Text style={styles.profileInitials}>RS</Text>
-      </View>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView
+          style={styles.scrollArea}
+          contentContainerStyle={{ paddingBottom: 40 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.profileCircle}>
+            <Text style={styles.profileInitials}>RS</Text>
+          </View>
 
-      {/* Name */}
-      <Text style={styles.label}>Name</Text>
-      <TextInput style={styles.input} placeholder="Enter your name" />
+          <Text style={styles.label}>Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your name"
+            value={name}
+            onChangeText={setName}
+            keyboardType="default"
+          />
 
-      {/* Gender */}
-      <Text style={styles.label}>Gender</Text>
-      <View style={styles.rectangle}>
-        <View style={styles.genderOuterBox}>
-          <TouchableOpacity
-            style={[styles.genderBtn, gender === 'Male' && styles.genderBtnActive]}
-            onPress={() => setGender('Male')}
-          >
-            <Text style={[styles.genderText, gender === 'Male' && styles.genderTextActive]}>
-              Male
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.label}>Gender</Text>
+          <View style={styles.rectangle}>
+            <View style={styles.genderOuterBox}>
+              <GenderButton
+                label="Male"
+                isActive={gender === 'Male'}
+                onPress={() => setGender('Male')}
+                style={{
+                  borderTopRightRadius: wp(10),
+                  borderBottomRightRadius: wp(10),
+                }}
+              />
+              <View style={styles.divider} />
+              <GenderButton
+                label="Female"
+                isActive={gender === 'Female'}
+                onPress={() => setGender('Female')}
+                style={{
+                  borderTopLeftRadius: wp(10),
+                  borderBottomLeftRadius: wp(10),
+                }}
+              />
+            </View>
+          </View>
 
-          <View style={styles.divider} />
+          <Text style={styles.label}>Date of Birth</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="DD/MM/YYYY"
+            value={dob}
+            onChangeText={setDob}
+            keyboardType="numbers-and-punctuation"
+          />
 
-          <TouchableOpacity
-            style={[styles.genderBtn, gender === 'Female' && styles.genderBtnActive]}
-            onPress={() => setGender('Female')}
-          >
-            <Text style={[styles.genderText, gender === 'Female' && styles.genderTextActive]}>
-              Female
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+          <Text style={styles.label}>Mobile Number</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter mobile number"
+            keyboardType="number-pad"
+            value={mobile}
+            onChangeText={setMobile}
+            maxLength={10}
+          />
 
-      {/* DOB */}
-      <Text style={styles.label}>Date of Birth</Text>
-      <TextInput style={styles.input} placeholder="DD/MM/YYYY" />
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={[styles.input, { marginBottom: 30 }]}
+            placeholder="Enter email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+          />
 
-      {/* Mobile */}
-      <Text style={styles.label}>Mobile Number</Text>
-      <TextInput style={styles.input} placeholder="Enter mobile number" keyboardType="phone-pad" />
-
-      {/* Email */}
-      <Text style={styles.label}>Email</Text>
-      <TextInput style={styles.input} placeholder="Enter email" keyboardType="email-address" />
-
-      {/* Save Button */}
-      <TouchableOpacity style={styles.saveBtn}>
-        <Text style={styles.saveBtnText}>Save Changes</Text>
-      </TouchableOpacity>
-    </ScrollView>
+          <GradientButton title="Save Changes" onPress={handleSave} />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -73,22 +161,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-    paddingHorizontal: 20,
   },
-  basicinfoContainer: {
-    height: hp(57),
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    paddingVertical: hp(15),
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E2E2',
+    width: '100%',
+    paddingHorizontal: 20,
+    backgroundColor: '#fff',
   },
-  basicinfoText: {
+  backButton: {
+    paddingRight: 10,
+  },
+  headerText: {
+    flex: 1,
+    textAlign: 'center',
     fontFamily: fontFamily.poppins500,
     fontSize: wp(18),
-    lineHeight: hp(70),
-    textAlign: 'center',
-    color: '#000000',
-    width: wp(100),
+    color: '#000',
+    marginRight: 30, 
+  },
+  arrowIcon: {
+    width: wp(20),
+    height: hp(18),
+    resizeMode: 'contain',
+  },
+  scrollArea: {
+    paddingHorizontal: 20,
   },
   profileCircle: {
     alignSelf: 'center',
@@ -123,22 +224,20 @@ const styles = StyleSheet.create({
   },
   rectangle: {
     width: '100%',
-    height: hp(60),
+    height: hp(48),
     backgroundColor: '#fff',
     marginVertical: 10,
     borderRadius: wp(10),
-    justifyContent: 'center', // center vertically
+    justifyContent: 'center',
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: '#E2E2E2',
   },
   genderOuterBox: {
     flexDirection: 'row',
-    borderWidth: 1,
     borderColor: '#E2E2E2',
     borderRadius: wp(10),
-    height: 40,
-    backgroundColor: '#fff',
+    height: hp(40),
     overflow: 'hidden',
   },
   genderBtn: {
@@ -150,7 +249,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#8225AF',
   },
   genderText: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: fontFamily.poppins500,
     color: '#000000',
   },
@@ -160,26 +259,6 @@ const styles = StyleSheet.create({
   divider: {
     width: 1,
     backgroundColor: '#E2E2E2',
-  },
-  saveBtn: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 25,
-    backgroundColor: '#0F52BA',
-    height: 50,
-    borderRadius: wp(100),
-  },
-  saveBtnText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  arrowIcon: {
-    width: wp(20),
-    height: hp(18),
-    position: 'absolute',
-    left: wp(10),
-    resizeMode: 'contain',
   },
 });
 
