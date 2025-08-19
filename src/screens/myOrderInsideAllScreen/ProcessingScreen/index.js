@@ -10,8 +10,11 @@ import {
   wp,
 } from '../../../utils/helpers';
 import {images, NavigationArrowIcon} from '../../../assets';
+import { useNavigation } from '@react-navigation/native';
+
 
 const ProcessingScreen = () => {
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={{backgroundColor: colors.white, flex: 1}}>
       <View style={{marginHorizontal: 18}}>
@@ -359,7 +362,10 @@ const ProcessingScreen = () => {
             }}
           />
 
-          <Touchable style={{marginTop: hp(10), marginBottom: hp(10)}}>
+          <Touchable 
+            style={{marginTop: hp(10), marginBottom: hp(10)}}
+            onPress={() => navigation.navigate('OrderDetails')}
+            >
             <Text
               style={{
                 textAlign: 'center',

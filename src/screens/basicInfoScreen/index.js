@@ -11,7 +11,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  SafeAreaView
 } from 'react-native';
 import { fontFamily, hp, wp } from '../../utils/helpers';
 import arrow_back from '../../assets/images/arrow_back.png';
@@ -40,17 +41,14 @@ const BasicInfoScreen = () => {
   const [email, setEmail] = useState('');
 
   const validate = () => {
-    // Name validation
     if (!name.trim()) {
       Alert.alert('Validation Error', 'Please enter your name.');
       return false;
     }
-    // Mobile validation
     if (!/^\d{10}$/.test(mobile)) {
       Alert.alert('Validation Error', 'Please enter a valid 10-digit mobile number.');
       return false;
     }
-    // Email validation
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       Alert.alert('Validation Error', 'Please enter a valid email.');
       return false;
@@ -66,7 +64,7 @@ const BasicInfoScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Image source={arrow_back} style={styles.arrowIcon} />
@@ -153,7 +151,7 @@ const BasicInfoScreen = () => {
           <GradientButton title="Save Changes" onPress={handleSave} />
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -229,9 +227,10 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     borderRadius: wp(10),
     justifyContent: 'center',
-    paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: '#E2E2E2',
+    paddingHorizontal: 5,
+    paddingVertical: 5,
   },
   genderOuterBox: {
     flexDirection: 'row',
@@ -239,6 +238,7 @@ const styles = StyleSheet.create({
     borderRadius: wp(10),
     height: hp(40),
     overflow: 'hidden',
+    
   },
   genderBtn: {
     flex: 1,
@@ -256,10 +256,10 @@ const styles = StyleSheet.create({
   genderTextActive: {
     color: '#fff',
   },
-  divider: {
-    width: 1,
-    backgroundColor: '#E2E2E2',
-  },
+  // divider: {
+  //   width: 1,
+  //   backgroundColor: '#9c2929ff',
+  // },
 });
 
 export default BasicInfoScreen;

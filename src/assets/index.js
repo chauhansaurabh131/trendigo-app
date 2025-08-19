@@ -95,5 +95,6 @@ export const images = {
   edit_address_icon: require('./images/adress_icon.png'),
   delete_icon: require('./images/delete_address_icon.png'),
   location_icon: require('./images/location_address_icon.png'),
-
+  delivery_icon: require('./images/delivery_order.png'),
+  image_icon : require('./images/imageProduct.png'),
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Modal,
   TextInput,
+  SafeAreaView,
 } from 'react-native';
 import { fontFamily, hp, wp } from '../../utils/helpers';
 import { useNavigation } from '@react-navigation/native';
+import RBSheet from 'react-native-raw-bottom-sheet';
+
 import back_icon from '../../assets/images/arrow_back.png';
 import edit_address_icon from '../../assets/images/adress_icon.png';
 import delete_icon from '../../assets/images/delete_address_icon.png';
@@ -20,10 +22,10 @@ import GradientButton from '../../components/gradientButton';
 
 const AddressScreen = () => {
   const navigation = useNavigation();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const bottomSheetRef = useRef(null);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -33,6 +35,7 @@ const AddressScreen = () => {
         <View style={{ width: wp(25) }} />
       </View>
 
+      {/* Address List */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.card}>
           <View style={styles.defaultRow}>
@@ -81,55 +84,70 @@ const AddressScreen = () => {
           </View>
         </View>
       </ScrollView>
+
       <View style={{ marginHorizontal: 17, marginBottom: 20 }}>
         <GradientButton
           title="Add New Address"
-          onPress={() => setIsModalVisible(true)}
+          onPress={() => bottomSheetRef.current.open()}
         />
       </View>
 
-      <Modal visible={isModalVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={styles.modalTitle}>Add New Address</Text>
+      {/* Bottom Sheet */}
+      <RBSheet
+        ref={bottomSheetRef}
+        animationType="slide"
+        closeOnDragDown={true}
+        closeOnPressMask={true}
+        height={hp(80)}
+        customStyles={{
+          wrapper: { backgroundColor: 'rgba(0,0,0,0.5)' },
+          draggableIcon: { backgroundColor: '#ccc' },
+          container: { borderTopLeftRadius: 20, borderTopRightRadius: 20, height: "80%" },
+        }}
+      >
+        {/* <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: 20 }}> */}
 
-              <TextInput style={styles.input} placeholder="Name" />
-              <TextInput
-                style={styles.input}
-                placeholder="Mobile Number"
-                keyboardType="phone-pad"
-              />
+          <Text style={styles.modalTitle}>Add New Address</Text>
+          <View style={{   borderBottomColor: '#E3E3E3',  borderBottomWidth: 1, width: '100%', marginTop: 5, marginBottom: 15, }} />
+         <View style={{paddingHorizontal: 20 }}>
+          <TextInput style={styles.input} placeholder="Name" placeholderTextColor="#000000"  marginTop={10}/>
+          <TextInput
+            style={styles.input}
+            placeholder="Mobile Number"
+            keyboardType="phone-pad"
+            placeholderTextColor="#000000"
+          />
 
-              <View style={styles.iconLabelRow}>
-                <Image source={location_icon} style={styles.locationIcon} />
-                <Text style={styles.sectionTitle}>Delivery Address</Text>
-              </View>
-
-              <TextInput style={styles.input} placeholder="Pincode" />
-              <TextInput
-                style={styles.input}
-                placeholder="Address (House No, Building, Street, Area)"
-                multiline
-              />
-              <TextInput style={styles.input} placeholder="Locality/Town" />
-
-              <View style={styles.defaultAddressRow}>
-                <Image source={check_icon} style={styles.checkIcon} />
-                <Text style={styles.defaultAddressText}>Make it default address</Text>
-              </View>
-
-              <GradientButton
-                title="Save Address"
-                onPress={() => {
-                  setIsModalVisible(false);
-                }}
-              />
-            </ScrollView>
+          <View style={styles.iconLabelRow}>
+            <Image source={location_icon} style={styles.locationIcon} />
+            <Text style={styles.sectionTitle}>Delivery Address</Text>
           </View>
+
+          <TextInput style={styles.input} placeholder="Pincode" placeholderTextColor="#000000" />
+          <TextInput
+            style={styles.input}
+            placeholder="Address (House No, Building, Street, Area)"
+            placeholderTextColor="#000000"
+            multiline
+          />
+          <TextInput style={styles.input} placeholder="Locality/Town" placeholderTextColor="#000000" />
+
+          <View style={styles.defaultAddressRow}>
+            <TouchableOpacity onPress={() => {}}>
+              <Image source={check_icon} style={styles.checkIcon} />
+                </TouchableOpacity>
+              <Text style={styles.defaultAddressText}>Make it default address</Text>
+          </View>
+            <View style={{marginBottom  : 10}}>
+               <GradientButton
+            title="Save Address"
+            onPress={() => bottomSheetRef.current.close()}/>
+            </View>
+        
+        {/* </ScrollView> */}
         </View>
-      </Modal>
-    </View>
+      </RBSheet>
+    </SafeAreaView>
   );
 };
 
@@ -148,10 +166,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   backIcon: {
-    width: wp(20),
-    height: wp(20),
-    resizeMode: 'contain',
-  },
+     width: wp(20),
+      height: wp(20),
+       resizeMode: 'contain'
+       },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
@@ -161,7 +179,9 @@ const styles = StyleSheet.create({
     marginRight: 30,
     marginLeft: 30,
   },
-  scrollContainer: { padding: wp(5) },
+  scrollContainer: { 
+    padding: wp(5)
+   },
   card: {
     backgroundColor: '#fff',
     padding: wp(15),
@@ -169,17 +189,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
-  defaultRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: wp(10),
-  },
-  checkIcon: {
+  defaultRow: { flexDirection: 'row',
+     alignItems: 'center',
+      marginBottom: wp(10) 
+    },
+  checkIcon: { 
     width: wp(18),
-    height: wp(18),
-    marginRight: wp(8),
-    resizeMode: 'contain',
-  },
+     height: wp(18),
+     marginRight: wp(8),
+     resizeMode: 'contain'
+   },
   defaultTag: {
     backgroundColor: '#9317CF',
     alignSelf: 'flex-start',
@@ -188,12 +207,15 @@ const styles = StyleSheet.create({
     borderRadius: wp(13),
     marginTop: hp(5),
   },
-  defaultText: { color: '#fff', fontSize: 12 },
-  row: {
+  defaultText: { 
+    color: '#fff',
+     fontSize: 12 
+    },
+  row: { 
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+     justifyContent: 'space-between',
+      alignItems: 'center'
+     },
   name: {
     fontSize: 16,
     fontFamily: fontFamily.poppins600,
@@ -201,32 +223,32 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 10,
   },
-  type: {
+  type: { 
     fontSize: 12,
-    fontFamily: fontFamily.poppins500,
-    color: '#B0B0B0',
-  },
+     fontFamily: fontFamily.poppins500, 
+     color: '#B0B0B0' 
+    },
   address: {
     fontSize: 12,
     fontFamily: fontFamily.poppins400,
     color: '#000000',
     marginTop: 10,
   },
-  mobile: {
-    fontFamily: fontFamily.poppins400,
+  mobile: { 
+    fontFamily: fontFamily.poppins400, 
     color: '#000000',
-    marginTop: 10,
-  },
-  mobileLabel: {
+     marginTop: 10
+     },
+  mobileLabel: { 
     fontFamily: fontFamily.poppins500,
     fontSize: 13,
-    color: '#000000',
+    color: '#000000'
   },
-  actions: {
+  actions: { 
     flexDirection: 'row',
-    marginTop: 10,
-    marginLeft: '70%',
-  },
+     marginTop: 10, 
+     marginLeft: '70%'
+     },
   iconButton: {
     width: wp(40),
     height: wp(40),
@@ -236,27 +258,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: wp(10),
   },
-  icon: {
+  icon: { 
     width: wp(18),
     height: wp(18),
-    resizeMode: 'contain',
-    marginLeft: wp(3),
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: wp(15),
-    paddingHorizontal: wp(20),
-    paddingVertical: wp(10),
-    marginTop: '50%',
-    height: '80%',
+    
+     resizeMode: 'contain',
+    marginLeft: wp(5),
+    marginRight: wp(5)
   },
   modalTitle: {
     fontSize: wp(16),
@@ -264,7 +272,8 @@ const styles = StyleSheet.create({
     color: '#000',
     textAlign: 'center',
     marginBottom: 15,
-    marginTop: 10,
+    marginTop: 18,
+
   },
   input: {
     borderWidth: 1,
@@ -272,34 +281,39 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    marginBottom: 30,
+    marginBottom: 15,
     fontFamily: fontFamily.poppins400,
     fontSize: 14,
   },
-  iconLabelRow: {
+  iconLabelRow: { 
     flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 8,
-  },
+     alignItems: 'center',
+     marginBottom: 10,
+    },
   locationIcon: {
-    width: wp(16),
+     width: wp(16),
     height: wp(16),
     resizeMode: 'contain',
-    marginRight: wp(5),
-  },
+    marginBottom: 10,
+    marginRight:10,
+   },
   sectionTitle: {
-    fontSize: 14,
-    fontFamily: fontFamily.poppins500,
-    color: '#000',
+     fontSize: 14,
+     fontFamily: fontFamily.poppins500,
+     color: '#000',
+     marginTop: 10,
+     marginBottom: 20,
+   },
+  defaultAddressRow: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 15 
   },
-  defaultAddressRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  defaultAddressText: {
-    fontSize: 16,
-    fontFamily: fontFamily.poppins500,
-    color: '#000',
+  defaultAddressText: { 
+    fontSize: 16, 
+    fontFamily: fontFamily.poppins500, 
+    color: '#000', 
+    marginTop: 10,
+    marginBottom: 10
   },
 });

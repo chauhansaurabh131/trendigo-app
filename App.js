@@ -12,6 +12,7 @@ import ProfileScreen from './src/screens/profileScreen';
 import BasicInfoScreen from './src/screens/basicInfoScreen';
 import AccountScreen from './src/screens/accountScreen';
 import AddressScreen from './src/screens/addressScreen';
+import OrderDetailsScreen from './src/screens/OrderDetailsScreen';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -30,6 +31,7 @@ const App = () => {
           <Stack.Screen name="Basic Info" component={BasicInfoScreen} />
           <Stack.Screen name="Account" component={AccountScreen} />
           <Stack.Screen name="Address" component={AddressScreen} />
+          <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   Image,
+  SafeAreaView,
 } from 'react-native';
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import arrow_back from '../../assets/images/arrow_back.png';
@@ -18,7 +19,7 @@ const ProfileScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.profileContainer}>
         {/* Back Button */}
         <TouchableOpacity
@@ -145,7 +146,7 @@ const ProfileScreen = () => {
           <Text style={styles.logoutBtn}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

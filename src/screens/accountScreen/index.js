@@ -7,7 +7,8 @@ import {
   ScrollView,
   Image,
   TextInput,
-  Modal
+  Modal,
+  SafeAreaView
 } from 'react-native';
 import { fontFamily, hp, wp } from '../../utils/helpers';
 import check_icon from '../../assets/images/check_green_icon.png';
@@ -20,12 +21,9 @@ const AccountScreen = () => {
   const navigation = useNavigation();
 
   const [email, setEmail] = useState('jit*****@gmail.com');
-  const [mobile, setMobile] = useState('****902');
+  const [mobile, setMobile] = useState('*******902');
   const [editingField, setEditingField] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  const isValidMobile = (value) => /^[0-9]{10}$/.test(value);
 
   const handleDeleteAccount = () => {
     setShowDeleteModal(false);
@@ -35,62 +33,76 @@ const AccountScreen = () => {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 30 }}>
       
-      <View style={styles.header}>
+      {/* Header */}
+      <SafeAreaView style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Image source={arrow_back} style={styles.arrowIcon} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Account Settings</Text>
-      </View>
+      </SafeAreaView>
 
       <View style={styles.contentWrapper}>
         
+        {/* Email Row */}
         <View style={styles.row}>
           <Text style={styles.label}>Email</Text>
           <View style={styles.valueRow}>
-            {editingField === 'email' ? (
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                style={styles.input}
-                placeholder="Enter email"
-                keyboardType="email-address"
-                autoFocus
-              />
-            ) : (
-              <Text style={styles.valueText}>{email}</Text>
-            )}
-
-            {isValidEmail(email) && <Image source={check_icon} style={styles.icon} />}
-            <TouchableOpacity onPress={() => setEditingField(editingField === 'email' ? null : 'email')}>
-              <Image source={edit_icon} style={styles.icon} />
+            <View style={styles.valueWrapper}>
+              {editingField === 'email' ? (
+                <TextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  style={styles.input}
+                  placeholder="Enter email"
+                  keyboardType="email-address"
+                  autoFocus
+                />
+              ) : (
+                <Text style={styles.valueText}>{email}</Text>
+              )}
+              <Image source={check_icon} style={styles.checkIcon} />
+            </View>
+            <TouchableOpacity
+              onPress={() =>
+                setEditingField(editingField === 'email' ? null : 'email')
+              }
+            >
+              <Image source={edit_icon} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
 
+        {/* Mobile Row */}
         <View style={styles.row}>
           <Text style={styles.label}>Mobile Number</Text>
           <View style={styles.valueRow}>
-            {editingField === 'mobile' ? (
-              <TextInput
-                value={mobile}
-                onChangeText={(text) => setMobile(text.replace(/[^0-9]/g, ''))}
-                style={styles.input}
-                placeholder="Enter mobile number"
-                keyboardType="phone-pad"
-                maxLength={10}
-                autoFocus
-              />
-            ) : (
-              <Text style={styles.valueText}>{mobile}</Text>
-            )}
-
-            {isValidMobile(mobile) && <Image source={check_icon} style={styles.icon} />}
-            <TouchableOpacity onPress={() => setEditingField(editingField === 'mobile' ? null : 'mobile')}>
-              <Image source={edit_icon} style={styles.icon} />
+            <View style={styles.valueWrapper}>
+              {editingField === 'mobile' ? (
+                <TextInput
+                  value={mobile}
+                  onChangeText={(text) => setMobile(text.replace(/[^0-9]/g, ''))}
+                  style={styles.input}
+                  placeholder="Enter mobile number"
+                  keyboardType="phone-pad"
+                  maxLength={10}
+                  autoFocus
+                />
+              ) : (
+                <Text style={styles.valueText}>{mobile}</Text>
+              )}
+              <Image source={check_icon} style={styles.checkiconmobile} />
+            </View>
+            <TouchableOpacity
+              onPress={() =>
+                setEditingField(editingField === 'mobile' ? null : 'mobile')
+              }
+            >
+              <Image source={edit_icon} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
 
+        {/* Delete Account Section */}
         <View style={styles.deleteSection}>
           <Text style={styles.label}>Delete Account</Text>
           <Text style={styles.deleteText}>
@@ -103,6 +115,7 @@ const AccountScreen = () => {
         </View>
       </View>
 
+      {/* Modal */}
       <Modal
         visible={showDeleteModal}
         transparent
@@ -147,14 +160,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 15,
   },
-  backButton: { 
-    zIndex: 2
-  },
-  arrowIcon: { 
-    width: wp(20), 
-    height: hp(18), 
-    resizeMode: 'contain'
-  },
+  backButton: { zIndex: 2 },
+  arrowIcon: { width: wp(20), height: hp(18), resizeMode: 'contain' },
   headerTitle: {
     position: 'absolute',
     left: 0, right: 0,
@@ -163,66 +170,89 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#000',
   },
-  contentWrapper: { 
-    paddingHorizontal: 20 },
+  contentWrapper: { paddingHorizontal: 20 },
 
   row: { 
     paddingVertical: 20, 
     borderBottomWidth: 1,
-     borderBottomColor: '#E7E7E7' },
-
+    borderBottomColor: '#E7E7E7' 
+  },
   label: { 
     fontSize: 16, 
     fontFamily: fontFamily.poppins500,
-     color: '#000', 
-     marginBottom: 8 },
+    color: '#000', 
+    marginBottom: 8 
+  },
 
   valueRow: { 
     flexDirection: 'row', 
-    alignItems: 'center' 
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  valueWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
   },
   valueText: {
-    flex: 1,
     fontSize: 14, 
     color: '#000',
-    fontFamily: fontFamily.poppins500
-    },
+    fontFamily: fontFamily.poppins500,
+    paddingVertical: 2,
+    marginRight: 6,
+  },
   input: {
-    flex: 1, fontSize: 14, 
+    flex: 1, 
+    fontSize: 14, 
     color: '#000', 
     fontFamily: fontFamily.poppins400,
     paddingVertical: 2,
-     borderBottomWidth: 1, 
-     borderBottomColor: '#ccc',
+    marginRight: 6,
+    // borderBottomWidth removed
+    // borderBottomColor removed
   },
-  icon: { 
-    width: wp(14),
-     height: wp(14),
-      marginHorizontal: wp(10),
-       resizeMode: "cover"
-       },
-  deleteSection: {
-     marginTop: 25
+  checkIcon: { 
+    width: wp(16),
+    height: wp(16),
+    resizeMode: 'contain',
+   
   },
+  checkiconmobile: {
+    width: wp(16),
+    height: wp(16),
+    resizeMode: 'contain',
+    marginRight:"65%",
+  },
+  editIcon: {
+    width: wp(16),
+    height: wp(16),
+    marginLeft: 10,
+    resizeMode: 'contain',
+  },
+
+  deleteSection: { marginTop: 25 },
   deleteText: {
     fontSize: 12, 
     color: '#898989',
-     marginTop: 5, 
-     marginBottom: 50,
+    marginTop: 5, 
+    marginBottom: 50,
     fontFamily: fontFamily.poppins400,
   },
   deleteBtn: {
     backgroundColor: '#000', 
     paddingVertical: 5,
-     borderRadius: wp(60),
-     alignItems: 'center',
-     justifyContent: 'center', 
-     width: "45%",
-     height: hp(45),
+    borderRadius: wp(60),
+    alignItems: 'center',
+    justifyContent: 'center', 
+    width: "45%",
+    height: hp(45),
+    marginTop: hp(-25),
   },
-  deleteBtnText: { color: '#FFFFFF', 
+  deleteBtnText: { 
+    color: '#FFFFFF', 
     fontSize: 14, 
-    fontFamily: fontFamily.poppins400 },
+    fontFamily: fontFamily.poppins400 
+  },
 
   modalOverlay: {
     flex: 1, backgroundColor: 'rgba(0,0,0,0.6)',
@@ -238,15 +268,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: '30%',
     marginBottom: 10,
-
   },
   modalText: {
     fontSize: 19,
     fontFamily: fontFamily.poppins400,
     color: '#000000',
-    marginBottom:   25,
     textAlign: 'center',
-    justifyContent: 'center',
     lineHeight: hp(20),
     marginBottom: 40,
   },
@@ -255,7 +282,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
-
   },
   cancelBtn: {
     flex: 1,
@@ -275,6 +301,5 @@ const styles = StyleSheet.create({
     flex: 1,
     height: hp(45),
     borderRadius: wp(30),
-    
   },
 });
