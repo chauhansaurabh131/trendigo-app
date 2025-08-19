@@ -121,6 +121,58 @@ const ProductDetailsScreen = () => {
         </View>
       </View>
 
+      <View
+        style={{
+          position: 'absolute',
+          zIndex: 99,
+          bottom: 0,
+          height: hp(80),
+          width: '100%',
+          backgroundColor: 'white',
+          justifyContent: 'center',
+        }}>
+        <View
+          style={{
+            marginHorizontal: 17,
+            // marginTop: hp(52),
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+
+            // backgroundColor: 'red',
+          }}>
+          <GradientButton
+            title={'Add to Cart'}
+            buttonStyle={{width: wp(285), height: hp(50)}}
+          />
+
+          <View style={{width: hp(50), height: hp(50)}}>
+            {/* Background circular image */}
+            <Image
+              source={images.gradientCircleImage}
+              style={{width: '100%', height: '100%'}}
+            />
+
+            {/* Touchable Like Icon */}
+            <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: [
+                  {translateX: -wp(23) / 2},
+                  {translateY: -hp(20) / 2},
+                ],
+              }}
+              onPress={() => console.log('Like pressed')}>
+              <Image
+                source={images.emptyLikeImage}
+                style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{marginTop: 10}}>
           <ProductImageComponent />
@@ -886,13 +938,13 @@ const ProductDetailsScreen = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: wp(125), // total size INCLUDING border
-                    height: hp(34),
+                    height: hp(32),
                     marginLeft: hp(12),
                   }}>
                   <TouchableOpacity
                     style={{
                       width: wp(122), // smaller than container
-                      height: hp(31),
+                      height: hp(29),
                       borderRadius: 50,
                       backgroundColor: 'white', // Inner background
                       alignItems: 'center',
@@ -1120,44 +1172,46 @@ const ProductDetailsScreen = () => {
           }}
         />
 
-        <View
-          style={{
-            marginHorizontal: 17,
-            marginTop: hp(52),
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <GradientButton
-            title={'Add to Cart'}
-            buttonStyle={{width: wp(256), height: hp(50)}}
-          />
+        <View style={{height: hp(85)}} />
 
-          <View style={{width: hp(50), height: hp(50)}}>
-            {/* Background circular image */}
-            <Image
-              source={images.gradientCircleImage}
-              style={{width: '100%', height: '100%'}}
-            />
+        {/*<View*/}
+        {/*  style={{*/}
+        {/*    marginHorizontal: 17,*/}
+        {/*    marginTop: hp(52),*/}
+        {/*    flexDirection: 'row',*/}
+        {/*    justifyContent: 'space-between',*/}
+        {/*  }}>*/}
+        {/*  <GradientButton*/}
+        {/*    title={'Add to Cart'}*/}
+        {/*    buttonStyle={{width: wp(285), height: hp(50)}}*/}
+        {/*  />*/}
 
-            {/* Touchable Like Icon */}
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: [
-                  {translateX: -wp(23) / 2},
-                  {translateY: -hp(20) / 2},
-                ],
-              }}
-              onPress={() => console.log('Like pressed')}>
-              <Image
-                source={images.emptyLikeImage}
-                style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {/*  <View style={{width: hp(50), height: hp(50)}}>*/}
+        {/*    /!* Background circular image *!/*/}
+        {/*    <Image*/}
+        {/*      source={images.gradientCircleImage}*/}
+        {/*      style={{width: '100%', height: '100%'}}*/}
+        {/*    />*/}
+
+        {/*    /!* Touchable Like Icon *!/*/}
+        {/*    <TouchableOpacity*/}
+        {/*      style={{*/}
+        {/*        position: 'absolute',*/}
+        {/*        top: '50%',*/}
+        {/*        left: '50%',*/}
+        {/*        transform: [*/}
+        {/*          {translateX: -wp(23) / 2},*/}
+        {/*          {translateY: -hp(20) / 2},*/}
+        {/*        ],*/}
+        {/*      }}*/}
+        {/*      onPress={() => console.log('Like pressed')}>*/}
+        {/*      <Image*/}
+        {/*        source={images.emptyLikeImage}*/}
+        {/*        style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}*/}
+        {/*      />*/}
+        {/*    </TouchableOpacity>*/}
+        {/*  </View>*/}
+        {/*</View>*/}
 
         <View style={{height: hp(30)}} />
 
@@ -1228,7 +1282,7 @@ const ProductDetailsScreen = () => {
                     textAlign: 'center',
                     fontSize: fontSize(10),
                     lineHeight: hp(14),
-                    fontFamily: fontFamily.poppins400,
+                    fontFamily: fontFamily.poppins500,
                     color: colors.pureBlack,
                   }}>
                   Assured Product quality at great value and Great{'\n'}shopping
@@ -1247,10 +1301,20 @@ const ProductDetailsScreen = () => {
                   textAlign: 'center',
                 }}>
                 Seller since :{' '}
-                <Text style={{fontFamily: fontFamily.poppins400}}>2 years</Text>{' '}
+                <Text
+                  style={{
+                    fontFamily: fontFamily.poppins500,
+                    fontSize: fontSize(12),
+                  }}>
+                  2 years
+                </Text>{' '}
                 {'    '}
                 FSSAI :{' '}
-                <Text style={{fontFamily: fontFamily.poppins400}}>
+                <Text
+                  style={{
+                    fontFamily: fontFamily.poppins500,
+                    fontSize: fontSize(12),
+                  }}>
                   10021043000393
                 </Text>
               </Text>

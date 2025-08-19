@@ -10,10 +10,13 @@ import {
 } from 'react-native';
 import {images} from '../../assets';
 import {hp} from '../../utils/helpers';
+import {useNavigation} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 
 const ProductImageComponent = () => {
+  const navigation = useNavigation();
+
   const groupOneImages = [
     images.productImageTwo,
     images.productImageOne,
@@ -58,9 +61,19 @@ const ProductImageComponent = () => {
           keyExtractor={(_, index) => index.toString()}
           onScroll={handleScroll}
           scrollEventThrottle={16}
-          renderItem={({item}) => (
+          renderItem={({item, index}) => (
             <View style={styles.imageWrapper}>
-              <Image source={item} style={styles.mainImage} />
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() =>
+                  navigation.navigate('FullImage', {
+                    images: selectedGroup, // current group images
+                    startIndex: index, // open at the tapped image index
+                    groupKey: selectedGroupKey, // 'groupOne' | 'groupTwo'
+                  })
+                }>
+                <Image source={item} style={styles.mainImage} />
+              </TouchableOpacity>
             </View>
           )}
         />

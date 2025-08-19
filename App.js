@@ -12,6 +12,7 @@ import ProfileScreen from './src/screens/profileScreen';
 import BasicInfoScreen from './src/screens/basicInfoScreen';
 import AccountScreen from './src/screens/accountScreen';
 import AddressScreen from './src/screens/addressScreen';
+import FullImage from './src/components/FullImage';
 import OrderDetailsScreen from './src/screens/OrderDetailsScreen';
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +28,7 @@ const App = () => {
             name="ProductDetails"
             component={ProductDetailsScreen}
           />
+          <Stack.Screen name="FullImage" component={FullImage} />
           <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
           <Stack.Screen name="Basic Info" component={BasicInfoScreen} />
           <Stack.Screen name="Account" component={AccountScreen} />
