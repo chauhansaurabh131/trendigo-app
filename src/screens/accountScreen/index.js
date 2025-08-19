@@ -8,8 +8,7 @@ import {
   Image,
   TextInput,
   Modal,
-  SafeAreaView
-  Modal,
+  SafeAreaView,
 } from 'react-native';
 import {fontFamily, hp, wp} from '../../utils/helpers';
 import check_icon from '../../assets/images/check_green_icon.png';
@@ -26,24 +25,17 @@ const AccountScreen = () => {
   const [editingField, setEditingField] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const isValidEmail = value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-  const isValidMobile = value => /^[0-9]{10}$/.test(value);
-
   const handleDeleteAccount = () => {
     setShowDeleteModal(false);
     console.log('Account Deleted');
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 30 }}>
-
-      {/* Header */}
-      <SafeAreaView style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
     <ScrollView
       style={styles.container}
       contentContainerStyle={{paddingBottom: 30}}>
-      <View style={styles.header}>
+      {/* Header */}
+      <SafeAreaView style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}>
@@ -53,7 +45,6 @@ const AccountScreen = () => {
       </SafeAreaView>
 
       <View style={styles.contentWrapper}>
-
         {/* Email Row */}
         <View style={styles.row}>
           <Text style={styles.label}>Email</Text>
@@ -76,30 +67,8 @@ const AccountScreen = () => {
             <TouchableOpacity
               onPress={() =>
                 setEditingField(editingField === 'email' ? null : 'email')
-              }
-            >
-              <Image source={edit_icon} style={styles.editIcon} />
-            {editingField === 'email' ? (
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                style={styles.input}
-                placeholder="Enter email"
-                keyboardType="email-address"
-                autoFocus
-              />
-            ) : (
-              <Text style={styles.valueText}>{email}</Text>
-            )}
-
-            {isValidEmail(email) && (
-              <Image source={check_icon} style={styles.icon} />
-            )}
-            <TouchableOpacity
-              onPress={() =>
-                setEditingField(editingField === 'email' ? null : 'email')
               }>
-              <Image source={edit_icon} style={styles.icon} />
+              <Image source={edit_icon} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
@@ -112,7 +81,7 @@ const AccountScreen = () => {
               {editingField === 'mobile' ? (
                 <TextInput
                   value={mobile}
-                  onChangeText={(text) => setMobile(text.replace(/[^0-9]/g, ''))}
+                  onChangeText={text => setMobile(text.replace(/[^0-9]/g, ''))}
                   style={styles.input}
                   placeholder="Enter mobile number"
                   keyboardType="phone-pad"
@@ -127,31 +96,8 @@ const AccountScreen = () => {
             <TouchableOpacity
               onPress={() =>
                 setEditingField(editingField === 'mobile' ? null : 'mobile')
-              }
-            >
-              <Image source={edit_icon} style={styles.editIcon} />
-            {editingField === 'mobile' ? (
-              <TextInput
-                value={mobile}
-                onChangeText={text => setMobile(text.replace(/[^0-9]/g, ''))}
-                style={styles.input}
-                placeholder="Enter mobile number"
-                keyboardType="phone-pad"
-                maxLength={10}
-                autoFocus
-              />
-            ) : (
-              <Text style={styles.valueText}>{mobile}</Text>
-            )}
-
-            {isValidMobile(mobile) && (
-              <Image source={check_icon} style={styles.icon} />
-            )}
-            <TouchableOpacity
-              onPress={() =>
-                setEditingField(editingField === 'mobile' ? null : 'mobile')
               }>
-              <Image source={edit_icon} style={styles.icon} />
+              <Image source={edit_icon} style={styles.editIcon} />
             </TouchableOpacity>
           </View>
         </View>
@@ -183,25 +129,17 @@ const AccountScreen = () => {
             <Text style={styles.modalText}>Are you sure want proceed?</Text>
 
             <View style={styles.modalButtons}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <TouchableOpacity
-                  style={styles.cancelBtn}
-                  onPress={() => setShowDeleteModal(false)}>
-                  <Text style={styles.cancelBtnText}>Not Now</Text>
-                </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelBtn}
+                onPress={() => setShowDeleteModal(false)}>
+                <Text style={styles.cancelBtnText}>Not Now</Text>
+              </TouchableOpacity>
 
-                <GradientButton
-                  title="Yes, Delete"
-                  onPress={handleDeleteAccount}
-                  // style={styles.gradientBtn}
-                  buttonStyle={{width: wp(135), height: hp(44)}}
-                />
-
-                {/*<GradientButton*/}
-                {/*  title={'Add to Cart'}*/}
-                {/*  buttonStyle={{width: wp(285), height: hp(50)}}*/}
-                {/*/>*/}
-              </View>
+              <GradientButton
+                title="Yes, Delete"
+                onPress={handleDeleteAccount}
+                style={styles.gradientBtn}
+              />
             </View>
           </View>
         </View>
@@ -223,16 +161,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 15,
   },
-  backButton: {
-    zIndex: 2,
-  },
-  arrowIcon: {
-    width: wp(20),
-    height: hp(18),
-    resizeMode: 'contain',
-  },
-  backButton: { zIndex: 2 },
-  arrowIcon: { width: wp(20), height: hp(18), resizeMode: 'contain' },
+  backButton: {zIndex: 2},
+  arrowIcon: {width: wp(20), height: hp(18), resizeMode: 'contain'},
   headerTitle: {
     position: 'absolute',
     left: 0,
@@ -242,20 +172,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#000',
   },
-  contentWrapper: {
-    paddingHorizontal: 20,
-  },
-  contentWrapper: { paddingHorizontal: 20 },
+  contentWrapper: {paddingHorizontal: 20},
 
   row: {
     paddingVertical: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#E7E7E7',
-  },
-
-  label: {
-    fontSize: 16,
-    borderBottomColor: '#E7E7E7'
   },
   label: {
     fontSize: 16,
@@ -263,13 +185,7 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 8,
   },
-    color: '#000',
-    marginBottom: 8
-  },
 
-  valueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
   valueRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -281,12 +197,8 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   valueText: {
-    flex: 1,
-    fontSize: 14,
     fontSize: 14,
     color: '#000',
-    fontFamily: fontFamily.poppins500,
-  },
     fontFamily: fontFamily.poppins500,
     paddingVertical: 2,
     marginRight: 6,
@@ -295,36 +207,22 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: '#000',
-    flex: 1,
-    fontSize: 14,
-    color: '#000',
     fontFamily: fontFamily.poppins400,
     paddingVertical: 2,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
     marginRight: 6,
     // borderBottomWidth removed
     // borderBottomColor removed
   },
-  icon: {
-    width: wp(14),
-    height: wp(14),
-    marginHorizontal: wp(10),
-    resizeMode: 'cover',
-  },
-  deleteSection: {
-    marginTop: 25,
   checkIcon: {
     width: wp(16),
     height: wp(16),
     resizeMode: 'contain',
-
   },
   checkiconmobile: {
     width: wp(16),
     height: wp(16),
     resizeMode: 'contain',
-    marginRight:"65%",
+    marginRight: '65%',
   },
   editIcon: {
     width: wp(16),
@@ -333,12 +231,10 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
 
-  deleteSection: { marginTop: 25 },
+  deleteSection: {marginTop: 25},
   deleteText: {
     fontSize: 12,
     color: '#898989',
-    marginTop: 5,
-    marginBottom: 50,
     marginTop: 5,
     marginBottom: 50,
     fontFamily: fontFamily.poppins400,
@@ -351,22 +247,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '45%',
     height: hp(45),
-    borderRadius: wp(60),
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: "45%",
-    height: hp(45),
     marginTop: hp(-25),
   },
   deleteBtnText: {
     color: '#FFFFFF',
     fontSize: 14,
     fontFamily: fontFamily.poppins400,
-  },
-  deleteBtnText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontFamily: fontFamily.poppins400
   },
 
   modalOverlay: {
@@ -378,49 +264,36 @@ const styles = StyleSheet.create({
   modalBox: {
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    // paddingVertical: 60,
-    // paddingHorizontal: 40,
-    // height: '30%',
+    paddingVertical: 60,
+    paddingHorizontal: 40,
+    height: '30%',
     width: '90%',
     alignItems: 'center',
-    // marginTop: '30%',
-    // marginBottom: 10,
+    marginTop: '30%',
+    marginBottom: 10,
   },
   modalText: {
     fontSize: 19,
     fontFamily: fontFamily.poppins400,
     color: '#000000',
-    marginBottom: 25,
     textAlign: 'center',
-    justifyContent: 'center',
     lineHeight: hp(20),
-    marginTop: hp(56),
-    // marginBottom: 40,
+    marginBottom: 40,
   },
   modalButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: hp(46),
-    // backgroundColor: 'orange',
-    marginHorizontal: 30,
-    // width: '100%',
-    // backgroundColor: 'red',
-    // flex: 1,
+    width: '100%',
   },
   cancelBtn: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#0F52BA',
-    // paddingVertical: 12,
+    paddingVertical: 12,
     alignItems: 'center',
-    // borderRadius: wp(25),
-    // marginRight: 20,
-    width: hp(126),
-    height: hp(44),
-    borderRadius: 50,
-    alignContent: 'center',
-    justifyContent: 'center',
-    marginRight: wp(22),
+    borderRadius: wp(25),
+    marginRight: 20,
   },
   cancelBtnText: {
     fontSize: 14,
@@ -428,10 +301,8 @@ const styles = StyleSheet.create({
     color: '#0E0E0E',
   },
   gradientBtn: {
-    // flex: 1,
+    flex: 1,
     height: hp(45),
     borderRadius: wp(30),
-    width: wp(135),
-    // width: '40%',
   },
 });
