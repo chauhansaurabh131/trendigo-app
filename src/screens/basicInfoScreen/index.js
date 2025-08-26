@@ -89,6 +89,7 @@ const BasicInfoScreen = () => {
           <TextInput
             style={styles.input}
             placeholder="Enter your name"
+            placeholderTextColor={"grey"}
             value={name}
             onChangeText={setName}
             keyboardType="default"
@@ -124,6 +125,7 @@ const BasicInfoScreen = () => {
             style={styles.input}
             placeholder="DD/MM/YYYY"
             value={dob}
+            placeholderTextColor={"grey"}
             onChangeText={setDob}
             keyboardType="numbers-and-punctuation"
           />
@@ -134,6 +136,7 @@ const BasicInfoScreen = () => {
             placeholder="Enter mobile number"
             keyboardType="number-pad"
             value={mobile}
+            placeholderTextColor={"grey"}
             onChangeText={setMobile}
             maxLength={10}
           />
@@ -143,12 +146,13 @@ const BasicInfoScreen = () => {
             style={[styles.input, { marginBottom: 30 }]}
             placeholder="Enter email"
             keyboardType="email-address"
+            placeholderTextColor={"grey"}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
           />
 
-          <GradientButton title="Save Changes" onPress={handleSave} />
+          <GradientButton title="Save Changes" onPress={handleSave} buttonStyle={{height:hp(45)}}/>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -219,6 +223,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderWidth: 1,
     borderColor: '#ccc',
+    color:"#000000"
   },
   rectangle: {
     width: '100%',

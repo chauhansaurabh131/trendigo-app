@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {
   SafeAreaView,
   Text,
@@ -28,7 +28,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaskedView from '@react-native-masked-view/masked-view';
 import ReviewRatingComponent from '../../components/reviewRatingComponent';
 import Svg, {Path} from 'react-native-svg';
-
+import star_icon from '../../assets/images/star_image_icon.png';
 export const CustomStarIcon = ({
   width = 24,
   height = 24,
@@ -50,7 +50,21 @@ export const CustomStarIcon = ({
 
 const ProductDetailsScreen = () => {
   const route = useRoute();
+  // const ratingsRef = useRef(null); 
+   const scrollRef = useRef(null); // Ref for ScrollView
+  const reviewsRef = useRef(null); // Ref for Reviews section
+  
+
+     const scrollToReviews = () => {
+    reviewsRef.current?.measureLayout(
+      scrollRef.current,
+      (x, y) => {
+        scrollRef.current.scrollTo({ y: y, animated: true });
+      }
+    );
+  }
   // const {product} = route.params;
+  
 
   const [selectedSize, setSelectedSize] = useState('S'); // Default selection
   const [pincode, setPincode] = useState('');
@@ -173,7 +187,7 @@ const ProductDetailsScreen = () => {
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView   ref={scrollRef} showsVerticalScrollIndicator={false}>
         <View style={{marginTop: 10}}>
           <ProductImageComponent />
         </View>
@@ -199,12 +213,16 @@ const ProductDetailsScreen = () => {
             }}>
             Women Floral Printed Fit & Flare Midi Class
           </Text>
-
+{/* 
           <View
             style={{
               marginTop: hp(19),
               flexDirection: 'row',
               alignItems: 'center',
+              padding:10,
+               justifyContent: 'center',
+                paddingHorizontal: 10,
+
             }}>
             <View
               style={{
@@ -218,7 +236,7 @@ const ProductDetailsScreen = () => {
                 paddingHorizontal: 10,
                 gap: 5, // optional for spacing between text and icon
               }}>
-              <Text style={{color: 'white'}}>6.2</Text>
+              <Text style={{color: 'white'}}>4.2</Text>
               <StarIcon width={hp(13)} height={hp(13)} />
             </View>
             <Text
@@ -231,10 +249,94 @@ const ProductDetailsScreen = () => {
               }}>
               122 Ratings
             </Text>
-          </View>
-        </View>
+          </View> */}
+          {/* <View style={{
+            flexDirection:"row",
+            alignItems: "center",
+            borderWidth:1,
+            borderRadius:30,
+            paddingVertical: 6,
+            alignSelf: "flex-start",
+            borderColor: "#000000",
+            width:hp(250),
+            height:hp(50),
+            marginTop:19
 
-        <View
+          }}>
+            <Text style={{
+              fontSize: 18,
+              fontFamily: fontFamily.poppins400,
+              color: "#8225AF",
+              marginLeft:25
+            }}>4.2</Text>
+
+            <View style={{
+              width: 1,
+              height:30,
+              backgroundColor:"#000000",
+              marginHorizontal: 8,
+              marginLeft:wp(60)
+            }}></View>
+            <Text style={{
+              color: colors.pureBlack,
+              fontFamily: fontFamily.poppins500,
+              marginLeft: 20,
+              fontSize: 16
+            }}>122 Ratings</Text>
+          </View>
+           */}
+
+           <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={scrollToReviews}
+                style={{
+            flexDirection: "row",
+            alignItems: "center",
+            borderWidth: 1,
+            borderRadius: 30,
+            paddingVertical: 4,
+            alignSelf: "flex-start",
+            borderColor: "#D2D2D2",
+            width: hp(200),
+            height: hp(35),
+            marginTop: 19,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: fontFamily.poppins400,
+              color: "#8225AF",
+              marginLeft: 15,
+            }}
+          >
+            4.2
+          </Text>
+           <Image source={star_icon} style={{width: hp(15), height:hp(15), marginLeft:10, marginBottom:2}}/>
+          <View
+            style={{
+              width: 1,
+              height: 23,
+              backgroundColor: "#D2D2D2",
+              marginHorizontal: 8,
+              marginLeft: wp(10),
+            }}
+            />
+
+            <Text
+            style={{
+              color: colors.pureBlack,
+              fontFamily: fontFamily.poppins500,
+              marginLeft: 10,
+              fontSize: 16,
+            }}
+            >
+            122 Ratings
+          </Text>
+            </TouchableOpacity>
+
+        </View>
+         <View
           style={{
             width: '100%',
             borderColor: '#E7E7E7',
@@ -976,7 +1078,7 @@ const ProductDetailsScreen = () => {
           }}
         />
 
-        <View style={{marginHorizontal: 17, marginTop: hp(24)}}>
+        <View  ref={reviewsRef} style={{marginHorizontal: 17, marginTop: hp(24)}}>
           <Text
             style={{
               fontSize: fontSize(17),

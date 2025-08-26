@@ -14,6 +14,8 @@ import AccountScreen from './src/screens/accountScreen';
 import AddressScreen from './src/screens/addressScreen';
 import FullImage from './src/components/FullImage';
 import OrderDetailsScreen from './src/screens/OrderDetailsScreen';
+import MenCategoryScreen from './src/screens/menCategoryScreen';
+// import WomenCategoryScreen from './src/screens/WomenCategoryScree';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -34,6 +36,8 @@ const App = () => {
           <Stack.Screen name="Account" component={AccountScreen} />
           <Stack.Screen name="Address" component={AddressScreen} />
           <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+          <Stack.Screen name="MenCategoryScreen" component={MenCategoryScreen} />
+          {/* <Stack.Screen name="WomenCategoryScreen" component={WomenCategoryScreen} /> */}
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

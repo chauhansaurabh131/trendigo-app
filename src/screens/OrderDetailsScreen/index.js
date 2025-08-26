@@ -2,7 +2,7 @@ import React from "react";
 import arrow_back from '../../assets/images/arrow_back.png';
 import delivery_icon from '../../assets/images/delivery_order.png';
 import image_icon from '../../assets/images/imageProduct.png';
-import { fontFamily, wp, fontSize, hp } from '../../utils/helpers';
+import { fontFamily, wp, hp } from '../../utils/helpers';
 import {
   View,
   Text,
@@ -33,7 +33,8 @@ const OrderDetailsScreen = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Order Details</Text>
       </View>
-      <ScrollView>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* Expected Delivery */}
         <View style={styles.deliveryBox}>
           <Image
@@ -53,7 +54,7 @@ const OrderDetailsScreen = () => {
             style={styles.productImage}
           />
           <Text style={styles.productTitle}>Designer Traditional Dress</Text>
-          <View style={{ borderColor: "#EBE8EB", borderBottomWidth: 1, width: "90%", marginVertical: 12 }}></View>
+          <View style={styles.divider} />
         </View>
 
         {/* Product Details */}
@@ -94,7 +95,7 @@ const OrderDetailsScreen = () => {
 
         {/* Buttons */}
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#FBF2FF", marginTop: 40 }]}
+          style={[styles.button, { backgroundColor: "#FBF2FF", marginTop: 40}]}
           onPress={() => handlePress('Track Order')}
         >
           <Text style={{ color: "#B225AF", fontFamily: fontFamily.poppins500, fontSize: wp(14) }}>Track Order</Text>
@@ -113,15 +114,16 @@ const OrderDetailsScreen = () => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
     padding: 15,
   },
   backIcon: {
-  width: wp(18),
-      height: hp(18),
-      resizeMode: 'contain',
+    width: wp(18),
+    height: hp(18),
+    resizeMode: 'contain',
     marginRight: 10
   },
   headerTitle: {
@@ -132,17 +134,18 @@ const styles = StyleSheet.create({
     color: '#000',
     marginRight: 30
   },
+
   deliveryBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f6f6f6",
+    backgroundColor: "#FCF7FF",
     padding: 12,
     marginBottom: 15,
     width: "100%"
   },
   deliveryIcon: {
-    width: 22,   // 👈 smaller size
-    height: 16,  // 👈 smaller size
+    width: 22,
+    height: 16,
     marginLeft: 15
   },
   deliveryText: {
@@ -156,6 +159,7 @@ const styles = StyleSheet.create({
     color: "#2B9909",
     width: "100%"
   },
+
   imageContainer: {
     alignItems: "center",
     marginVertical: 15
@@ -172,29 +176,41 @@ const styles = StyleSheet.create({
     color: "#000000",
     fontWeight: "bold"
   },
-  detailsBox: {
-    marginHorizontal: 15,
-    marginVertical: 10,
+  divider: {
+    borderColor: "#EBEBEB",
     borderBottomWidth: 1,
-    borderBottomColor: "#EBE8EB",
+    width: "90%",
+    marginVertical: 12,
+    marginTop: 20
+  },
+
+  detailsBox: {
+    marginHorizontal: 14,
+    marginVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#EBEBEB",
     paddingBottom: 10,
+    bottom:30,
+    width: "90%",
+    alignSelf: "center", 
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 5,
-    marginHorizontal: 15
+    marginVertical: hp(1.5),
+    marginHorizontal: 4,
   },
   label: {
     fontSize: 14,
     color: "#000000",
-    fontFamily: fontFamily.poppins400
+    fontFamily: fontFamily.poppins400,
   },
   value: {
     fontSize: 14,
     fontFamily: fontFamily.poppins500,
     color: "#000000"
   },
+
   button: {
     marginHorizontal: 15,
     marginVertical: 10,
@@ -203,11 +219,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: 50,
-  },
-  buttonText: {
-    fontFamily: fontFamily.poppins500,
-    fontSize: wp(14),
-    color: "#fff",
+    width: "90%"
   },
 });
 

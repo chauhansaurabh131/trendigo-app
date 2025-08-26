@@ -1,4 +1,5 @@
-import React, {useRef} from 'react';
+
+import React, {useRef, useState} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -6,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ScrollView,
 } from 'react-native';
 import {colors} from '../../utils/colors';
 import {
@@ -21,12 +23,47 @@ import {useNavigation} from '@react-navigation/native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import GradientButton from '../../components/gradientButton';
 import CheckBoxComponent from '../../components/checkBoxComponent';
+import purple_image from '../../assets/images/purple_kurta_image.png';
+import pink_kurta from '../../assets/images/pink_kurta_image.png';
 
 const BagScreen = () => {
   const navigation = useNavigation();
 
-  const sheetRef1 = useRef(); // First bottom sheet
-  const sheetRef2 = useRef(); // Second bottom sheet
+  const sheetRef1 = useRef(); // First bottom sheet - Address
+  const sheetRef2 = useRef(); // Second bottom sheet - Add Address
+  const sheetRef3 = useRef(); // Third bottom sheet - Edit Item
+
+  // State for selected color and size
+  const [selectedColor, setSelectedColor] = useState('sky_blue');
+  const [selectedSize, setSelectedSize] = useState('S');
+
+  // Color options with their respective images - Replace these with your actual image paths
+  const colorOptions = [
+    {
+      id: 'sky_blue',
+      name: 'Sky Blue',
+      image: images.trending_one, 
+    },
+    {
+      id: 'purple',
+      name: 'Purple',
+      image: images.purple_image, 
+    },
+    {
+      id: 'pink',
+      name: 'Pink',
+      image: images.pink_image, 
+    },
+  ];
+
+  // Size options
+  const sizeOptions = ['S', 'M', 'L', 'XL', 'XXL'];
+
+  // Get current selected color image for main display
+  const getCurrentColorImage = () => {
+    const selectedColorObj = colorOptions.find(color => color.id === selectedColor);
+    return selectedColorObj ? selectedColorObj.image : images.trending_one;
+  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
@@ -145,7 +182,7 @@ const BagScreen = () => {
           }}>
           <View style={{width: '25%'}}>
             <Image
-              source={images.trending_one}
+              source={getCurrentColorImage()}
               style={{
                 width: isIOS ? 75 : wp(75),
                 height: isIOS ? 95 : hp(97),
@@ -228,7 +265,7 @@ const BagScreen = () => {
                       marginLeft: 5,
                     }}>
                     {' '}
-                    S
+                    {selectedSize}
                   </Text>
                 </View>
                 <View style={{flexDirection: 'row', top: isIOS ? -2 : -3}}>
@@ -258,7 +295,7 @@ const BagScreen = () => {
                       marginLeft: 5,
                     }}>
                     {' '}
-                    Sky Blue
+                    {colorOptions.find(color => color.id === selectedColor)?.name || 'Sky Blue'}
                   </Text>
                 </View>
               </View>
@@ -272,7 +309,8 @@ const BagScreen = () => {
                   borderColor: '#D3D3D3',
                   alignItems: 'center',
                   justifyContent: 'center',
-                }}>
+                }}
+                onPress={() => sheetRef3.current?.open()}>
                 <Image
                   source={images.edit_icon}
                   style={{width: hp(9), height: hp(9), resizeMode: 'contain'}}
@@ -286,7 +324,6 @@ const BagScreen = () => {
                   borderRadius: 50,
                   borderWidth: 1,
                   borderColor: '#D3D3D3',
-                  // alignItems: 'center',
                   justifyContent: 'center',
                 }}>
                 <View
@@ -297,7 +334,6 @@ const BagScreen = () => {
                   }}>
                   <Touchable
                     style={{
-                      // backgroundColor: 'red',
                       width: 30,
                       height: 24,
                       alignItems: 'center',
@@ -367,7 +403,7 @@ const BagScreen = () => {
               backgroundColor: '#D1FFDC',
               alignItems: 'center',
               justifyContent: 'center',
-              marginLeft: 'auto', // pushes this pill to the right
+              marginLeft: 'auto',
               marginRight: 8,
             }}>
             <Text
@@ -556,6 +592,7 @@ const BagScreen = () => {
         </View>
       </View>
 
+      {/* First Bottom Sheet - Address Selection */}
       <RBSheet
         ref={sheetRef1}
         height={hp(350)}
@@ -654,14 +691,13 @@ const BagScreen = () => {
           </Touchable>
         </View>
 
-        {/* Button to add address */}
         <View style={{marginHorizontal: 18, bottom: 10}}>
           <GradientButton
             title={'Add New Address'}
             onPress={() => {
-              sheetRef1.current?.close(); // Close first sheet
+              sheetRef1.current?.close();
               setTimeout(() => {
-                sheetRef2.current?.open(); // Open second sheet after a short delay
+                sheetRef2.current?.open();
               }, 300);
             }}
           />
@@ -816,8 +852,6 @@ const BagScreen = () => {
               <CheckBoxComponent />
             </View>
 
-            {/* Your Add Address form goes here */}
-
             <GradientButton
               title={'Save Address'}
               onPress={() => {
@@ -827,6 +861,135 @@ const BagScreen = () => {
             />
           </View>
         </View>
+      </RBSheet>
+
+      {/* Third Bottom Sheet - Edit Item (Color & Size) */}
+      <RBSheet
+        ref={sheetRef3}
+        height={hp(520)}
+        openDuration={250}
+        closeOnDragDown
+        closeOnPressMask
+        customStyles={{
+          wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
+          draggableIcon: {backgroundColor: '#C4C4C4'},
+          container: {
+            borderTopLeftRadius: 16,
+            borderTopRightRadius: 16,
+            height: hp(480)
+          },
+        }}>
+        <ScrollView style={{flex: 1, backgroundColor: colors.white}} showsVerticalScrollIndicator={false} >
+          <Text
+            style={{
+              color: colors.black,
+              textAlign: 'center',
+              marginTop: hp(25),
+              marginBottom: hp(15),
+              fontSize: fontSize(18),
+              marginRight:"75%",
+              fontFamily: fontFamily.poppins400,
+            }}>
+            Modify
+          </Text>
+
+          <View
+            style={{width: '100%', height: 1, backgroundColor: '#E3E3E3', marginBottom: hp(25)}}
+          />
+
+          {/* Change Color Section */}
+          <View style={{marginHorizontal: 18}}>
+            <Text
+              style={{
+                color: colors.black,
+                fontSize: fontSize(14),
+                fontFamily: fontFamily.poppins500,
+                marginBottom: hp(20),
+              }}>
+              Change Color
+            </Text>
+
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              style={{marginBottom: hp(30)}}
+              contentContainerStyle={{paddingRight: 20}}>
+              {colorOptions.map((color, index) => (
+                <Touchable
+                  key={color.id}
+                  style={{
+                    marginRight: wp(15),
+                    borderWidth: selectedColor === color.id ? 3 : 0,
+                    borderColor: selectedColor === color.id ? '#8225AF' : '#E0E0E0',
+                    borderRadius: 10,
+                    // padding: 10,
+                    
+                  }}
+                  onPress={() => setSelectedColor(color.id)}>
+                  <Image
+                    source={color.image}
+                    style={{
+                      width: wp(55),
+                      height: hp(55),
+                      borderRadius: 8,
+                    }}
+                  />
+                </Touchable>
+              ))}
+            </ScrollView>
+
+            {/* Select Size Section */}
+            <Text
+              style={{
+                color: colors.black,
+                fontSize: fontSize(14),
+                fontFamily: fontFamily.poppins500,
+                marginBottom: hp(20),
+              }}>
+              Select Size
+            </Text>
+
+            <View style={{flexDirection: 'row', flexWrap: 'wrap', marginBottom: hp(35)}}>
+              {sizeOptions.map((size) => (
+                <Touchable
+                  key={size}
+                  style={{
+                    width: wp(50),
+                    height: wp(50),
+                    borderRadius: wp(32.5),
+                    borderWidth: 2,
+                    borderColor: selectedSize === size ? '#000000' : '#E0E0E0',
+                    backgroundColor: selectedSize === size ? '#F7E7FF' : colors.white,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: wp(12),
+                    marginBottom: hp(15),
+                  }}
+                  onPress={() => setSelectedSize(size)}>
+                  <Text
+                    style={{
+                      fontSize: fontSize(16),
+                      fontFamily: fontFamily.poppins600,
+                      color: selectedSize === size ? colors.pureBlack : colors.pureBlack,
+                    }}>
+                    {size}
+                  </Text>
+                </Touchable>
+              ))}
+            </View>
+
+            <GradientButton
+              title={'Update'}
+              onPress={() => {
+                // Handle update logic here
+                console.log('Selected Color:', selectedColor);
+                console.log('Selected Size:', selectedSize);
+                sheetRef3.current?.close();
+              }}
+              buttonStyle={{marginBottom:hp(30)}}
+            />
+          </View>
+        </ScrollView>
       </RBSheet>
     </SafeAreaView>
   );

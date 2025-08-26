@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   logoutContainer: {
     alignSelf: 'center',
-    width: wp(340),
+    width: wp(360),
     height: hp(50),
     borderRadius: wp(100),
     backgroundColor: '#F3F3F3',

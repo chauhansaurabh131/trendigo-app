@@ -10,8 +10,10 @@ import {
 import {colors} from '../../utils/colors';
 import {fontFamily, fontSize, hp, Touchable} from '../../utils/helpers';
 import {images, NavigationArrowIcon} from '../../assets';
+import { useNavigation } from '@react-navigation/native';
 
 const CategoryScreen = () => {
+  const navigation = useNavigation(); 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
@@ -37,7 +39,9 @@ const CategoryScreen = () => {
             marginHorizontal: 18,
             marginTop: hp(17),
           }}>
-          <TouchableOpacity activeOpacity={0.6}>
+          <TouchableOpacity activeOpacity={0.6}
+           onPress={() => navigation.navigate('MenCategoryScreen')}
+          >
             <View style={{position: 'relative'}}>
               <Image
                 source={images.men_collection_img}

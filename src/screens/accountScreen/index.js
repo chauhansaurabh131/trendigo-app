@@ -16,6 +16,7 @@ import edit_icon from '../../assets/images/edit_black_icon.png';
 import arrow_back from '../../assets/images/arrow_back.png';
 import {useNavigation} from '@react-navigation/native';
 import GradientButton from '../../components/gradientButton';
+import { heightPercentageToDP } from 'react-native-responsive-screen';
 
 const AccountScreen = () => {
   const navigation = useNavigation();
@@ -138,7 +139,8 @@ const AccountScreen = () => {
               <GradientButton
                 title="Yes, Delete"
                 onPress={handleDeleteAccount}
-                style={styles.gradientBtn}
+                buttonStyle={{width: 135, height:45}}
+                
               />
             </View>
           </View>
@@ -264,21 +266,21 @@ const styles = StyleSheet.create({
   modalBox: {
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    paddingVertical: 60,
-    paddingHorizontal: 40,
-    height: '30%',
+    paddingVertical: 50,
+    paddingHorizontal: 35,
+    height: '25%',
     width: '90%',
     alignItems: 'center',
     marginTop: '30%',
-    marginBottom: 10,
+    marginBottom: 20
   },
   modalText: {
     fontSize: 19,
     fontFamily: fontFamily.poppins400,
     color: '#000000',
     textAlign: 'center',
-    lineHeight: hp(20),
-    marginBottom: 40,
+    // lineHeight: hp(20),
+    marginBottom: hp(30),
   },
   modalButtons: {
     flexDirection: 'row',
@@ -287,22 +289,31 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   cancelBtn: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#0F52BA',
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderRadius: wp(25),
-    marginRight: 20,
+    // flex: 1,
+    // borderWidth: 1,
+    // borderColor: '#0F52BA',
+    // paddingVertical: 12,
+    // alignItems: 'center',
+    // borderRadius: wp(25),
+    // marginRight: 20,
+    width: 126,
+    borderColor:"#0F52BA",
+    height:44,
+    borderWidth:1,
+    borderRadius:25,
+    alignItems:'center',
+    justifyContent:'center',
+
+
   },
   cancelBtnText: {
     fontSize: 14,
     fontFamily: fontFamily.poppins400,
     color: '#0E0E0E',
   },
-  gradientBtn: {
-    flex: 1,
-    height: hp(45),
-    borderRadius: wp(30),
-  },
+  // gradientBtn: {
+  //   flex: 1,
+  //   height: hp(45),
+  //   borderRadius: wp(30),
+  // },
 });
