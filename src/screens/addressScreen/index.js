@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,44 +10,47 @@ import {
   SafeAreaView,
   Modal,
 } from 'react-native';
-import { fontFamily, hp, wp } from '../../utils/helpers';
-import { useNavigation } from '@react-navigation/native';
+import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
+import {useNavigation} from '@react-navigation/native';
 import RBSheet from 'react-native-raw-bottom-sheet';
-
+import {useDispatch, useSelector} from 'react-redux';
 import back_icon from '../../assets/images/arrow_back.png';
 import edit_address_icon from '../../assets/images/adress_icon.png';
 import delete_icon from '../../assets/images/delete_address_icon.png';
 import check_icon from '../../assets/images/check_right_icon.png';
 import location_icon from '../../assets/images/location_address_icon.png';
 import GradientButton from '../../components/gradientButton';
+import {FlatList} from 'react-native';
+import {KeyboardAvoidingView} from 'react-native';
+// IMPORT ACTION CREATORS (ensure these exist / match names)
+import {
+  getAddressRequest,
+  addAddressRequest,
+  updateAddressRequest,
+  deleteAddressRequest,
+} from '../../redux/actions/addressActions';
 
 const AddressScreen = () => {
   const navigation = useNavigation();
   const bottomSheetRef = useRef(null);
+  const dispatch = useDispatch();
 
-  // store addresses
-  const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      name: 'Rahul Gajjar',
-      type: 'Home',
-      address: '25/3 Housing Estate, Near by sector 17, Singapore 31134',
-      mobile: '+91 95022 22322',
-      pincode: '31134',
-      locality: 'Sector 17',
-      isDefault: true,
-    },
-    {
-      id: 2,
-      name: 'Neha Gajjar',
-      type: 'Office',
-      address: '25/3 Housing Estate, Near by sector 17, Singapore 31134',
-      mobile: '+91 95022 22322',
-      pincode: '31134',
-      locality: 'Sector 17',
-      isDefault: false,
-    },
-  ]);
+  // --- Redux selectors (assumes you saved token & user in redux) ---
+  // const token = useSelector(state => state.auth?.token); // <- adjust if your key different
+  // const token = useSelector(state => state.auth?.token);
+  const token = useSelector(state => state.auth?.token);
+
+  console.log('TOKEN ===>', token);
+
+  // const userId = useSelector(state => state.auth?.user?.id);
+  const userId = useSelector(state => state.auth?.user?.id);
+
+  console.log('USER ID ===>', userId);
+
+  // Address list comes from redux address reducer
+  const addresses = useSelector(state => state.addresses?.list) || [];
+  const loading = useSelector(state => state.addresses?.loading);
+  const error = useSelector(state => state.addresses?.error);
 
   // form states
   const [form, setForm] = useState({
@@ -66,6 +69,10 @@ const AddressScreen = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
+  useEffect(() => {
+    dispatch(getAddressRequest(userId, token));
+  }, []);
+
   // open add sheet with blank form
   const openAddSheet = () => {
     setEditId(null);
@@ -79,44 +86,85 @@ const AddressScreen = () => {
     });
     bottomSheetRef.current.open();
   };
-
-  const openEditSheet = (item) => {
+  const openEditSheet = item => {
+    // Map API fields to your form fields
+    // setEditId(item._id || item.id); // API likely returns _id
+    // setEditId(item._id);
     setEditId(item.id);
+
+    // setForm({
+    //   name: item.name || '',
+    //   mobile: String(item.mobileNumber || item.mobile || ''),
+    //   pincode: String(item.pincode || ''),
+    //   address: item.addressLineOne || item.address || '',
+    //   locality: item.addressLineTwo || item.locality || '',
+    //   isDefault: !!item.isDefaultAddress || !!item.isDefault,
+    // });
     setForm({
       name: item.name,
-      mobile: item.mobile,
-      pincode: item.pincode || '',
-      address: item.address,
-      locality: item.locality || '',
-      isDefault: item.isDefault,
+      mobile: String(item.mobileNumber),
+      pincode: String(item.pincode),
+      address: item.addressLineOne,
+      locality: item.addressLineTwo,
+      isDefault: item.isDefaultAddress,
     });
-    bottomSheetRef.current.open();
-  };
 
+    bottomSheetRef.current?.open();
+  };
   const saveAddress = () => {
+    if (!userId || !token) return;
+
+    const payload = {
+      userId,
+      name: form.name,
+      mobileNumber: Number(form.mobile),
+      pincode: Number(form.pincode),
+      addressLineOne: form.address,
+      addressLineTwo: form.locality,
+      city: 'patan',
+      isDefaultAddress: form.isDefault,
+    };
+
     if (editId) {
-      setAddresses((prev) =>
-        prev.map((addr) =>
-          addr.id === editId ? { ...addr, ...form } : addr
-        )
+      console.log('click to edited', editId);
+      dispatch(
+        updateAddressRequest(
+          editId, // correct address ID
+          payload, // full body data
+          token, // correct token from redux
+          userId,
+        ),
       );
+
+      console.log('Updating address with ID:', editId);
     } else {
-      const newId = Date.now();
-      setAddresses((prev) => [...prev, { id: newId, ...form, type: 'Home' }]);
+      // ADD
+      dispatch(addAddressRequest(payload, token));
     }
-    bottomSheetRef.current.close();
+
+    bottomSheetRef.current?.close();
   };
 
   // confirm delete
-  const confirmDelete = (id) => {
+  const confirmDelete = id => {
+    console.log('donfirm delete id:', id);
     setDeleteId(id);
     setShowConfirm(true);
   };
 
-  const handleDelete = () => {
-    setAddresses((prev) => prev.filter((addr) => addr.id !== deleteId));
+  // const handleDelete = () => {
+  //   console.log('DELETE ID INSIDE HANDLE DELETE:', deleteId);
+  //   if (!deleteId || !token || !userId) return;
+  //   dispatch(deleteAddressRequest(deleteId, token, userId));
+  //   console.log('DELETE ID BEFORE DISPATCH:', deleteId);
+  //   setShowConfirm(false);
+  //   setDeleteId(null);
+  // };
+  const handleDelete = id => {
+    console.log('DELETE ID INSIDE HANDLE DELETE:', id);
+    if (!id || !token || !userId) return;
+    dispatch(deleteAddressRequest(id, token, userId));
     setShowConfirm(false);
-    setDeleteId(null);
   };
 
   return (
@@ -127,47 +175,80 @@ const AddressScreen = () => {
           <Image source={back_icon} style={styles.backIcon} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Addresses</Text>
-        <View style={{ width: wp(25) }} />
+        <View style={{width: wp(25)}} />
       </View>
 
       {/* Address List */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {addresses.map((item) => (
-          <View style={styles.card} key={item.id}>
-            {item.isDefault && (
-              <View style={styles.defaultRow}>
-                <View style={styles.defaultTag}>
-                  <Text style={styles.defaultText}>Default</Text>
+        {/* {loading && <Text>Loading...</Text>}
+        {error && <Text style={{color: 'red'}}>{JSON.stringify(error)}</Text>} */}
+
+        <FlatList
+          data={addresses}
+          // keyExtractor={item => item._id} // 👈 FIX
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
+          ListEmptyComponent={
+            <Text
+              style={{
+                textAlign: 'center',
+                marginTop: 20,
+                color: '#000',
+                fontFamily: fontFamily.poppins400,
+                fontSize: fontSize(16),
+              }}>
+              No Address Found
+            </Text>
+          }
+          renderItem={({item}) => {
+            const addressText = `${item.addressLineOne}, ${item.addressLineTwo}`;
+            const isDefault = item.isDefaultAddress;
+            console.log('ITEM:', item); // <-- ADD THIS HERE
+            return (
+              <View style={styles.card}>
+                {isDefault && (
+                  <View style={styles.defaultRow}>
+                    <View style={styles.defaultTag}>
+                      <Text style={styles.defaultText}>Default</Text>
+                    </View>
+                  </View>
+                )}
+
+                <View style={styles.row}>
+                  <Text style={styles.name}>{item.name}</Text>
+                  <Text style={styles.type}>{item.type}</Text>
+                </View>
+
+                <Text style={styles.address}>{addressText}</Text>
+
+                <Text style={styles.mobile}>
+                  <Text style={styles.mobileLabel}>Mobile :</Text>{' '}
+                  {item.mobileNumber}
+                </Text>
+
+                <View style={styles.actions}>
+                  <TouchableOpacity
+                    style={styles.iconButton}
+                    onPress={() => openEditSheet(item)}>
+                    <Image source={edit_address_icon} style={styles.icon} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.iconButton}
+                    // onPress={() => confirmDelete(item._id)}
+                    onPress={() => confirmDelete(item.id)}>
+                    <Image source={delete_icon} style={styles.icon} />
+                  </TouchableOpacity>
                 </View>
               </View>
-            )}
-            <View style={styles.row}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text style={styles.type}>{item.type}</Text>
-            </View>
-            <Text style={styles.address}>{item.address}</Text>
-            <Text style={styles.mobile}>
-              <Text style={styles.mobileLabel}>Mobile :</Text> {item.mobile}
-            </Text>
-            <View style={styles.actions}>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => openEditSheet(item)}
-              >
-                <Image source={edit_address_icon} style={styles.icon} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => confirmDelete(item.id)}
-              >
-                <Image source={delete_icon} style={styles.icon} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
+            );
+          }}
+        />
       </ScrollView>
 
-      <View style={{ marginHorizontal: 17, marginBottom: 20 }}>
+      <View style={{marginHorizontal: 17, marginBottom: 20}}>
         <GradientButton title="Add New Address" onPress={openAddSheet} />
       </View>
 
@@ -179,117 +260,130 @@ const AddressScreen = () => {
         closeOnPressMask={true}
         height={hp(80)}
         customStyles={{
-          wrapper: { backgroundColor: 'rgba(0,0,0,0.5)' },
-          draggableIcon: { backgroundColor: '#ccc' },
+          wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
+          draggableIcon: {backgroundColor: '#ccc'},
           container: {
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
             height: '80%',
           },
-        }}
-      >
-        <Text style={styles.modalTitle}>
-          {editId ? 'Edit Address' : 'Add New Address'}
-        </Text>
-        <View
-          style={{
-            borderBottomColor: '#E3E3E3',
-            borderBottomWidth: 1,
-            width: '100%',
-            marginTop: 5,
-            marginBottom: 15,
-          }}
-        />
-        <View style={{ paddingHorizontal: 20 }}>
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
-            value={form.name}
-            onChangeText={(val) => setForm({ ...form, name: val })}
-            placeholderTextColor="#9C9C9C"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Mobile Number"
-            keyboardType="phone-pad"
-            value={form.mobile}
-            onChangeText={(val) => setForm({ ...form, mobile: val })}
-            placeholderTextColor="#9C9C9C"
-          />
-
-          <View style={styles.iconLabelRow}>
-            <Image source={location_icon} style={styles.locationIcon} />
-            <Text style={styles.sectionTitle}>Delivery Address</Text>
-          </View>
-
-          <TextInput
-            style={styles.input}
-            placeholder="Pincode"
-            value={form.pincode}
-            onChangeText={(val) => setForm({ ...form, pincode: val })}
-            placeholderTextColor="#9C9C9C"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Address (House No, Building, Street, Area)"
-            value={form.address}
-            onChangeText={(val) => setForm({ ...form, address: val })}
-            placeholderTextColor="#9C9C9C"
-            multiline
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Locality/Town"
-            value={form.locality}
-            onChangeText={(val) => setForm({ ...form, locality: val })}
-            placeholderTextColor="#9C9C9C"
-          />
-
-          <TouchableOpacity
-            style={styles.defaultAddressRow}
-            onPress={() => setForm({ ...form, isDefault: !form.isDefault })}
-          >
-            <View style={styles.checkboxContainer}>
-              {form.isDefault ? (
-                <Image source={check_icon} style={styles.checkIcon} />
-              ) : (
-                <View style={styles.uncheckedBox} />
-              )}
-            </View>
-            <Text style={styles.defaultAddressText}>
-              Make it default address
+        }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{flex: 1}}>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}>
+            {/* 🔽 ALL TextInputs here */}
+            <Text style={styles.modalTitle}>
+              {editId ? 'Edit Address' : 'Add New Address'}
             </Text>
-          </TouchableOpacity>
+            <View
+              style={{
+                borderBottomColor: '#E3E3E3',
+                borderBottomWidth: 1,
+                width: '100%',
+                marginTop: 5,
+                marginBottom: 15,
+              }}
+            />
+            <View style={{paddingHorizontal: 20}}>
+              <TextInput
+                style={styles.input}
+                placeholder="Name"
+                value={form.name}
+                onChangeText={val => setForm({...form, name: val})}
+                placeholderTextColor="#9C9C9C"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Mobile Number"
+                keyboardType="phone-pad"
+                value={form.mobile}
+                onChangeText={val => setForm({...form, mobile: val})}
+                placeholderTextColor="#9C9C9C"
+              />
 
-          <View style={{ marginBottom: 10 }}>
-            <GradientButton title="Save Address" onPress={saveAddress} />
-          </View>
-        </View>
+              <View style={styles.iconLabelRow}>
+                <Image source={location_icon} style={styles.locationIcon} />
+                <Text style={styles.sectionTitle}>Delivery Address</Text>
+              </View>
+
+              <TextInput
+                style={styles.input}
+                placeholder="Pincode"
+                value={form.pincode}
+                onChangeText={val => setForm({...form, pincode: val})}
+                placeholderTextColor="#9C9C9C"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Address (House No, Building, Street, Area)"
+                value={form.address}
+                onChangeText={val => setForm({...form, address: val})}
+                placeholderTextColor="#9C9C9C"
+                multiline
+              />
+              <TextInput
+                // style={styles.input}
+                style={[styles.input, {minHeight: 45}]}
+                placeholder="Locality/Town"
+                value={form.locality}
+                onChangeText={val => setForm({...form, locality: val})}
+                placeholderTextColor="#9C9C9C"
+              />
+
+              <TouchableOpacity
+                style={styles.defaultAddressRow}
+                onPress={() => setForm({...form, isDefault: !form.isDefault})}>
+                <View style={styles.checkboxContainer}>
+                  {form.isDefault ? (
+                    <Image source={check_icon} style={styles.checkIcon} />
+                  ) : (
+                    <View style={styles.uncheckedBox} />
+                  )}
+                </View>
+                <Text style={styles.defaultAddressText}>
+                  Make it default address
+                </Text>
+              </TouchableOpacity>
+
+              <View style={{marginBottom: 10}}>
+                <GradientButton title="Save Address" onPress={saveAddress} />
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </RBSheet>
 
       {/* Delete Confirmation Modal */}
+      {showConfirm && console.log('MODAL OPEN - deleteId:', deleteId)}
+
       <Modal
         visible={showConfirm}
         transparent
         animationType="fade"
-        onRequestClose={() => setShowConfirm(false)}
-      >
+        onRequestClose={() => setShowConfirm(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.confirmBox}>
             <Text style={styles.confirmText}>
               Are you sure want to delete this address?
             </Text>
+
+            {console.log('INSIDE MODAL deleteId:', deleteId)}
+
             <View style={styles.confirmButtons}>
               <TouchableOpacity
                 style={styles.cancelButton}
-                onPress={() => setShowConfirm(false)}
-              >
+                onPress={() => setShowConfirm(false)}>
                 <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
+
               <GradientButton
                 title="Yes, Delete"
-                onPress={handleDelete}
-                buttonStyle={{ width: 130 }}
+                // onPress={handleDelete}
+                onPress={() => handleDelete(deleteId || null)}
+                buttonStyle={{width: 130}}
               />
             </View>
           </View>
@@ -302,7 +396,7 @@ const AddressScreen = () => {
 export default AddressScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: {flex: 1, backgroundColor: '#fff'},
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -327,7 +421,7 @@ const styles = StyleSheet.create({
     marginRight: 30,
     marginLeft: 30,
   },
-  scrollContainer: { padding: wp(5) },
+  scrollContainer: {padding: wp(5)},
   card: {
     backgroundColor: '#fff',
     padding: wp(15),
@@ -353,7 +447,7 @@ const styles = StyleSheet.create({
     borderRadius: wp(13),
     marginTop: hp(5),
   },
-  defaultText: { color: '#fff', fontSize: 12 },
+  defaultText: {color: '#fff', fontSize: 12},
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -450,7 +544,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
-    alignSelf: 'flex-start'
+    alignSelf: 'flex-start',
   },
   checkboxContainer: {
     width: wp(18),

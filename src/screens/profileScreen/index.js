@@ -11,13 +11,54 @@ import {
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import arrow_back from '../../assets/images/arrow_back.png';
 import {useNavigation} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import {useEffect} from 'react';
+// import {fetchUserRequest} from '../redux/actions/userActions';
+import {fetchUserRequest} from '../../redux/actions/userActions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {logout} from '../../redux/actions/authActions';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const handlePress = label => {
-    console.log(`${label} pressed`);
-  };
+  const dispatch = useDispatch();
+  const {user, loading} = useSelector(state => state.user);
 
+  useEffect(() => {
+    const loadToken = async () => {
+      const token = await AsyncStorage.getItem('authToken');
+      console.log('PROFILE SCREEN TOKEN:', token);
+
+      if (token) {
+        dispatch(fetchUserRequest(token));
+      } else {
+        console.log('No token found');
+      }
+    };
+
+    loadToken();
+  }, []);
+
+  const getInitials = fullName => {
+    if (!fullName) return 'U';
+
+    const parts = fullName.trim().split(' ');
+
+    if (parts.length === 1) {
+      return parts[0].substring(0, 2).toUpperCase();
+    }
+
+    // First letter of first word + first letter of second word
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  };
+  //Logout function
+  const onLogoutPress = () => {
+    dispatch(logout());
+
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'StartingScreen'}],
+    });
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.profileContainer}>
@@ -35,9 +76,14 @@ const ProfileScreen = () => {
         {/* User Info */}
         <View style={styles.userContainer}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>RS</Text>
+            <Text style={styles.avatarText}>
+              {getInitials(user?.name || user?.email)}
+            </Text>
           </View>
-          <Text style={styles.nameText}>Riya Shah</Text>
+
+          <Text style={styles.nameText}>
+            {user?.name || user?.email || user?.mobileNumber || 'User'}
+          </Text>
         </View>
 
         {/* Menu Grid */}
@@ -104,7 +150,7 @@ const ProfileScreen = () => {
 
           <TouchableOpacity
             style={styles.boxWrapper}
-            onPress={() => handlePress('Track Order')}>
+            onPress={() => navigation.navigate('OrderDetails')}>
             <View style={[styles.box, {backgroundColor: '#F7F5FD'}]}>
               <Image
                 source={require('../../assets/images/track_icon_info.png')}
@@ -120,19 +166,19 @@ const ProfileScreen = () => {
 
         {/* About Section */}
         <View style={styles.mainContainer}>
-          <TouchableOpacity onPress={() => handlePress('About Tranding')}>
+          <TouchableOpacity onPress={() => console.log('About Tranding')}>
             <Text style={styles.about}>About Tranding</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handlePress('Terms of Service')}>
+          <TouchableOpacity onPress={() => console.log('Terms of Service')}>
             <Text style={styles.about}>Terms of Service</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handlePress('Privacy Policy')}>
+          <TouchableOpacity onPress={() => console.log('Privacy Policy')}>
             <Text style={styles.about}>Privacy Policy</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handlePress('Help Center')}>
+          <TouchableOpacity onPress={() => console.log('Help Center')}>
             <Text style={styles.about}>Help Center</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handlePress('Grievance Redressal')}>
+          <TouchableOpacity onPress={() => console.log('Grievance Redressal')}>
             <Text style={[styles.about, {marginBottom: 0}]}>
               Grievance Redressal
             </Text>
@@ -142,7 +188,7 @@ const ProfileScreen = () => {
         {/* Logout */}
         <TouchableOpacity
           style={[styles.logoutContainer, {marginTop: hp(15)}]}
-          onPress={() => handlePress('Log Out')}>
+          onPress={() => onLogoutPress()}>
           <Text style={styles.logoutBtn}>Log Out</Text>
         </TouchableOpacity>
       </ScrollView>

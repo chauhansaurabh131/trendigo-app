@@ -1,226 +1,580 @@
-import React from "react";
+// import React from 'react';
+// import arrow_back from '../../assets/images/arrow_back.png';
+// import delivery_icon from '../../assets/images/delivery_order.png';
+// import image_icon from '../../assets/images/imageProduct.png';
+// import {fontFamily, wp, hp} from '../../utils/helpers';
+// import {
+//   View,
+//   Text,
+//   StyleSheet,
+//   Image,
+//   TouchableOpacity,
+//   ScrollView,
+//   SafeAreaView,
+// } from 'react-native';
+// import {useNavigation} from '@react-navigation/native';
+
+// const OrderDetailsScreen = () => {
+//   const navigation = useNavigation();
+
+//   const handlePress = type => {
+//     console.log(`${type} pressed`);
+//   };
+
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       {/* Header */}
+//       <View style={styles.header}>
+//         <TouchableOpacity onPress={() => navigation.goBack()}>
+//           <Image source={arrow_back} style={styles.backIcon} />
+//         </TouchableOpacity>
+//         <Text style={styles.headerTitle}>Order Details</Text>
+//       </View>
+
+//       <ScrollView showsVerticalScrollIndicator={false}>
+//         {/* Expected Delivery */}
+//         <View style={styles.deliveryBox}>
+//           <Image source={delivery_icon} style={styles.deliveryIcon} />
+//           <Text style={styles.deliveryText}>
+//             <Text style={styles.deliveryHighlight}>
+//               Expected Delivery On :{' '}
+//             </Text>
+//             Monday , 19 Dec. 2024
+//           </Text>
+//         </View>
+
+//         {/* Product Image */}
+//         <View style={styles.imageContainer}>
+//           <Image source={image_icon} style={styles.productImage} />
+//           <Text style={styles.productTitle}>Designer Traditional Dress</Text>
+//           <View style={styles.divider} />
+//         </View>
+
+//         {/* Product Details */}
+//         <View style={styles.detailsBox}>
+//           <View style={styles.row}>
+//             <Text style={styles.label}>Size</Text>
+//             <Text style={styles.value}>S</Text>
+//           </View>
+//           <View style={styles.row}>
+//             <Text style={styles.label}>Color</Text>
+//             <Text style={styles.value}>Sky Blue</Text>
+//           </View>
+//           <View style={styles.row}>
+//             <Text style={styles.label}>Qty</Text>
+//             <Text style={styles.value}>01</Text>
+//           </View>
+//         </View>
+
+//         {/* Payment Details */}
+//         <View style={styles.detailsBox}>
+//           <View style={styles.row}>
+//             <Text style={styles.label}>Total Paid</Text>
+//             <Text style={styles.value}>Rs. 180.00</Text>
+//           </View>
+//           <View style={styles.row}>
+//             <Text style={styles.label}>Paid By</Text>
+//             <Text style={styles.value}>Mastercard</Text>
+//           </View>
+//           <View style={styles.row}>
+//             <Text style={styles.label}>Paid Date</Text>
+//             <Text style={styles.value}>02-02-2025, 10:30:10</Text>
+//           </View>
+//           <View style={styles.row}>
+//             <Text style={styles.label}>Order ID</Text>
+//             <Text style={styles.value}>BGS08975201</Text>
+//           </View>
+//         </View>
+
+//         {/* Buttons */}
+//         <TouchableOpacity
+//           style={[styles.button, {backgroundColor: '#FBF2FF', marginTop: 40}]}
+//           onPress={() => handlePress('Track Order')}>
+//           <Text
+//             style={{
+//               color: '#B225AF',
+//               fontFamily: fontFamily.poppins500,
+//               fontSize: wp(14),
+//             }}>
+//             Track Order
+//           </Text>
+//         </TouchableOpacity>
+
+//         <TouchableOpacity
+//           style={[
+//             styles.button,
+//             {backgroundColor: '#F5F5F5', marginBottom: 20},
+//           ]}
+//           onPress={() => handlePress('Download Receipt')}>
+//           <Text
+//             style={{
+//               color: '#000000',
+//               fontFamily: fontFamily.poppins500,
+//               fontSize: wp(14),
+//             }}>
+//             Download Receipt
+//           </Text>
+//         </TouchableOpacity>
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {flex: 1, backgroundColor: '#fff'},
+
+//   header: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     padding: 15,
+//   },
+//   backIcon: {
+//     width: wp(18),
+//     height: hp(18),
+//     resizeMode: 'contain',
+//     marginRight: 10,
+//   },
+//   headerTitle: {
+//     flex: 1,
+//     textAlign: 'center',
+//     fontFamily: fontFamily.poppins500,
+//     fontSize: wp(18),
+//     color: '#000',
+//     marginRight: 30,
+//   },
+
+//   deliveryBox: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//     backgroundColor: '#FCF7FF',
+//     padding: 12,
+//     marginBottom: 15,
+//     width: '100%',
+//   },
+//   deliveryIcon: {
+//     width: 22,
+//     height: 16,
+//     marginLeft: 15,
+//   },
+//   deliveryText: {
+//     fontSize: 14,
+//     color: '#000000',
+//     flex: 1,
+//     marginLeft: 15,
+//   },
+//   deliveryHighlight: {
+//     fontWeight: 'bold',
+//     color: '#2B9909',
+//     width: '100%',
+//   },
+
+//   imageContainer: {
+//     alignItems: 'center',
+//     marginVertical: 15,
+//   },
+//   productImage: {
+//     width: 100,
+//     height: 130,
+//     borderRadius: 12,
+//     marginBottom: 10,
+//   },
+//   productTitle: {
+//     fontSize: 14,
+//     fontFamily: fontFamily.poppins500,
+//     color: '#000000',
+//     fontWeight: 'bold',
+//   },
+//   divider: {
+//     borderColor: '#EBEBEB',
+//     borderBottomWidth: 1,
+//     width: '90%',
+//     marginVertical: 12,
+//     marginTop: 20,
+//   },
+
+//   detailsBox: {
+//     marginHorizontal: 14,
+//     marginVertical: 12,
+//     borderBottomWidth: 1,
+//     borderBottomColor: '#EBEBEB',
+//     paddingBottom: 10,
+//     bottom: 30,
+//     width: '90%',
+//     alignSelf: 'center',
+//   },
+//   row: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     marginVertical: hp(1.5),
+//     marginHorizontal: 4,
+//   },
+//   label: {
+//     fontSize: 14,
+//     color: '#000000',
+//     fontFamily: fontFamily.poppins400,
+//   },
+//   value: {
+//     fontSize: 14,
+//     fontFamily: fontFamily.poppins500,
+//     color: '#000000',
+//   },
+
+//   button: {
+//     marginHorizontal: 15,
+//     marginVertical: 10,
+//     paddingVertical: 12,
+//     borderRadius: 30,
+//     alignItems: 'center',
+//     justifyContent: 'center',
+//     height: 50,
+//     width: wp(360),
+//   },
+// });
+
+// export default OrderDetailsScreen;
+import React from 'react';
+import {Image, Text, TouchableOpacity, View} from 'react-native';
+import {fontFamily, fontSize, wp, hp} from '../../utils/helpers';
+import {images} from '../../assets';
 import arrow_back from '../../assets/images/arrow_back.png';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import delivery_icon from '../../assets/images/delivery_order.png';
 import image_icon from '../../assets/images/imageProduct.png';
-import { fontFamily, wp, hp } from '../../utils/helpers';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-
+import {useNavigation} from '@react-navigation/native';
 const OrderDetailsScreen = () => {
   const navigation = useNavigation();
-
-  const handlePress = (type) => {
-    console.log(`${type} pressed`);
-  }
-
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
+    <SafeAreaView style={{flex: 1, backgroundColor: '#FFFFFF'}}>
+      <View
+        style={{
+          marginTop: hp(14),
+          marginHorizontal: wp(18),
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image
             source={arrow_back}
-            style={styles.backIcon}
+            style={{
+              width: 18,
+              height: 18,
+              resizeMode: 'contain',
+            }}
           />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Order Details</Text>
-      </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Expected Delivery */}
-        <View style={styles.deliveryBox}>
+        <View style={{flex: 1, alignItems: 'center'}}>
+          <Text
+            style={{
+              fontSize: fontSize(18),
+              color: '#000',
+              fontFamily: fontFamily.poppins500,
+            }}>
+            Order Details
+          </Text>
+        </View>
+      </View>
+      <View
+        style={{
+          backgroundColor: '#FCF7FF',
+          width: '100%',
+          height: hp(40),
+          marginTop: hp(16),
+        }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: hp(13),
+            marginLeft: wp(36),
+          }}>
           <Image
             source={delivery_icon}
-            style={styles.deliveryIcon}
+            style={{width: wp(19), height: hp(13), resizeMode: 'contain'}}
           />
-          <Text style={styles.deliveryText}>
-            <Text style={styles.deliveryHighlight}>Expected Delivery On : </Text>
+
+          <Text
+            style={{
+              color: '#2B9909',
+              fontSize: fontSize(14),
+              fontFamily: fontFamily.poppins600,
+              marginLeft: wp(11),
+            }}>
+            Expected Delivery On :
+          </Text>
+          <Text
+            style={{
+              color: '#000',
+              fontSize: fontSize(13),
+              fontFamily: fontFamily.poppins400,
+              marginLeft: wp(11),
+            }}>
             Monday , 19 Dec. 2024
           </Text>
         </View>
-
-        {/* Product Image */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={image_icon}
-            style={styles.productImage}
-          />
-          <Text style={styles.productTitle}>Designer Traditional Dress</Text>
-          <View style={styles.divider} />
+      </View>
+      <View
+        style={{
+          alignItems: 'center',
+          marginTop: hp(16),
+        }}>
+        <Image
+          source={image_icon}
+          style={{width: wp(73), height: hp(88)}}
+          resizeMode="contain"
+        />
+        <View style={{marginTop: hp(13)}}>
+          <Text
+            style={{
+              color: '#000',
+              fontSize: fontSize(14),
+              fontFamily: fontFamily.poppins500,
+            }}>
+            Designer Traditional Dress
+          </Text>
         </View>
+      </View>
+      <View
+        style={{
+          borderColor: '#E8E8E8',
+          borderWidth: 1,
+          // width: '100%',
+          marginHorizontal: wp(18),
+          marginTop: hp(16),
+        }}
+      />
 
-        {/* Product Details */}
-        <View style={styles.detailsBox}>
-          <View style={styles.row}>
-            <Text style={styles.label}>Size</Text>
-            <Text style={styles.value}>S</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Color</Text>
-            <Text style={styles.value}>Sky Blue</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Qty</Text>
-            <Text style={styles.value}>01</Text>
-          </View>
-        </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp(14),
+          marginHorizontal: wp(18),
+        }}>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins600,
+            fontSize: fontSize(14),
+          }}>
+          Size
+        </Text>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins400,
+            fontSize: fontSize(14),
+          }}>
+          S
+        </Text>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp(14),
+          marginHorizontal: wp(18),
+        }}>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins400,
+            fontSize: fontSize(14),
+          }}>
+          Color
+        </Text>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins600,
+            fontSize: fontSize(14),
+          }}>
+          Sky Blue
+        </Text>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp(14),
+          marginHorizontal: wp(18),
+        }}>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins400,
+            fontSize: fontSize(14),
+          }}>
+          Qty
+        </Text>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins600,
+            fontSize: fontSize(14),
+          }}>
+          01
+        </Text>
+      </View>
+      <View
+        style={{
+          borderColor: '#E8E8E8',
+          borderWidth: 1,
+          // width: '100%',
+          marginHorizontal: wp(18),
+          marginTop: hp(16),
+        }}
+      />
 
-        {/* Payment Details */}
-        <View style={styles.detailsBox}>
-          <View style={styles.row}>
-            <Text style={styles.label}>Total Paid</Text>
-            <Text style={styles.value}>Rs. 180.00</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Paid By</Text>
-            <Text style={styles.value}>Mastercard</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Paid Date</Text>
-            <Text style={styles.value}>02-02-2025, 10:30:10</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Order ID</Text>
-            <Text style={styles.value}>BGS08975201</Text>
-          </View>
-        </View>
-
-        {/* Buttons */}
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#FBF2FF", marginTop: 40}]}
-          onPress={() => handlePress('Track Order')}
-        >
-          <Text style={{ color: "#B225AF", fontFamily: fontFamily.poppins500, fontSize: wp(14) }}>Track Order</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: "#F5F5F5", marginBottom: 20 }]}
-          onPress={() => handlePress('Download Receipt')}
-        >
-          <Text style={{ color: "#000000", fontFamily: fontFamily.poppins500, fontSize: wp(14) }}>Download Receipt</Text>
-        </TouchableOpacity>
-      </ScrollView>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp(14),
+          marginHorizontal: wp(18),
+        }}>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins400,
+            fontSize: fontSize(14),
+          }}>
+          Total Paid
+        </Text>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins600,
+            fontSize: fontSize(14),
+          }}>
+          Rs. 180.00
+        </Text>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp(14),
+          marginHorizontal: wp(18),
+        }}>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins400,
+            fontSize: fontSize(14),
+          }}>
+          Paid By
+        </Text>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins600,
+            fontSize: fontSize(14),
+          }}>
+          Mastecard
+        </Text>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp(14),
+          marginHorizontal: wp(18),
+        }}>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins400,
+            fontSize: fontSize(14),
+          }}>
+          Paid Date
+        </Text>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins600,
+            fontSize: fontSize(14),
+          }}>
+          02-02-2025, 10:30:10
+        </Text>
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginTop: hp(14),
+          marginHorizontal: wp(18),
+        }}>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins400,
+            fontSize: fontSize(14),
+          }}>
+          Order ID
+        </Text>
+        <Text
+          style={{
+            color: '#000',
+            fontFamily: fontFamily.poppins600,
+            fontSize: fontSize(14),
+          }}>
+          BGS08975201
+        </Text>
+      </View>
+      <View
+        style={{
+          borderColor: '#E8E8E8',
+          borderWidth: 1,
+          // width: '100%',
+          marginHorizontal: wp(18),
+          marginTop: hp(16),
+        }}
+      />
+      <TouchableOpacity
+        onPress={() => navigation.navigate('TrackOrder')}
+        style={{
+          height: hp(50),
+          backgroundColor: '#FBF2FF',
+          borderRadius: 30,
+          position: 'absolute',
+          bottom: hp(87),
+          left: wp(18),
+          right: wp(18),
+          alignItems: 'center', // horizontal center
+          justifyContent: 'center',
+        }}>
+        <Text
+          style={{
+            color: '#8225AF',
+            fontFamily: fontFamily.poppins500,
+            fontSize: fontSize(14),
+          }}>
+          Track Order
+        </Text>
+      </TouchableOpacity>
+      <View
+        style={{
+          height: hp(50),
+          backgroundColor: '#F5F5F5',
+          borderRadius: 30,
+          position: 'absolute',
+          bottom: hp(20),
+          left: wp(18),
+          right: wp(18),
+          alignItems: 'center', // horizontal center
+          justifyContent: 'center',
+        }}>
+        <Text
+          style={{
+            color: '#8225AF',
+            fontFamily: fontFamily.poppins500,
+            fontSize: fontSize(14),
+          }}>
+          Download Receipt
+        </Text>
+      </View>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 15,
-  },
-  backIcon: {
-    width: wp(18),
-    height: hp(18),
-    resizeMode: 'contain',
-    marginRight: 10
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontFamily: fontFamily.poppins500,
-    fontSize: wp(18),
-    color: '#000',
-    marginRight: 30
-  },
-
-  deliveryBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FCF7FF",
-    padding: 12,
-    marginBottom: 15,
-    width: "100%"
-  },
-  deliveryIcon: {
-    width: 22,
-    height: 16,
-    marginLeft: 15
-  },
-  deliveryText: {
-    fontSize: 14,
-    color: "#000000",
-    flex: 1,
-    marginLeft: 15
-  },
-  deliveryHighlight: {
-    fontWeight: "bold",
-    color: "#2B9909",
-    width: "100%"
-  },
-
-  imageContainer: {
-    alignItems: "center",
-    marginVertical: 15
-  },
-  productImage: {
-    width: 100,
-    height: 130,
-    borderRadius: 12,
-    marginBottom: 10
-  },
-  productTitle: {
-    fontSize: 14,
-    fontFamily: fontFamily.poppins500,
-    color: "#000000",
-    fontWeight: "bold"
-  },
-  divider: {
-    borderColor: "#EBEBEB",
-    borderBottomWidth: 1,
-    width: "90%",
-    marginVertical: 12,
-    marginTop: 20
-  },
-
-  detailsBox: {
-    marginHorizontal: 14,
-    marginVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#EBEBEB",
-    paddingBottom: 10,
-    bottom:30,
-    width: "90%",
-    alignSelf: "center", 
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginVertical: hp(1.5),
-    marginHorizontal: 4,
-  },
-  label: {
-    fontSize: 14,
-    color: "#000000",
-    fontFamily: fontFamily.poppins400,
-  },
-  value: {
-    fontSize: 14,
-    fontFamily: fontFamily.poppins500,
-    color: "#000000"
-  },
-
-  button: {
-    marginHorizontal: 15,
-    marginVertical: 10,
-    paddingVertical: 13,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 50,
-    width: "90%"
-  },
-});
-
 export default OrderDetailsScreen;

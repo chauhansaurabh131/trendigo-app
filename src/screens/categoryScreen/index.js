@@ -10,10 +10,10 @@ import {
 import {colors} from '../../utils/colors';
 import {fontFamily, fontSize, hp, Touchable} from '../../utils/helpers';
 import {images, NavigationArrowIcon} from '../../assets';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
 const CategoryScreen = () => {
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
@@ -39,9 +39,15 @@ const CategoryScreen = () => {
             marginHorizontal: 18,
             marginTop: hp(17),
           }}>
-          <TouchableOpacity activeOpacity={0.6}
-           onPress={() => navigation.navigate('MenCategoryScreen')}
-          >
+          <TouchableOpacity
+            activeOpacity={0.6}
+            onPress={() =>
+              navigation.navigate('MenCategoryScreen', {
+                title: "Men's Collection",
+                type: 'men',
+                image: images.men_collection_img,
+              })
+            }>
             <View style={{position: 'relative'}}>
               <Image
                 source={images.men_collection_img}
@@ -87,7 +93,16 @@ const CategoryScreen = () => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.6} style={{marginTop: hp(17)}}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            style={{marginTop: hp(17)}}
+            onPress={() =>
+              navigation.navigate('MenCategoryScreen', {
+                title: "Women's Collection",
+                image: images.women_collection_img,
+                type: 'women',
+              })
+            }>
             <View style={{position: 'relative'}}>
               <Image
                 source={images.women_collection_img}
@@ -133,7 +148,16 @@ const CategoryScreen = () => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.6} style={{marginTop: hp(17)}}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            style={{marginTop: hp(17)}}
+            onPress={() =>
+              navigation.navigate('MenCategoryScreen', {
+                title: "Kids's Collection",
+                image: images.kids_collection_img,
+                type: 'kids',
+              })
+            }>
             <View style={{position: 'relative'}}>
               <Image
                 source={images.kids_collection_img}
@@ -179,7 +203,16 @@ const CategoryScreen = () => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.6} style={{marginTop: hp(17)}}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            style={{marginTop: hp(17)}}
+            onPress={() =>
+              navigation.navigate('MenCategoryScreen', {
+                title: 'Beauty Collection',
+                image: images.beauty_product_img,
+                type: 'beauty',
+              })
+            }>
             <View style={{position: 'relative'}}>
               <Image
                 source={images.beauty_product_img}

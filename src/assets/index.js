@@ -22,7 +22,6 @@ import SellerShopIcon from './svgIcons/seller_shop_icon.svg';
 import BackIcon from './svgIcons/back_icon.svg';
 import SearchFilterIcon from './svgIcons/seach_filter_icon.svg';
 import GradientFullFillLike from './svgIcons/gradient_fulfill_like.svg';
-
 export {
   WhiteTrendiGo,
   RightSideArrow,
@@ -96,9 +95,9 @@ export const images = {
   delete_icon: require('./images/delete_address_icon.png'),
   location_icon: require('./images/location_address_icon.png'),
   delivery_icon: require('./images/delivery_order.png'),
-  image_icon : require('./images/imageProduct.png'),
-  banner_icon : require('./images/banner_men_icon.png'),
-  tishrt_icon : require('./images/tishrt_men_icon.png'),
+  image_icon: require('./images/imageProduct.png'),
+  banner_icon: require('./images/banner_men_icon.png'),
+  tishrt_icon: require('./images/tishrt_men_icon.png'),
   formal_image: require('./images/formal_men_image.png'),
   jacket_image: require('./images/jacket_men_image.png'),
   blazer_image: require('./images/blazer_men_image.png'),
@@ -107,10 +106,17 @@ export const images = {
   rain_image: require('./images/rain_men_image.png'),
   caps_image: require('./images/caps_men_image.png'),
   topwear_icon: require('./images/topwear_men_icon.png'),
-  bottmwear_image:require('./images/bottomwear_men_image.png'),
+  bottmwear_image: require('./images/bottomwear_men_image.png'),
   footwear_image: require('./images/footwear_men_image.png'),
-  men_causal :require('./images/men_causal_image.png'),
-  star_icon : require('./images/star_image_icon.png'),
+  men_causal: require('./images/men_causal_image.png'),
+  star_icon: require('./images/star_image_icon.png'),
   purple_image: require('./images/purple_kurta_image.png'),
   pink_image: require('./images/pink_kurta_image.png'),
+  otp_verify: require('./images/otp_verify_image.png'),
+  white_icon: require('./images/white_image_icon.png'),
+  watch_image: require('./images/watch_image_icon.png'),
+  line_icon: require('./images/line_image_icon.png'),
+  packed_icon: require('./images/packed_icon_image.png'),
+  ship_icon: require('./images/ship_icon_image.png'),
+  delivered_icon: require('./images/delivered_icon_image.png'),
 };

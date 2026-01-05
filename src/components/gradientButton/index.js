@@ -1,16 +1,29 @@
 import React from 'react';
-import {Text, TouchableOpacity, SafeAreaView} from 'react-native';
+import {
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {fontFamily, fontSize, hp} from '../../utils/helpers';
 
-const GradientButton = ({title, onPress, buttonStyle, textStyle, disabled}) => {
+const GradientButton = ({
+  title,
+  onPress,
+  buttonStyle,
+  textStyle,
+  disabled,
+  loading = false,
+}) => {
   return (
     <SafeAreaView>
       <TouchableOpacity
         style={[{marginTop: hp(1)}, buttonStyle]} // Applying custom button style
         activeOpacity={0.7}
         onPress={onPress}
-        disabled={disabled} // Disable the button when disabled is true
+        // disabled={disabled} // Disable the button when disabled is true
+        disabled={disabled || loading} // ✅ prevent multi click when loading
       >
         <LinearGradient
           colors={['#0F52BA', '#8225AF']}
@@ -27,18 +40,23 @@ const GradientButton = ({title, onPress, buttonStyle, textStyle, disabled}) => {
             },
             buttonStyle,
           ]}>
-          <Text
-            style={[
-              {
-                color: 'white',
-                fontSize: fontSize(16),
-                lineHeight: hp(24),
-                fontFamily: fontFamily.poppins400,
-              },
-              textStyle,
-            ]}>
-            {title} {/* Button text dynamically passed as prop */}
-          </Text>
+          {/* 🔥 HERE IS THE MAIN CHANGE */}
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text
+              style={[
+                {
+                  color: 'white',
+                  fontSize: fontSize(16),
+                  lineHeight: hp(24),
+                  fontFamily: fontFamily.poppins400,
+                },
+                textStyle,
+              ]}>
+              {title} {/* Button text dynamically passed as prop */}
+            </Text>
+          )}
         </LinearGradient>
       </TouchableOpacity>
     </SafeAreaView>

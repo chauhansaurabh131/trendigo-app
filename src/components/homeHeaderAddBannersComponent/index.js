@@ -10,33 +10,55 @@ import {
 import {colors} from '../../utils/colors';
 import {images} from '../../assets';
 import {hp} from '../../utils/helpers';
-
+import {fetchBannerRequest} from '../../redux/actions/bannerActions';
+import {useSelector, useDispatch} from 'react-redux';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-const originalImages = [
-  images.sale_banner_img,
-  images.men_collection_img,
-  images.women_collection_img,
-  images.kids_collection_img,
-];
+// const originalImages = [
+//   images.sale_banner_img,
+//   images.men_collection_img,
+//   images.women_collection_img,
+//   images.kids_collection_img,
+// ];
 
-const imageData = [...originalImages, originalImages[0]];
+// const imageData = [...originalImages, originalImages[0]];
 
 const HomeHeaderAddBannersComponent = () => {
+  const dispatch = useDispatch();
+  // const {banners, loading} = useSelector(state => state.banner);
+
+  // // ✅ ADD HERE
+  // const bannerImages =
+  //   banners?.[0]?.images?.map(img => img?.imageUrl)?.filter(Boolean) || [];
+
+  // const bannerData =
+  //   bannerImages.length > 0 ? [...bannerImages, bannerImages[0]] : [];
+
+  const {banners, loading} = useSelector(state => state.banner);
+
+  // ✅ CONVERT API DATA TO IMAGE URL ARRAY
+  const bannerImages = banners?.[0]?.images?.map(img => img.imageUrl) || [];
+
+  // ✅ ADD DUPLICATE IMAGE FOR INFINITE SCROLL
+  const bannerData =
+    bannerImages.length > 0 ? [...bannerImages, bannerImages[0]] : [];
+
+  useEffect(() => {
+    dispatch(fetchBannerRequest());
+  }, []);
   const flatListRef = useRef(null);
   const currentIndexRef = useRef(0);
   const [visibleIndex, setVisibleIndex] = useState(0); // for rendering dots
 
   useEffect(() => {
+    if (bannerData.length <= 1) return;
+
     const interval = setInterval(() => {
       let nextIndex = currentIndexRef.current + 1;
 
-      if (nextIndex === imageData.length) {
-        return;
-      }
-
-      if (nextIndex === imageData.length - 1) {
+      if (nextIndex === bannerData.length - 1) {
         flatListRef.current?.scrollToIndex({index: nextIndex, animated: true});
+
         setTimeout(() => {
           flatListRef.current?.scrollToIndex({index: 0, animated: false});
           currentIndexRef.current = 0;
@@ -45,19 +67,20 @@ const HomeHeaderAddBannersComponent = () => {
       } else {
         flatListRef.current?.scrollToIndex({index: nextIndex, animated: true});
         currentIndexRef.current = nextIndex;
-        setVisibleIndex(nextIndex); // update for dots
+        setVisibleIndex(nextIndex);
       }
-    }, 2000);
+    }, 2500);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [bannerData]);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View>
         <FlatList
           ref={flatListRef}
-          data={imageData}
+          // data={imageData}
+          data={bannerData} // ✅ FIXED
           keyExtractor={(_, index) => index.toString()}
           horizontal
           pagingEnabled
@@ -65,11 +88,11 @@ const HomeHeaderAddBannersComponent = () => {
           renderItem={({item}) => (
             <View style={{width: SCREEN_WIDTH}}>
               <Image
-                source={item}
+                source={{uri: item}}
+                resizeMode="stretch"
                 style={{
                   width: SCREEN_WIDTH,
                   height: hp(169),
-                  resizeMode: 'cover',
                 }}
               />
             </View>
@@ -84,7 +107,8 @@ const HomeHeaderAddBannersComponent = () => {
 
         {/* Pagination Dots inside image */}
         <View style={styles.paginationContainer}>
-          {originalImages.map((_, i) => {
+          {/* {originalImages.map((_, i) => { */}
+          {bannerData.slice(0, -1).map((_, i) => {
             const isActive = visibleIndex === i;
             return (
               <View
