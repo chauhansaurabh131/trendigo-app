@@ -1,6 +1,7 @@
 import React from 'react';
 import {Image, SafeAreaView, Text, View} from 'react-native';
 import {colors} from '../../../utils/colors';
+import {useState} from 'react';
 import {
   fontFamily,
   fontSize,
@@ -11,8 +12,22 @@ import {
 } from '../../../utils/helpers';
 import {images, NavigationArrowIcon} from '../../../assets';
 import RatingStatComponent from '../../../components/ratingStarComponent';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
-const DeliveredScreen = () => {
+DeliveredScreen = () => {
+  const navigation = useNavigation();
+  const [rating, setRating] = useState(0);
+  const product = {
+    _id: '695f9b9e37424f1de0c4a436',
+    title: 'Designer Traditional Dress',
+    image: images.trending_one,
+    size: 'S',
+    color: 'Sky Blue',
+    qty: 1,
+    storeId: {
+      id: '6960ba8237424f1de0c4a7e3',
+    },
+  };
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View style={{marginHorizontal: 18}}>
@@ -55,7 +70,8 @@ const DeliveredScreen = () => {
 
           <View style={{flexDirection: 'row'}}>
             <Image
-              source={images.trending_one}
+              // source={images.trending_one}
+              source={product.image}
               style={{width: wp(73), height: hp(88)}}
               borderRadius={8}
             />
@@ -67,7 +83,8 @@ const DeliveredScreen = () => {
                   fontFamily: fontFamily.poppins500,
                   color: colors.pureBlack,
                 }}>
-                Designer Traditional Dress
+                {/* Designer Traditional Dress */}
+                <Text>{product.title}</Text>
               </Text>
 
               <View style={{marginTop: isIOS ? hp(15) : hp(7)}}>
@@ -97,7 +114,8 @@ const DeliveredScreen = () => {
                       fontFamily: fontFamily.poppins400,
                     }}>
                     {' '}
-                    S{' '}
+                    {/* S{' '} */}
+                    <Text>{product.size}</Text>
                   </Text>
                 </View>
 
@@ -127,7 +145,8 @@ const DeliveredScreen = () => {
                       fontFamily: fontFamily.poppins400,
                     }}>
                     {' '}
-                    Sky Blue{' '}
+                    {/* Sky Blue{' '} */}
+                    <Text>{product.color}</Text>
                   </Text>
                 </View>
 
@@ -157,7 +176,8 @@ const DeliveredScreen = () => {
                       fontFamily: fontFamily.poppins400,
                     }}>
                     {' '}
-                    1{' '}
+                    {/* 1{' '} */}
+                    <Text>{product.quantity}</Text>
                   </Text>
                 </View>
               </View>
@@ -193,10 +213,21 @@ const DeliveredScreen = () => {
           </Text>
 
           <View style={{marginTop: hp(9), marginBottom: hp(13)}}>
-            <RatingStatComponent />
+            {/* <RatingStatComponent /> */}
+            <RatingStatComponent
+              value={rating}
+              onRatingChange={value => setRating(value)}
+            />
+            {/* {productId && <RatingStatComponent productId={productId} />} */}
           </View>
 
           <Touchable
+            onPress={() =>
+              navigation.navigate('ReviewRating', {
+                product: product,
+                rating: rating,
+              })
+            }
             activeOpacity={0.6}
             style={{
               width: '97%',

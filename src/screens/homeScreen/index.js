@@ -6,11 +6,15 @@ import {
   GradientColorSearchIcon,
   ProfileIcon,
 } from '../../assets';
-import {fontFamily, fontSize, hp, Touchable} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, Touchable, wp} from '../../utils/helpers';
 import {useNavigation} from '@react-navigation/native';
 import HomeHeaderAddBannersComponent from '../../components/homeHeaderAddBannersComponent';
 import HomeAllProductCategoryComponent from '../../components/homeAllProductCategoryComponent';
 import HomeTrendingComponent from '../../components/homeTrendingComponent';
+import LatestTrendyComponet from '../../components/latestTrendyComponent';
+import ViralTrendyComponet from '../../components/viralTrendComponent';
+import ShopByBrandsComponent from '../../components/shopByBrandComponenent';
+import RecentlyViewComponent from '../../components/recentlyViewComponent';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -83,16 +87,34 @@ const HomeScreen = () => {
             <View style={{marginTop: hp(25)}}>
               <HomeAllProductCategoryComponent />
             </View>
-            <View
+
+            {/* <View
               style={{
                 width: '100%',
                 borderColor: '#E7E7E7',
                 borderWidth: 0.7,
-                marginTop: hp(10),
+                // marginTop: hp(10),
               }}
-            />
-            <View style={{marginTop: hp(18), marginLeft: 8}}>
+            /> */}
+            <View style={{marginTop: hp(28)}}>
+              <LatestTrendyComponet />
+            </View>
+            <View
+              style={{
+                // marginTop: hp(18),
+                marginTop: hp(35),
+                //  marginLeft: 8
+              }}>
               <HomeTrendingComponent />
+            </View>
+            <View style={{marginTop: hp(28)}}>
+              <ViralTrendyComponet />
+            </View>
+            <View style={{marginTop: hp(47)}}>
+              <ShopByBrandsComponent />
+            </View>
+            <View style={{marginTop: hp(35.17), marginHorizontal: wp(0)}}>
+              <RecentlyViewComponent />
             </View>
           </>
         }

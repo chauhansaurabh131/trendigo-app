@@ -22,6 +22,12 @@ import SellerShopIcon from './svgIcons/seller_shop_icon.svg';
 import BackIcon from './svgIcons/back_icon.svg';
 import SearchFilterIcon from './svgIcons/seach_filter_icon.svg';
 import GradientFullFillLike from './svgIcons/gradient_fulfill_like.svg';
+import PullBearIcon from './svgIcons/pull_bear_icon.svg';
+import BossIcon from './svgIcons/boss_icon.svg';
+import UniIcon from './svgIcons/uni_icon.svg';
+import Adidas from './svgIcons/adidas_icon.svg';
+import LevisIcon from './svgIcons/levis_icon.svg';
+import CalvinIcon from './svgIcons/calvin_icon.svg';
 export {
   WhiteTrendiGo,
   RightSideArrow,
@@ -47,6 +53,12 @@ export {
   BackIcon,
   SearchFilterIcon,
   GradientFullFillLike,
+  PullBearIcon,
+  BossIcon,
+  UniIcon,
+  Adidas,
+  CalvinIcon,
+  LevisIcon,
 };
 
 export const images = {
@@ -119,4 +131,15 @@ export const images = {
   packed_icon: require('./images/packed_icon_image.png'),
   ship_icon: require('./images/ship_icon_image.png'),
   delivered_icon: require('./images/delivered_icon_image.png'),
+  reviews_image: require('./images/reviews_image1.png'),
+  review_delete: require('./images/review_delete_icon.png'),
+  camera_icon: require('./images/camera_icon_image.png'),
+  star_icon1: require('./images/star_icon11.png'),
+  revews_icon: require('./images/revews_icon1.png'),
+  my_review: require('./images/my_review1.png'),
+  seller_image: require('./images/seller_profile_image.png'),
+  seller_shop: require('./images/seller_shop_image.png'),
+  latest_trendy: require('./images/latest_trendy_image.png'),
+  viral_trendy: require('./images/viral_trendy_image.png'),
+  video_play: require('./images/video_play_icon.png'),
 };

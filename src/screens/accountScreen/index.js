@@ -28,7 +28,11 @@ import {
   VERIFY_CHANGE_EMAIL_OTP_REQUEST,
   deleteAccountRequest,
   resetEmailVerifyStatus,
+  sendMobileOtpRequest,
+  verifyMobileOtpRequest,
 } from '../../redux/actions/userAccountActions';
+import {resetMobileMessage} from '../../redux/actions/userAccountActions';
+
 import {getMeRequest} from '../../redux/actions/userAccountActions';
 
 import LinearGradient from 'react-native-linear-gradient';
@@ -53,14 +57,15 @@ const AccountScreen = () => {
   // const user = useSelector(state => state.userAccount.user);
   const user = useSelector(state => state.userAccount.user);
   const userData = useSelector(state => state.userAccount.user?.user);
-
-  console.log('EMAIL:', userData?.email);
-
   const updatedEmail = useSelector(state => state.userAccount.updatedEmail);
   const message = useSelector(state => state.userAccount.message);
-
+  const [otp, setOtp] = useState(['', '', '', '']);
+  const inputRefs = [useRef(), useRef(), useRef(), useRef()];
+  const [newMobileNumber, setNewMobileNumber] = useState('');
   const [timer, setTimer] = useState(48);
-
+  console.log('EMAIL:', userData?.email);
+  const token = useSelector(state => state.auth.token);
+  console.log('TOKEN IN ACCOUNT SCREEN:', token);
   useEffect(() => {
     let interval = null;
 
@@ -80,10 +85,6 @@ const AccountScreen = () => {
 
     return () => clearInterval(interval);
   }, [showMobileOtpModal]);
-
-  const [otp, setOtp] = useState(['', '', '', '']);
-
-  const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
   const handleOtpChange = (value, index) => {
     const newOtp = [...otp];
@@ -127,7 +128,12 @@ const AccountScreen = () => {
       setEmail(user.user.email);
     }
   }, [user]);
-
+  useEffect(() => {
+    if (user?.user?.mobileNumber) {
+      setMobile(String(user.user.mobileNumber)); // 🔥 IMPORTANT
+    }
+  }, [user]);
+  console.log('MOBILE NUMBER ===>', mobile);
   console.log('USER ===>', user);
   console.log('EMAIL in user ===>', userData?.email);
 
@@ -272,6 +278,12 @@ const AccountScreen = () => {
       );
     }
   }, [error]);
+  // const {message} = useSelector(state => state.userAccount);
+  useEffect(() => {
+    if (message === 'Mobile number updated successfully') {
+      setShowMobileSuccessModal(true);
+    }
+  }, [message]);
 
   return (
     <ScrollView
@@ -834,8 +846,8 @@ const AccountScreen = () => {
                     marginTop: hp(9),
                   }}>
                   <TextInput
-                    // value={email}
-                    // onChangeText={setEmail}
+                    value={newMobileNumber}
+                    onChangeText={setNewMobileNumber}
                     style={{
                       color: '#000',
                       fontSize: fontSize(14),
@@ -869,7 +881,7 @@ const AccountScreen = () => {
                       }}
                       onPress={() => {
                         setShowEditModal(false);
-                        setEditingField(null);
+                        setShowMobileEditModal(null);
                       }}>
                       <Text
                         style={{
@@ -886,7 +898,25 @@ const AccountScreen = () => {
                     title={'Continue'}
                     buttonStyle={{width: wp(136), height: hp(50)}}
                     onPress={() => {
-                      setShowEditModal(false);
+                      if (!newMobileNumber.trim()) {
+                        Alert.alert('Error', 'Please enter new mobile number');
+                        return;
+                      }
+                      // setShowEditModal(false);
+                      // setShowMobileOtpModal(true);
+                      dispatch(
+                        sendMobileOtpRequest(
+                          token,
+                          mobile, // current mobile
+                          newMobileNumber, // new mobile
+                        ),
+                      );
+                      console.log(
+                        'token, mobile, newMobileNumber',
+                        token,
+                        mobile,
+                        newMobileNumber,
+                      );
                       setShowMobileOtpModal(true);
                     }}
                   />
@@ -943,7 +973,7 @@ const AccountScreen = () => {
                       fontFamily: fontFamily.poppins400,
                     }}>
                     <Text style={{color: '#A3A3A3'}}>OTP sent on</Text>
-                    <Text style={{color: '#000000'}}>123********{mobile}</Text>
+                    <Text style={{color: '#000000'}}>{newMobileNumber}</Text>
                   </Text>
                 </View>
                 <View
@@ -999,7 +1029,21 @@ const AccountScreen = () => {
                         alert('Please enter full 4-digit OTP');
                         return;
                       }
-
+                      dispatch(
+                        verifyMobileOtpRequest(
+                          token,
+                          mobile,
+                          newMobileNumber,
+                          finalOtp,
+                        ),
+                      );
+                      console.log(
+                        'token, mobile, newMobileNumber, finalOtp',
+                        token,
+                        mobile,
+                        newMobileNumber,
+                        finalOtp,
+                      );
                       console.log('OTP ENTERED:', finalOtp);
 
                       setShowMobileSuccessModal(true);
@@ -1062,12 +1106,37 @@ const AccountScreen = () => {
                     marginTop: hp(33),
                     marginLeft: wp(127),
                   }}>
-                  <GradientButton
+                  {/* <GradientButton
                     onPress={() => {
-                      navigation.navigate('Account');
+                      setShowMobileOtpModal(false);
+                      setEditingField(null);
+                      setShowMobileSuccessModal(false);
+                      navigation.goBack();
                     }}
                     title={'Ok'}
                     buttonStyle={{width: wp(120), height: hp(50)}}
+                  /> */}
+                  <GradientButton
+                    title={'Ok'}
+                    buttonStyle={{width: wp(120), height: hp(50)}}
+                    onPress={() => {
+                      // 1️⃣ Close success modal
+                      setShowMobileSuccessModal(false);
+
+                      // 2️⃣ Close OTP modal
+                      setShowMobileOtpModal(false);
+
+                      // 3️⃣ Close edit modal
+                      setShowMobileEditModal(false);
+
+                      // 4️⃣ Stop editing
+                      setEditingField(null);
+                      // 🔥 IMPORTANT: RESET redux message
+                      dispatch(resetMobileMessage());
+
+                      // 5️⃣ Go back to previous screen
+                      navigation.goBack();
+                    }}
                   />
                 </View>
               </View>

@@ -82,13 +82,22 @@ export default function authReducer(state = initialState, action) {
         token: action.payload, // 👈 restore token here
       };
 
+    // case VERIFY_EMAIL_OTP_SUCCESS:
+    //   return {
+    //     ...state,
+    //     loading: false,
+    //     token: action.payload.tokens.access.token,
+    //     user: action.payload.user,
+    //   };
     case VERIFY_EMAIL_OTP_SUCCESS:
       return {
         ...state,
         loading: false,
         token: action.payload.tokens.access.token,
         user: action.payload.user,
+        error: null,
       };
+
     case LOGOUT:
       return {
         ...initialState, // 🔥 everything reset

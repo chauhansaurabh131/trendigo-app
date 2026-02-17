@@ -17,6 +17,7 @@ import {useEffect} from 'react';
 import {fetchUserRequest} from '../../redux/actions/userActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {logout} from '../../redux/actions/authActions';
+import {images} from '../../assets';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -82,7 +83,7 @@ const ProfileScreen = () => {
           </View>
 
           <Text style={styles.nameText}>
-            {user?.name || user?.email || user?.mobileNumber || 'User'}
+            {user?.name || user?.email || user?.mobileNumber || 'No User'}
           </Text>
         </View>
 
@@ -158,6 +159,18 @@ const ProfileScreen = () => {
               />
             </View>
             <Text style={styles.boxLabel}>Track Order</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.boxWrapper}
+            onPress={() =>
+              navigation.navigate('HomeStack', {
+                screen: 'ReviewsScreen',
+              })
+            }>
+            <View style={[styles.box, {backgroundColor: '#FFF6F6'}]}>
+              <Image source={images.revews_icon} style={styles.boxImage} />
+            </View>
+            <Text style={styles.boxLabel}>My Revews</Text>
           </TouchableOpacity>
         </View>
 

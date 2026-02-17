@@ -14,6 +14,7 @@ import {
   RESEND_OTP_REQUEST,
   resendOtpSuccess,
   resendOtpFailure,
+  REFRESH_TOKEN_REQUEST,
 } from '../actions/authActions';
 
 // BASE URL
@@ -56,6 +57,7 @@ function* registerSaga(action) {
     );
 
     yield put(registerSuccess(response.data.message));
+    console.log('REGISTER SUCCESS:', response.data);
   } catch (error) {
     const message = error?.response?.data?.message || 'Register failed';
     yield put(registerFailure(message));
@@ -127,13 +129,20 @@ function* verifyEmailOtpSaga(action) {
 
     const fullData = response.data?.data;
     const token = fullData?.tokens?.access?.token;
+    const refreshToken = fullData?.tokens?.refresh?.token;
 
     if (token) {
       yield AsyncStorage.setItem('authToken', token);
     }
 
-    yield put(verifyEmailOtpSuccess(fullData));
+    if (refreshToken) {
+      yield AsyncStorage.setItem('refreshToken', refreshToken);
+    }
+    console.log('ACCESS TOKEN:', token);
+    console.log('REFRESH TOKEN:', refreshToken);
 
+    yield put(verifyEmailOtpSuccess(fullData));
+    console.log('OTP VERIFY SUCCESS:', response.data);
     Alert.alert('Success', 'Login Successfully!', [
       {text: 'OK', onPress: () => navigate('MainTabs')},
     ]);
@@ -195,6 +204,44 @@ function* resendOtpSaga(action) {
   }
 }
 
+//refresh token saga
+function* refreshTokenSaga(action) {
+  try {
+    const response = yield call(() =>
+      axios.post(
+        `${BASE_URL}/refresh-tokens`,
+        {refreshToken: action.payload},
+        {headers: {'Content-Type': 'application/json'}},
+      ),
+    );
+
+    const newAccessToken = response.data?.data?.access?.token;
+    const newRefreshToken = response.data?.data?.refresh?.token;
+
+    if (newAccessToken) {
+      yield AsyncStorage.setItem('authToken', newAccessToken);
+    }
+
+    if (newRefreshToken) {
+      yield AsyncStorage.setItem('refreshToken', newRefreshToken);
+    }
+
+    yield put({
+      type: 'REFRESH_TOKEN_SUCCESS',
+      payload: response.data.data,
+    });
+
+    console.log('🔄 Token refreshed successfully');
+  } catch (error) {
+    console.log('❌ Refresh token failed');
+
+    yield put({
+      type: 'REFRESH_TOKEN_FAILURE',
+      payload: error.response?.status,
+    });
+  }
+}
+
 // -----------------------------------------------------
 // ✅ ROOT SAGA
 // -----------------------------------------------------
@@ -202,4 +249,5 @@ export default function* authRootSaga() {
   yield takeLatest(REGISTER_REQUEST, registerSaga);
   yield takeLatest(VERIFY_EMAIL_OTP_REQUEST, verifyEmailOtpSaga);
   yield takeLatest(RESEND_OTP_REQUEST, resendOtpSaga);
+  yield takeLatest(REFRESH_TOKEN_REQUEST, refreshTokenSaga);
 }

@@ -44,7 +44,8 @@ const CategoryScreen = () => {
             onPress={() =>
               navigation.navigate('MenCategoryScreen', {
                 title: "Men's Collection",
-                type: 'men',
+                // type: 'men',
+                type: 'Men',
                 image: images.men_collection_img,
               })
             }>
@@ -100,7 +101,8 @@ const CategoryScreen = () => {
               navigation.navigate('MenCategoryScreen', {
                 title: "Women's Collection",
                 image: images.women_collection_img,
-                type: 'women',
+                // type: 'women',
+                type: 'Women',
               })
             }>
             <View style={{position: 'relative'}}>
@@ -155,7 +157,7 @@ const CategoryScreen = () => {
               navigation.navigate('MenCategoryScreen', {
                 title: "Kids's Collection",
                 image: images.kids_collection_img,
-                type: 'kids',
+                type: 'Kids',
               })
             }>
             <View style={{position: 'relative'}}>
@@ -210,7 +212,7 @@ const CategoryScreen = () => {
               navigation.navigate('MenCategoryScreen', {
                 title: 'Beauty Collection',
                 image: images.beauty_product_img,
-                type: 'beauty',
+                type: 'Beauty',
               })
             }>
             <View style={{position: 'relative'}}>

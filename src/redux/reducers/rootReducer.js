@@ -7,7 +7,15 @@ import addressReducer from './addressReducer';
 import userAccountReducer from './userAccountReducer';
 import profileImageReducer from './profileImageReducer';
 import bannerReducer from './bannerReducer';
-import {authMobileReducer} from './authMobileReducer';
+import productReducer from './productReducer';
+import wishlistReducer from './wishlistReducer';
+import productCategoryReucer from './productCategoryReducer';
+import reviewReducer from './reviewReducer';
+import productByReviewReducer from './productByReviewReducer';
+import reviewByUserIdReducer from './reviewByUserIdReducer';
+import storeReducer from './storeReducer';
+import storeProductReducer from './storeProductReducer';
+import {productDetailsReducer} from './productDetailsReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -17,6 +25,15 @@ const appReducer = combineReducers({
   userAccount: userAccountReducer, // ✅ unique key
   profileImage: profileImageReducer,
   banner: bannerReducer,
+  product: productReducer,
+  productD: productDetailsReducer,
+  wishlist: wishlistReducer,
+  productCategroy: productCategoryReucer,
+  review: reviewReducer,
+  productByReview: productByReviewReducer,
+  reviewByUserId: reviewByUserIdReducer,
+  sellerStore: storeReducer,
+  storeProduct: storeProductReducer,
 });
 
 const rootReducer = (state, action) => {

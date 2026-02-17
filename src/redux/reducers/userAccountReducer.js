@@ -1,83 +1,3 @@
-// import {
-//   GET_ME_REQUEST,
-//   GET_ME_SUCCESS,
-//   GET_ME_FAILURE,
-//   DELETE_ACCOUNT_REQUEST,
-//   DELETE_ACCOUNT_SUCCESS,
-//   DELETE_ACCOUNT_FAILURE,
-//   SEND_EMAIL_OTP_REQUEST,
-//   SEND_EMAIL_OTP_SUCCESS,
-//   SEND_EMAIL_OTP_FAILURE,
-//   VERIFY_EMAIL_OTP_REQUEST,
-//   VERIFY_EMAIL_OTP_SUCCESS,
-//   VERIFY_EMAIL_OTP_FAILURE,
-//   RESET_EMAIL_UPDATE_FLAG,
-// } from '../actions/userAccountActions';
-
-// const initialState = {
-//   loading: false,
-//   data: null,
-//   error: null,
-// };
-
-// export default function userAccountReducer(state = initialState, action) {
-//   switch (action.type) {
-//     case GET_ME_REQUEST:
-//       return {...state, loading: true, error: null};
-
-//     case GET_ME_SUCCESS:
-//       return {loading: false, data: action.payload.data.user, error: null};
-
-//     case GET_ME_FAILURE:
-//       return {loading: false, data: null, error: action.error};
-
-//     case DELETE_ACCOUNT_REQUEST:
-//       return {...state, loading: true, error: null};
-
-//     case DELETE_ACCOUNT_SUCCESS:
-//       return {loading: false, data: null, error: null}; // account deleted
-//     case DELETE_ACCOUNT_FAILURE:
-//       return {loading: false, data: null, error: action.error};
-
-//     case SEND_EMAIL_OTP_REQUEST:
-//       return {...state, loading: true, error: null};
-
-//     case SEND_EMAIL_OTP_SUCCESS:
-//       return {...state, loading: false, otpSent: true};
-
-//     case SEND_EMAIL_OTP_FAILURE:
-//       return {...state, loading: false, otpSent: false, error: action.error};
-
-//     case VERIFY_EMAIL_OTP_REQUEST:
-//       return {...state, loading: true, error: null};
-
-//     case VERIFY_EMAIL_OTP_SUCCESS:
-//       return {
-//         ...state,
-//         loading: false,
-//         emailUpdated: true,
-//         //  data: action.payload,
-//       };
-
-//     case VERIFY_EMAIL_OTP_FAILURE:
-//       return {
-//         ...state,
-//         loading: false,
-//         emailUpdated: false,
-//         error: action.error,
-//       };
-
-//     case RESET_EMAIL_UPDATE_FLAG:
-//       return {
-//         ...state,
-//         emailUpdated: false,
-//       };
-
-//     default:
-//       return state;
-//   }
-// }
-
 import {
   SEND_EMAIL_OTP_REQUEST,
   SEND_EMAIL_OTP_SUCCESS,
@@ -93,6 +13,9 @@ import {
   DELETE_ACCOUNT_SUCCESS,
   DELETE_ACCOUNT_FAILURE,
   RESET_EMAIL_VERIFY_STATUS,
+  SEND_MOBILE_OTP_REQUEST,
+  SEND_MOBILE_OTP_SUCCESS,
+  VERIFY_CHANGE_MOBILE_OTP_SUCCESS,
 } from '../actions/userAccountActions';
 import {LOGOUT} from '../actions/authActions';
 const initialState = {
@@ -204,7 +127,24 @@ export default function userAccountReducer(state = initialState, action) {
       };
     case LOGOUT:
       return initialState; // 🔥 FULL RESET
+    case SEND_MOBILE_OTP_REQUEST:
+      return {...state, loading: true, otpSent: false};
 
+    case SEND_MOBILE_OTP_SUCCESS:
+      return {...state, loading: false, otpSent: true};
+
+    case VERIFY_CHANGE_MOBILE_OTP_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        message: 'Mobile number updated successfully',
+      };
+
+    case 'RESET_MOBILE_MESSAGE':
+      return {
+        ...state,
+        message: null,
+      };
     default:
       return state;
   }

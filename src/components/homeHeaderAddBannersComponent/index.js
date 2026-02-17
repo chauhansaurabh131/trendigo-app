@@ -38,6 +38,7 @@ const HomeHeaderAddBannersComponent = () => {
 
   // ✅ CONVERT API DATA TO IMAGE URL ARRAY
   const bannerImages = banners?.[0]?.images?.map(img => img.imageUrl) || [];
+  // its now only checked
 
   // ✅ ADD DUPLICATE IMAGE FOR INFINITE SCROLL
   const bannerData =

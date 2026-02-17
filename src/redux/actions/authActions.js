@@ -9,6 +9,9 @@ export const VERIFY_EMAIL_OTP_FAILURE = 'VERIFY_EMAIL_OTP_FAILURE';
 export const RESEND_OTP_REQUEST = 'RESEND_OTP_REQUEST';
 export const RESEND_OTP_SUCCESS = 'RESEND_OTP_SUCCESS';
 export const RESEND_OTP_FAILURE = 'RESEND_OTP_FAILURE';
+export const REFRESH_TOKEN_REQUEST = 'REFRESH_TOKEN_REQUEST';
+export const REFRESH_TOKEN_SUCCESS = 'REFRESH_TOKEN_SUCCESS';
+export const REFRESH_TOKEN_FAILURE = 'REFRESH_TOKEN_FAILURE';
 
 export const LOGOUT = 'LOGOUT';
 
@@ -41,11 +44,6 @@ export const resetAuthFlow = () => ({
   type: RESET_AUTH_FLOW,
 });
 
-// Register
-// export const registerRequest = email => ({
-//   type: REGISTER_REQUEST,
-//   payload: {email},
-// });
 export const registerRequest = payload => ({
   type: REGISTER_REQUEST,
   payload,
@@ -83,4 +81,8 @@ export const LOAD_TOKEN_FROM_STORAGE = 'LOAD_TOKEN_FROM_STORAGE';
 export const loadTokenFromStorage = token => ({
   type: LOAD_TOKEN_FROM_STORAGE,
   payload: token,
+});
+export const refreshTokenRequest = refreshToken => ({
+  type: REFRESH_TOKEN_REQUEST,
+  payload: refreshToken,
 });

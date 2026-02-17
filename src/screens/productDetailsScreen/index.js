@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   SafeAreaView,
   Text,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
+  FlatList,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import ProductImageComponent from '../../components/productImageComponent';
@@ -18,6 +19,8 @@ import {
   BackIcon,
   BagIcon,
   CancelIcon,
+  GradientFullFillLike,
+  GradientLikeIcon,
   images,
   SearchFilterIcon,
   SellerShopIcon,
@@ -31,6 +34,10 @@ import ReviewRatingComponent from '../../components/reviewRatingComponent';
 import Svg, {Path} from 'react-native-svg';
 import star_icon from '../../assets/images/star_image_icon.png';
 import {useDispatch} from 'react-redux';
+import {wishlistRequest} from '../../redux/actions/wishlistActions';
+import {productDetailsRequest} from '../../redux/actions/productDetailsAction';
+import {getUserReviewsRequest} from '../../redux/actions/reviewActions';
+import {getStoreRequest} from '../../redux/actions/storeActions';
 export const CustomStarIcon = ({
   width = 24,
   height = 24,
@@ -55,7 +62,77 @@ const ProductDetailsScreen = () => {
   // const ratingsRef = useRef(null);
   const scrollRef = useRef(null); // Ref for ScrollView
   const reviewsRef = useRef(null); // Ref for Reviews section
+  // ✅ FIRST define product
+  const userReviews = useSelector(state => state.review.userReviews);
+  console.log('USER REVIEWS FROM REDUX 👉', userReviews);
+  // const reviews = useSelector(
+  //   state => state.product.productDetails?.reviews || [],
+  // );
 
+  const reviewData = useSelector(state => state.review.userReviews);
+
+  const reviews = reviewData?.reviews || [];
+  const averageRating = reviewData?.averageRating || 0;
+  const totalReviews = reviewData?.totalReviews || 0;
+  const ratingBreakdown = reviewData?.ratingBreakdown || {};
+  useEffect(() => {
+    console.log(' REVIEW DATA:', reviewData);
+    console.log(' REVIEWS ARRAY:', reviews);
+    console.log(' REVIEWS COUNT:', reviews.length);
+  }, [reviewData]);
+
+  const user = useSelector(state => state.auth.user);
+  const userId = user?.id || user?._id;
+  const product = route.params?.product;
+
+  console.log('FULL PRODUCT 👉', product);
+  console.log('PRODUCT ID 👉', product?.id);
+  console.log('PRODUCT _ID 👉', product?._id);
+
+  const productId = product?.id || product?._id;
+  console.log('FINAL PRODUCT ID 👉', productId);
+  // ✅ safety check
+  if (!product) {
+    console.log('❌ Product not received from navigation');
+    return null;
+  }
+
+  useEffect(() => {
+    if (productId) {
+      console.log('FETCHING REVIEWS FOR PRODUCT ---------', productId);
+      dispatch(getUserReviewsRequest(productId));
+    }
+  }, [productId]);
+  useEffect(() => {
+    console.log(' FULL PRODUCT:', product);
+    console.log(' RESULTS:', product?.results);
+    console.log(' REVIEWS:', product?.results?.reviews);
+    console.log(' REVIEWS COUNT:', product?.results?.reviews?.length);
+  }, [product]);
+
+  const {storeData} = useSelector(state => state.sellerStore);
+  const seller = storeData;
+  const storeId = product?.storeId;
+  useEffect(() => {
+    console.log('UPDATED STORE DATA =>', storeData);
+  }, [storeData]);
+  useEffect(() => {
+    console.log(storeId, 'storeid......');
+    console.log('Fetching store for ID:', storeId);
+    dispatch(getStoreRequest(storeId));
+  }, [storeId]);
+  useEffect(() => {
+    console.log('PRODUCT NAME ', product?.title);
+    console.log('STORE ID ', product?.storeId);
+    console.log('CURRENT PRODUCT STORE ID ', storeId);
+    console.log('Store seller name ', storeData?.name);
+    console.log('Product Store Object:', product?.storeId);
+    console.log('Store ID Used For API:', storeId);
+    console.log('StoreData From Redux:', storeData);
+  }, [product]);
+  //shop image
+  // const shopImage = storeData?.shopImage;
+  const shopImage = storeData?.profileImage;
   const scrollToReviews = () => {
     reviewsRef.current?.measureLayout(scrollRef.current, (x, y) => {
       scrollRef.current.scrollTo({y: y, animated: true});
@@ -63,13 +140,31 @@ const ProductDetailsScreen = () => {
   };
   // const {product} = route.params;
 
-  const [selectedSize, setSelectedSize] = useState('S'); // Default selection
+  // const [selectedSize, setSelectedSize] = useState('S'); // Default selection
   const [pincode, setPincode] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
   const navigation = useNavigation();
-
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+
+  // const [selectedSize, setSelectedSize] = useState(sizes[0]); // default first size
+  // const [selectedVariant, setSelectedVariant] = useState(
+  //   product?.variants?.[0],
+  // );
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const sellerId = product?.storeId?.id;
+  const [ratingValue, setRatingValue] = useState(0);
+  const [reviewText, setReviewText] = useState('');
+  const wishlistState = useSelector(state => state.wishlist);
+
+  // 🔹 Safety check – wishlistData always array
+  // beacuse filter/map always work on array
+  const wishlistData = Array.isArray(wishlistState?.wishlistData)
+    ? wishlistState.wishlistData
+    : [];
+  const [justAdded, setJustAdded] = useState([]);
 
   const handlePincodeChange = text => {
     // Allow only digits and limit input to 6 characters
@@ -77,20 +172,26 @@ const ProductDetailsScreen = () => {
       setPincode(text);
     }
   };
-  console.log('TOKEN:', token);
-  console.log('PRODUCT:', product);
+
+  console.log('PRODUCT..........:', product);
   const dispatch = useDispatch();
   const token = useSelector(state => state.auth.token);
-  const product = route.params?.product; // ✅ FIX
-  // const handleAddToCart = () => {
-  //   if (token) {
-  //     dispatch(addToCartRequest(product));
-  //   } else {
-  //     navigation.navigate('StartingScreen', {
-  //       product,
-  //     });
-  //   }
-  // };
+  console.log('TOKEN:', token);
+  console.log(token, 'token product details');
+  // const product = route.params?.product;
+
+  if (!product) {
+    console.log('product not available yet');
+    return null;
+  }
+
+  console.log('product available.....:', product);
+  console.log('Product Code:', product.productCode);
+  console.log('product Storeid name', product.storeId.name);
+  // console.log('SPECIFICATIONS FROM API:', product?.specifications);
+  // console.log('product Title', product.title),
+  //   console.log('product description', product.description);
+  // console.log('product Details...', product.productDetails);
 
   const handleAddToCart = () => {
     if (token) {
@@ -103,7 +204,269 @@ const ProductDetailsScreen = () => {
       });
     }
   };
+  // console.log('PRODUCT12345:', route.params.product);
+  //html covert to the stings
 
+  const htmlString = '&lt;p>women t shirt&lt;/p&gt;';
+
+  // Convert HTML entities
+  const normalString = htmlString
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+
+  // Remove HTML tags
+  const plainText = normalString.replace(/<[^>]+>/g, '');
+
+  // console.log(plainText); // "women t shirt"
+  // decode html code convert to the strings
+  const decodeHtml = html =>
+    html?.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+  const getBulletPoints = html => {
+    if (!html) return [];
+
+    const decoded = decodeHtml(html);
+
+    return (
+      decoded
+        .match(/<li>(.*?)<\/li>/g)
+        ?.map(item => item.replace(/<[^>]+>/g, '').trim()) || []
+    );
+  };
+
+  //  find out the variants
+
+  const findVariant = (product, color, size) => {
+    console.log('--- FIND VARIANT CALLED ---');
+    console.log('Selected Color:', color);
+    console.log('Selected Size:', size);
+
+    if (!product || !color || !size) {
+      console.log('❌ Missing product / color / size');
+      return null;
+    }
+
+    const result = product.variants.find((v, index) => {
+      console.log(`Checking variant ${index}:`, v.variants);
+
+      const hasColor = v.variants.some(
+        x => x.key === 'color' && x.value.toLowerCase() === color.toLowerCase(),
+      );
+
+      const hasSize = v.variants.some(
+        x => x.key === 'size' && x.value.toLowerCase() === size.toLowerCase(),
+      );
+
+      console.log('  color match:', hasColor);
+      console.log('  size match:', hasSize);
+
+      return hasColor && hasSize;
+    });
+
+    console.log('✅ MATCHED VARIANT:', result);
+    return result || null;
+  };
+
+  const handleColorChange = color => {
+    console.log('--- COLOR SELECTED ---', color);
+
+    setSelectedColor(color);
+
+    if (selectedSize) {
+      const variant = findVariant(product, color, selectedSize);
+      console.log('Variant after color select:', variant);
+      setSelectedVariant(variant);
+    }
+  };
+
+  const handleSizeChange = size => {
+    console.log('--- SIZE SELECTED ---', size);
+
+    setSelectedSize(size);
+
+    if (selectedColor) {
+      const variant = findVariant(product, selectedColor, size);
+      console.log('Variant after size select:', variant);
+      setSelectedVariant(variant);
+    }
+  };
+  useEffect(() => {
+    if (product?.variants?.length > 0) {
+      const firstVariant = product.variants[0];
+
+      const colorObj = firstVariant.variants.find(v => v.key === 'color');
+      const sizeObj = firstVariant.variants.find(v => v.key === 'size');
+
+      setSelectedColor(colorObj?.value || null);
+      setSelectedSize(sizeObj?.value || null);
+      setSelectedVariant(firstVariant);
+    }
+  }, [product]);
+  useEffect(() => {
+    console.log('===== FINAL STATE =====');
+    console.log('Selected Color:', selectedColor);
+    console.log('Selected Size:', selectedSize);
+    console.log('Selected Variant:', selectedVariant);
+    console.log('Price:', selectedVariant?.price);
+    console.log('Discount:', selectedVariant?.discount);
+  }, [selectedVariant]);
+
+  useEffect(() => {
+    if (productId) {
+      console.log('DISPATCHING PRODUCT DETAILS 👉', productId);
+      dispatch(productDetailsRequest(productId));
+    }
+  }, [productId]);
+  const onWishlistPress = product => {
+    if (!token) {
+      navigation.navigate('StartingScreen');
+      return;
+    }
+
+    const productId = product.id || product._id;
+
+    // If product already in redux wishlist → do nothing (no alert)
+    if (
+      wishlistData.some(
+        w => (w.productId?.id || w.productId?._id) === productId,
+      )
+    ) {
+      return;
+    }
+
+    // First time click → alert
+    alert('Product saved in wishlist');
+
+    // Mark product as just added (for gradient icon)
+    setJustAdded(prev => [...prev, productId]);
+
+    // Dispatch redux action to add wishlist
+    dispatch(wishlistRequest(productId));
+    console.log(' Product ID sending:', productId);
+  };
+  const ReviewItem = ({item}) => {
+    console.log('REVIEW IMAGES 👉', item.images);
+    console.log('FULL ITEM 👉', item);
+    console.log('USER DATA 👉', item.user);
+    return (
+      <View style={{marginHorizontal: 17, marginTop: hp(24)}}>
+        {/* Review Title */}
+        <Text
+          style={{
+            color: colors.pureBlack,
+            fontSize: fontSize(14),
+            lineHeight: hp(24),
+            fontFamily: fontFamily.poppins700,
+          }}>
+          {item?.title || 'No title'}
+        </Text>
+
+        {/* Review Description */}
+        <Text
+          style={{
+            color: colors.pureBlack,
+            fontSize: fontSize(14),
+            lineHeight: hp(24),
+            fontFamily: fontFamily.poppins400,
+            marginTop: hp(25),
+          }}>
+          {item?.description ||
+            item?.review ||
+            item?.comment ||
+            item?.reviewText ||
+            'No description yet.'}
+        </Text>
+        {/* Review Images (if any) */}
+        {item?.images && item.images.length > 0 ? (
+          // ✅ Images available → show images
+          <View style={{marginTop: hp(20), flexDirection: 'row'}}>
+            {item.images.map((img, index) => (
+              <Image
+                key={index}
+                source={{uri: img}}
+                style={{
+                  width: wp(60),
+                  height: hp(80),
+                  borderRadius: 14,
+                  marginRight: wp(11),
+                }}
+              />
+            ))}
+          </View>
+        ) : (
+          <Text
+            style={{
+              marginTop: hp(20),
+              fontSize: fontSize(12),
+              color: '#999',
+              fontFamily: fontFamily.poppins400,
+            }}>
+            No images added in this review
+          </Text>
+        )}
+
+        {/* User + Rating */}
+        <View
+          style={{
+            marginTop: hp(27),
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          {/* User info */}
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Image
+              source={{uri: item.user.profilePic}}
+              style={{width: hp(34), height: hp(34), borderRadius: 50}}
+            />
+
+            <Text
+              style={{
+                marginLeft: wp(11),
+                color: colors.pureBlack,
+                fontSize: fontSize(14),
+                lineHeight: hp(18),
+                fontFamily: fontFamily.poppins700,
+              }}>
+              {item?.user?.name || 'No Name'}
+            </Text>
+
+            <Text
+              style={{
+                marginLeft: wp(12),
+                fontSize: fontSize(10),
+                lineHeight: hp(24),
+                fontFamily: fontFamily.poppins400,
+                color: '#C1C1C1',
+                top: 1,
+              }}>
+              {item?.createdAt ? new Date(item.createdAt).toDateString() : ''}
+            </Text>
+          </View>
+
+          {/* Rating */}
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <CustomStarIcon
+              width={hp(15)}
+              height={hp(14)}
+              fill="#8225AF"
+              style={{marginRight: 10}}
+            />
+            <Text
+              style={{
+                fontSize: fontSize(14),
+                lineHeight: hp(24),
+                fontFamily: fontFamily.poppins700,
+                color: '#8225AF',
+                top: 2,
+              }}>
+              {item?.rating || 0}
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       {/*<Text>{product.title}</Text>*/}
@@ -195,6 +558,34 @@ const ProductDetailsScreen = () => {
             />
 
             {/* Touchable Like Icon */}
+            {/* <TouchableOpacity
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: [
+                  {translateX: -wp(23) / 2},
+                  {translateY: -hp(20) / 2},
+                ],
+              }}
+              // onPress={() => dispatch(wishlistRequest(product._id))}>
+              // <Image
+              //   source={images.emptyLikeImage}
+              //   style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
+              // />
+              onPress={() => onPress(() => onWishlistPress(product))}>
+              {wishlistData.some(
+                w =>
+                  (w.productId?.id || w.productId?._id) ===
+                  (item.id || item._id),
+              ) || justAdded.includes(item.id || item._id) ? (
+                // Filled / gradient heart
+                <GradientFullFillLike />
+              ) : (
+                // Empty heart
+                <GradientLikeIcon />
+              )}
+            </TouchableOpacity> */}
             <TouchableOpacity
               style={{
                 position: 'absolute',
@@ -205,11 +596,23 @@ const ProductDetailsScreen = () => {
                   {translateY: -hp(20) / 2},
                 ],
               }}
-              onPress={() => console.log('Like pressed')}>
-              <Image
-                source={images.emptyLikeImage}
-                style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
-              />
+              onPress={() => onWishlistPress(product)}>
+              {wishlistData.some(
+                w =>
+                  (w.productId?.id || w.productId?._id) ===
+                  (product.id || product._id),
+              ) || justAdded.includes(product.id || product._id) ? (
+                <GradientFullFillLike width={wp(23)} height={hp(20)} />
+              ) : (
+                //   <Image
+                //   source={images.emptyLikeImage}
+                //   style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
+                // />
+                <Image
+                  source={images.emptyLikeImage}
+                  style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
+                />
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -217,7 +620,7 @@ const ProductDetailsScreen = () => {
 
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
         <View style={{marginTop: 10}}>
-          <ProductImageComponent />
+          <ProductImageComponent product={route.params.product} />
         </View>
 
         <View style={{marginHorizontal: 17, marginTop: hp(31)}}>
@@ -228,9 +631,9 @@ const ProductDetailsScreen = () => {
               lineHeight: hp(26),
               fontFamily: fontFamily.poppins700,
             }}>
-            Designer Traditional Dress
+            {/* Designer Traditional Dress */}
+            {product?.title ?? ''}
           </Text>
-
           <Text
             style={{
               fontSize: fontSize(12),
@@ -239,84 +642,14 @@ const ProductDetailsScreen = () => {
               color: '#6B6B6B',
               marginTop: hp(2),
             }}>
-            Women Floral Printed Fit & Flare Midi Class
+            {/* Women Floral Printed Fit & Flare Midi Class */}
+            {product?.description ?? ''}
           </Text>
-          {/* 
-          <View
-            style={{
-              marginTop: hp(19),
-              flexDirection: 'row',
-              alignItems: 'center',
-              padding:10,
-               justifyContent: 'center',
-                paddingHorizontal: 10,
-
-            }}>
-            <View
-              style={{
-                width: hp(64),
-                height: hp(28),
-                borderRadius: 25,
-                backgroundColor: '#8225AF',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingHorizontal: 10,
-                gap: 5, // optional for spacing between text and icon
-              }}>
-              <Text style={{color: 'white'}}>4.2</Text>
-              <StarIcon width={hp(13)} height={hp(13)} />
-            </View>
-            <Text
-              style={{
-                color: colors.pureBlack,
-                fontSize: fontSize(13),
-                lineHeight: hp(23),
-                fontFamily: fontFamily.poppins700,
-                marginLeft: hp(16),
-              }}>
-              122 Ratings
-            </Text>
-          </View> */}
-          {/* <View style={{
-            flexDirection:"row",
-            alignItems: "center",
-            borderWidth:1,
-            borderRadius:30,
-            paddingVertical: 6,
-            alignSelf: "flex-start",
-            borderColor: "#000000",
-            width:hp(250),
-            height:hp(50),
-            marginTop:19
-
-          }}>
-            <Text style={{
-              fontSize: 18,
-              fontFamily: fontFamily.poppins400,
-              color: "#8225AF",
-              marginLeft:25
-            }}>4.2</Text>
-
-            <View style={{
-              width: 1,
-              height:30,
-              backgroundColor:"#000000",
-              marginHorizontal: 8,
-              marginLeft:wp(60)
-            }}></View>
-            <Text style={{
-              color: colors.pureBlack,
-              fontFamily: fontFamily.poppins500,
-              marginLeft: 20,
-              fontSize: 16
-            }}>122 Ratings</Text>
-          </View>
-           */}
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={scrollToReviews}
+            // onPress={handleSubmitReview}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
@@ -336,7 +669,13 @@ const ProductDetailsScreen = () => {
                 color: '#8225AF',
                 marginLeft: 15,
               }}>
-              4.2
+              {/* 4.2
+               */}
+              {/* {product?.rating ?? '0.0'} */}
+
+              {/* {product?.averageRating?.toFixed(1) ?? '0.0'} */}
+              {averageRating ? averageRating.toFixed(1) : '0.0'}
+              {/* {userReviews?.averageRating ?? 0} */}
             </Text>
             <Image
               source={star_icon}
@@ -364,7 +703,11 @@ const ProductDetailsScreen = () => {
                 marginLeft: 10,
                 fontSize: 16,
               }}>
-              122 Ratings
+              {/* 122 Ratings */}
+              {/* {product?.ratingCount ?? '0.0 Ratings'} */}
+              {/* {product?.totalReviews ?? 0} Ratings */}
+              {totalReviews} Ratings
+              {/* {userReviews?.totalReviews ?? 0} Ratings */}
             </Text>
           </TouchableOpacity>
         </View>
@@ -390,7 +733,10 @@ const ProductDetailsScreen = () => {
                 lineHeight: hp(32),
                 fontFamily: fontFamily.poppins700,
               }}>
-              Rs.780
+              {/* Rs.780
+               */}
+              {/* ₹{product?.variants?.[0]?.price ?? ''}₹ */}
+              {selectedVariant?.price ?? product?.variants[0]?.price}
             </Text>
             <Text
               style={{
@@ -410,7 +756,8 @@ const ProductDetailsScreen = () => {
                 lineHeight: hp(26),
                 fontFamily: fontFamily.poppins400,
               }}>
-              Rs.3443
+              {/* Rs.3443₹{product?.variants?.[0]?.mrp ?? '000'}₹ */}
+              {selectedVariant?.mrp ?? product?.variants[0]?.mrp}
             </Text>
 
             <Text
@@ -421,7 +768,9 @@ const ProductDetailsScreen = () => {
                 lineHeight: hp(24),
                 fontFamily: fontFamily.poppins600,
               }}>
-              34% Off
+              {/* 34% Off */}
+              {/* {product?.variants?.[0]?.discount ?? ''}% Off */}
+              {selectedVariant?.discount ?? product?.variants[0]?.discount}% Off
             </Text>
           </View>
 
@@ -450,7 +799,7 @@ const ProductDetailsScreen = () => {
               justifyContent: 'space-between',
               marginTop: hp(23),
             }}>
-            {sizes.map(size => (
+            {/* {sizes.map(size => (
               <TouchableOpacity
                 key={size}
                 onPress={() => setSelectedSize(size)}
@@ -473,6 +822,28 @@ const ProductDetailsScreen = () => {
                     lineHeight: hp(26),
                     fontFamily: fontFamily.poppins400,
                   }}>
+                  {size}
+                </Text>
+              </TouchableOpacity>
+            ))} */}
+
+            {sizes.map(size => (
+              <TouchableOpacity
+                key={size}
+                onPress={() => handleSizeChange(size)}
+                style={{
+                  width: hp(52),
+                  height: hp(52),
+                  borderRadius: 50,
+                  borderWidth: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: 6,
+                  backgroundColor:
+                    selectedSize === size ? '#F7E7FF' : 'transparent',
+                  borderColor: selectedSize === size ? '#000' : '#D1D1D1',
+                }}>
+                <Text style={{color: selectedSize === size ? '#000' : '#000'}}>
                   {size}
                 </Text>
               </TouchableOpacity>
@@ -580,12 +951,18 @@ const ProductDetailsScreen = () => {
               lineHeight: hp(18),
               fontFamily: fontFamily.poppins400,
             }}>
-            Pink, blue & gold toned yoke design Kurta with{'\n'}Trousers with
-            dupatta
+            {/* Pink, blue & gold toned yoke design Kurta with{'\n'}Trousers with
+            dupatta */}
+            {/* {product?.productDetails ?? ''} */}
+            {product?.productDetails
+              ?.replace(/&lt;/g, '<')
+              ?.replace(/&gt;/g, '>')
+              ?.replace(/&amp;/g, '&')
+              ?.replace(/<[^>]+>/g, '') ?? ''}
           </Text>
 
           <View style={{marginTop: hp(16)}}>
-            <View
+            {/* <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -714,7 +1091,28 @@ const ProductDetailsScreen = () => {
               <Text style={{color: '#6B6B6B'}}>
                 Cotton blend machine weave fabric
               </Text>
-            </View>
+            </View> */}
+            {/* <View style={{marginTop: hp(16)}}> */}
+            {getBulletPoints(product?.productDetails).map((point, index) => (
+              <View
+                key={index}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: hp(3),
+                  marginLeft: wp(7),
+                }}>
+                <Text
+                  style={{
+                    fontSize: fontSize(10),
+                    color: '#6B6B6B',
+                    marginRight: wp(10),
+                  }}>
+                  ●
+                </Text>
+                <Text style={{color: '#6B6B6B'}}>{point}</Text>
+              </View>
+            ))}
           </View>
 
           <Text
@@ -728,7 +1126,7 @@ const ProductDetailsScreen = () => {
             Specification
           </Text>
 
-          <View style={{marginTop: hp(23)}}>
+          {/* <View style={{marginTop: hp(23)}}>
             <View
               style={{
                 flexDirection: 'row',
@@ -943,6 +1341,76 @@ const ProductDetailsScreen = () => {
                 </Text>
               </View>
             </View>
+          </View> */}
+
+          <View style={{marginTop: hp(23)}}>
+            {product?.specifications?.map((item, index) => {
+              if (index % 2 !== 0) return null;
+
+              const left = product.specifications[index];
+              const right = product.specifications[index + 1];
+
+              return (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    marginTop: index === 0 ? 0 : hp(25),
+                  }}>
+                  {/* LEFT ITEM */}
+                  <View style={{width: '50%'}}>
+                    <Text
+                      style={{
+                        color: '#6B6B6B',
+                        fontSize: fontSize(12),
+                        lineHeight: hp(16),
+                        fontFamily: fontFamily.poppins400,
+                      }}>
+                      {left.key.replace(/_/g, ' ')}
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontSize: fontSize(14),
+                        lineHeight: hp(18),
+                        fontFamily: fontFamily.poppins400,
+                        color: colors.pureBlack,
+                        marginTop: hp(2),
+                      }}>
+                      {left.value}
+                    </Text>
+                  </View>
+
+                  {/* RIGHT ITEM */}
+                  {right && (
+                    <View style={{width: '50%'}}>
+                      <Text
+                        style={{
+                          color: '#6B6B6B',
+                          fontSize: fontSize(12),
+                          lineHeight: hp(16),
+                          fontFamily: fontFamily.poppins400,
+                        }}>
+                        {right.key.replace(/_/g, ' ')}
+                      </Text>
+
+                      <Text
+                        style={{
+                          fontSize: fontSize(14),
+                          lineHeight: hp(18),
+                          fontFamily: fontFamily.poppins400,
+                          color: colors.pureBlack,
+                          marginTop: hp(2),
+                        }}>
+                        {right.value}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
           </View>
 
           <TouchableOpacity style={{marginTop: hp(27)}}>
@@ -986,7 +1454,8 @@ const ProductDetailsScreen = () => {
                   color: colors.pureBlack,
                   fontFamily: fontFamily.poppins700,
                 }}>
-                18407738
+                {/* 18407738 */}
+                {product?.productCode ?? ''}
               </Text>
             </Text>
           </View>
@@ -1022,7 +1491,9 @@ const ProductDetailsScreen = () => {
                 }}>
                 Seller:{' '}
                 <Text style={{fontFamily: fontFamily.poppins400}}>
-                  Galaxy Fashion Hub
+                  {/* Galaxy Fashion Hub */}
+                  {/* {product?.storeId?.name ?? ''} */}
+                  {storeData?.name ?? ''}
                 </Text>
               </Text>
 
@@ -1131,7 +1602,9 @@ const ProductDetailsScreen = () => {
                   fontFamily: fontFamily.poppins700,
                   color: 'black',
                 }}>
-                4.2
+                {/* 4.2 */}
+                {/* {product?.averageRating?.toFixed(1) ?? '0.0'} */}
+                {averageRating ? averageRating.toFixed(1) : '0.0'}
               </Text>
             }>
             <LinearGradient
@@ -1148,7 +1621,8 @@ const ProductDetailsScreen = () => {
                   fontFamily: fontFamily.poppins700,
                   opacity: 0,
                 }}>
-                4.2
+                {/* 4.2 */}
+                {product?.averageRating?.toFixed(1) ?? '0.0'}
               </Text>
             </LinearGradient>
           </MaskedView>
@@ -1165,7 +1639,10 @@ const ProductDetailsScreen = () => {
           {/*</Text>*/}
 
           <View style={{top: -20}}>
-            <ReviewRatingComponent />
+            <ReviewRatingComponent
+              ratingBreakdown={ratingBreakdown}
+              totalReviews={totalReviews}
+            />
           </View>
         </View>
 
@@ -1178,7 +1655,7 @@ const ProductDetailsScreen = () => {
           }}
         />
 
-        <View style={{marginHorizontal: 17, marginTop: hp(24)}}>
+        {/* <View style={{marginHorizontal: 17, marginTop: hp(24)}}>
           <Text
             style={{
               color: colors.pureBlack,
@@ -1273,8 +1750,14 @@ const ProductDetailsScreen = () => {
                 4.2
               </Text>
             </View>
-          </View>
-        </View>
+          </View> */}
+        <FlatList
+          data={reviews}
+          keyExtractor={item => item._id}
+          renderItem={({item}) => <ReviewItem item={item} />}
+          scrollEnabled={false}
+        />
+        {/* </View> */}
 
         <View
           style={{
@@ -1385,16 +1868,23 @@ const ProductDetailsScreen = () => {
                 }}>
                 <CancelIcon />
               </Touchable>
-
-              <Image
-                source={images.shopClothImage}
-                style={{
-                  width: hp(64),
-                  height: hp(64),
-                  marginTop: hp(31),
-                  alignSelf: 'center',
-                }}
-              />
+              <Touchable
+                onPress={() =>
+                  navigation.navigate('sellerProfile', {
+                    store: storeData,
+                  })
+                }>
+                <Image
+                  // source={images.shopClothImage}
+                  source={shopImage ? {uri: shopImage} : images.shopClothImage}
+                  style={{
+                    width: hp(64),
+                    height: hp(64),
+                    marginTop: hp(31),
+                    alignSelf: 'center',
+                  }}
+                />
+              </Touchable>
               <Text
                 style={{
                   fontSize: fontSize(16),
@@ -1403,7 +1893,9 @@ const ProductDetailsScreen = () => {
                   color: colors.pureBlack,
                   textAlign: 'center',
                 }}>
-                Galaxy Fashion Hub
+                {/* Galaxy Fashion Hub */}
+                {storeData?.name ?? ''}
+                {/* {product?.storeId?.name ?? ''} */}
               </Text>
 
               <View
@@ -1421,9 +1913,10 @@ const ProductDetailsScreen = () => {
                     fontFamily: fontFamily.poppins500,
                     color: colors.pureBlack,
                   }}>
-                  Assured Product quality at great value and Great{'\n'}shopping
+                  {/* Assured Product quality at great value and Great{'\n'}shopping
                   experience and best class services with Ruhi{'\n'}Dress
-                  Materials
+                  Materials */}
+                  {storeData?.description ?? ''}
                 </Text>
               </View>
 

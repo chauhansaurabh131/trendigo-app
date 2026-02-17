@@ -4,30 +4,62 @@ import LinearGradient from 'react-native-linear-gradient';
 import {fontFamily, fontSize, hp} from '../../utils/helpers';
 import {colors} from '../../utils/colors';
 
-const ratingsData = [
-  {rating: 5, count: 50},
-  {rating: 4, count: 60},
-  {rating: 3, count: 45},
-  {rating: 2, count: 10},
-  {rating: 1, count: 80},
-];
+// const ratingsData = [
+//   {rating: 5, count: 50},
+//   {rating: 4, count: 60},
+//   {rating: 3, count: 45},
+//   {rating: 2, count: 10},
+//   {rating: 1, count: 80},
+// ];
 
-const MAX_COUNT = 100;
+// const MAX_COUNT = 100;
 
-const totalCount = ratingsData.reduce((sum, item) => sum + item.count, 0);
+// const totalCount = ratingsData.reduce((sum, item) => sum + item.count, 0);
 
-const ReviewRatingComponent = () => {
+const ReviewRatingComponent = ({ratingBreakdown, totalReviews}) => {
+  const ratingsData = [5, 4, 3, 2, 1].map(rating => ({
+    rating,
+    count: ratingBreakdown?.[rating] || 0,
+  }));
+
+  const maxCount = Math.max(...ratingsData.map(i => i.count), 1);
+  // return (
+  //   <SafeAreaView style={styles.container}>
+  //     <Text style={styles.totalCountText}>
+  //       {totalCount} <Text style={{color: '#8F8F8F'}}>Verified Buyers</Text>
+  //     </Text>
+
+  //     {ratingsData.map(({rating, count}) => {
+  //       const barWidth = (count / MAX_COUNT) * 100;
+  //       return (
+  //         <View key={rating} style={styles.row}>
+  //           <Text style={styles.ratingText}>{rating}</Text>
+  //           <View style={styles.barContainer}>
+  //             <LinearGradient
+  //               colors={['#0F52BA', '#8225AF']}
+  //               start={{x: 0, y: 0}}
+  //               end={{x: 1, y: 0}}
+  //               style={[styles.barFill, {width: `${barWidth}%`}]}
+  //             />
+  //           </View>
+  //           <Text style={styles.countText}>{count}</Text>
+  //         </View>
+  //       );
+  //     })}
+  //   </SafeAreaView>
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.totalCountText}>
-        {totalCount} <Text style={{color: '#8F8F8F'}}>Verified Buyers</Text>
+        {totalReviews} <Text style={{color: '#8F8F8F'}}>Verified Buyers</Text>
       </Text>
 
       {ratingsData.map(({rating, count}) => {
-        const barWidth = (count / MAX_COUNT) * 100;
+        const barWidth = (count / maxCount) * 100;
+
         return (
           <View key={rating} style={styles.row}>
             <Text style={styles.ratingText}>{rating}</Text>
+
             <View style={styles.barContainer}>
               <LinearGradient
                 colors={['#0F52BA', '#8225AF']}
@@ -36,6 +68,7 @@ const ReviewRatingComponent = () => {
                 style={[styles.barFill, {width: `${barWidth}%`}]}
               />
             </View>
+
             <Text style={styles.countText}>{count}</Text>
           </View>
         );

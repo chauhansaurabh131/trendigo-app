@@ -15,13 +15,15 @@ import {useNavigation} from '@react-navigation/native';
 import DeliveredScreen from '../myOrderInsideAllScreen/DeliveredScreen';
 import ReturnedScreen from '../myOrderInsideAllScreen/ReturnedScreen';
 import CancelledScreen from '../myOrderInsideAllScreen/CancelledScreen';
-
+import {useRoute} from '@react-navigation/native';
 const MyOrderScreen = () => {
   const [activeTab, setActiveTab] = useState('Processing');
 
   const tabs = ['Processing', 'Delivered', 'Returned', 'Cancelled'];
 
   const navigation = useNavigation();
+  const route = useRoute();
+  const item = route?.params?.item;
 
   // Render content based on current tab
   const renderTabContent = () => {
@@ -35,7 +37,7 @@ const MyOrderScreen = () => {
       case 'Delivered':
         return (
           <View style={styles.screenContent}>
-            <DeliveredScreen />
+            <DeliveredScreen item={item} />
           </View>
         );
       case 'Returned':

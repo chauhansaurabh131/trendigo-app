@@ -9,8 +9,9 @@ import {
   View,
 } from 'react-native';
 import {images, RightSideArrow, WhiteTrendiGo} from '../../assets';
-import {fontFamily, fontSize, hp, isIOS} from '../../utils/helpers';
-
+// import {fontFamily, fontSize, hp, isIOS} from '../../utils/helpers';
+// import {fontFamily, fontSize, hp, isIOS} from '../../../utils/helpers';
+import {fontFamily, fontSize, hp} from '../../utils/helpers';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import StartingScreenBottomButtonContainer from '../../components/startingScreenBottomButtonContainer';
 import {useNavigation} from '@react-navigation/native';

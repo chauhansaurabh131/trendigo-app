@@ -15,6 +15,12 @@ import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 import MenCategoryScreen from '../screens/menCategoryScreen';
 import WomenCategoryScreen from '../screens/WomenCategoryScree';
 import TrackOrderDetailScreen from '../screens/TrackOrderDetailScreen';
+import ReviewRatingComponent from '../components/reviewRatingComponent';
+import ReviewandRatingsScreen from '../screens/ReviewandRatingsScreen';
+import revewsScreen from '../screens/revewsScreen';
+import RevewsScreen from '../screens/revewsScreen';
+import sellerProfileScreen from '../screens/sellerProfileScreen';
+import SellerProfileScreen from '../screens/sellerProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +48,9 @@ const RootNavigator = () => {
         name="WomenCategoryScreen"
         component={WomenCategoryScreen}
       />
+      <Stack.Screen name="ReviewRating" component={ReviewandRatingsScreen} />
+      <Stack.Screen name="ReviewsScreen" component={RevewsScreen} />
+      <Stack.Screen name="sellerProfile" component={SellerProfileScreen} />
     </Stack.Navigator>
   );
 };

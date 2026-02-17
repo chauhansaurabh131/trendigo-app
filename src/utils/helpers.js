@@ -36,10 +36,16 @@ export const fontFamily = {
   inter500: isAndroid ? 'inter_medium' : 'Inter Medium',
   inter400: isAndroid ? 'inter_regular' : 'Inter Regular',
 
-  poppins700: isAndroid ? 'poppins_bold' : 'Poppins Bold',
-  poppins600: isAndroid ? 'poppins_semi_bold' : 'Poppins SemiBold',
-  poppins500: isAndroid ? 'poppins_medium' : 'Poppins Medium',
-  poppins400: isAndroid ? 'poppins_regular' : 'Poppins Regular',
+  // poppins700: isAndroid ? 'poppins_bold' : 'Poppins Bold',
+  // poppins600: isAndroid ? 'poppins_semi_bold' : 'Poppins SemiBold',
+  // poppins500: isAndroid ? 'poppins_medium' : 'Poppins Medium',
+  // poppins400: isAndroid ? 'poppins_regular' : 'Poppins Regular',
+  // poppins900: 'Poppins-Black',
+
+  poppins400: 'Poppins-Regular',
+  poppins500: 'Poppins-Medium',
+  poppins600: 'Poppins-SemiBold',
+  poppins700: 'Poppins-Bold',
   poppins900: 'Poppins-Black',
 
   bebesneue400: isAndroid ? 'bebasneue_regular' : 'Bebas Neue',

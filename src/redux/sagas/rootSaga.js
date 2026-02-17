@@ -10,6 +10,15 @@ import {profileImageWatcher} from './profileImageSaga';
 import {bannerSaga} from './bannerSaga';
 import watchLogout from './logoutSaga';
 import authMobileSaga from './authMobileSaga';
+import productSaga from './productSaga';
+import {watchProductDetails} from './productDetailsSaga';
+import wishlistSaga from './wishlistSaga';
+import {watchProductCategory} from './productCategorySaga';
+import {watchAddReview} from './reviewSaga';
+import productByReviewRootSaga from './productByReviewSaga';
+import {watchReviewByUserId} from './reviewByUserIdSaga';
+import {watchStoreSaga} from './storeSaga';
+import {watchStoreProducts} from './storeProductSaga';
 
 export default function* rootSaga() {
   yield all([
@@ -23,5 +32,14 @@ export default function* rootSaga() {
     bannerSaga(),
     watchLogout(),
     authMobileSaga(),
+    productSaga(),
+    watchProductDetails(),
+    wishlistSaga(),
+    watchProductCategory(),
+    watchAddReview(),
+    productByReviewRootSaga(),
+    watchReviewByUserId(),
+    watchStoreSaga(),
+    watchStoreProducts(),
   ]);
 }

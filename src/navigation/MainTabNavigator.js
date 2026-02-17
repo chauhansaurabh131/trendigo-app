@@ -33,6 +33,7 @@ import {
 
 // Utils
 import {fontFamily, fontSize, hp, isIOS} from '../utils/helpers';
+import RevewsScreen from '../screens/revewsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -82,6 +83,7 @@ const HomeStackScreen = () => {
       <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
       <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
       <Stack.Screen name="WishlistScreen" component={WishlistScreen} />
+      <Stack.Screen name="ReviewsScreen" component={RevewsScreen} />
     </Stack.Navigator>
   );
 };

@@ -10,6 +10,15 @@ import userAccountReducer from './reducers/userAccountReducer';
 import profileImageReducer from './reducers/profileImageReducer';
 import bannerReducer from './reducers/bannerReducer';
 import {authMobileReducer} from './reducers/authMobileReducer';
+import productReducer from './reducers/productReducer';
+import wishlistReducer from './reducers/wishlistReducer';
+import productCategoryReucer from './reducers/productCategoryReducer';
+import reviewReducer from './reducers/reviewReducer';
+import productByReviewReducer from './reducers/productByReviewReducer';
+import reviewByUserIdReducer from './reducers/reviewByUserIdReducer';
+import storeReducer from './reducers/storeReducer';
+import storeProductReducer from './reducers/storeProductReducer';
+import {productDetailsReducer} from './reducers/productDetailsReducer';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -21,8 +30,16 @@ const rootReducer = combineReducers({
   userAccount: userAccountReducer,
   profileImage: profileImageReducer,
   authMobile: authMobileReducer,
-
+  product: productReducer,
   banner: bannerReducer,
+  productD: productDetailsReducer,
+  wishlist: wishlistReducer,
+  productCategroy: productCategoryReucer,
+  review: reviewReducer,
+  productByReview: productByReviewReducer,
+  reviewByUserId: reviewByUserIdReducer,
+  sellerStore: storeReducer,
+  storeProduct: storeProductReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));

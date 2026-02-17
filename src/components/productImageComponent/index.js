@@ -14,31 +14,43 @@ import {useNavigation} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 
-const ProductImageComponent = () => {
+// const ProductImageComponent = ({product}) => {
+const ProductImageComponent = ({product, selectedVariant}) => {
   const navigation = useNavigation();
 
-  const groupOneImages = [
-    images.productImageTwo,
-    images.productImageOne,
-    images.productImageThree,
-    images.productImageFour,
-  ];
+  // const groupOneImages = [
+  //   images.productImageTwo,
+  //   images.productImageOne,
+  //   images.productImageThree,
+  //   images.productImageFour,
+  // ];
 
-  const groupTwoImages = [
-    images.productImageFive,
-    images.productImageSix,
-    images.productImageSeven,
-    images.productImageFive,
-  ];
+  // const groupTwoImages = [
+  //   images.productImageFive,
+  //   images.productImageSix,
+  //   images.productImageSeven,
+  //   images.productImageFive,
+  // ];
+
+  const variants = product?.variants || [];
+
+  // main screen images (default group)
+  const variantImages = variants.map(v =>
+    (v.images || [])
+      .filter(img => img.imageUrl)
+      .map(img => ({uri: img.imageUrl})),
+  );
 
   const [selectedGroupKey, setSelectedGroupKey] = useState('groupOne');
-  const [selectedGroup, setSelectedGroup] = useState(groupOneImages);
+  // const [selectedGroup, setSelectedGroup] = useState(groupOneImages);
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef(null);
-
-  const handleGroupChange = (group, key) => {
-    setSelectedGroup(group);
-    setSelectedGroupKey(key);
+  // const [selectedGroup, setSelectedGroup] = useState(mainImages);
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const [selectedGroup, setSelectedGroup] = useState(variantImages[0] || []);
+  const handleGroupChange = index => {
+    setSelectedVariantIndex(index);
+    setSelectedGroup(variantImages[index]);
     setActiveIndex(0);
     flatListRef.current?.scrollToIndex({index: 0, animated: false});
   };
@@ -72,7 +84,9 @@ const ProductImageComponent = () => {
                     groupKey: selectedGroupKey, // 'groupOne' | 'groupTwo'
                   })
                 }>
-                <Image source={item} style={styles.mainImage} />
+                {/* <Image source={item} style={styles.mainImage} />
+                 */}
+                <Image source={{uri: item.uri}} style={styles.mainImage} />
               </TouchableOpacity>
             </View>
           )}
@@ -95,12 +109,13 @@ const ProductImageComponent = () => {
       </View>
 
       {/* Thumbnails */}
-      <View style={styles.thumbnailsRow}>
+      {/* <View style={styles.thumbnailsRow}>
         <TouchableOpacity
-          onPress={() => handleGroupChange(groupOneImages, 'groupOne')}
+          // onPress={() => handleGroupChange(groupOneImages, 'groupOne')}
           style={{marginRight: hp(20)}}>
           <Image
-            source={groupOneImages[0]}
+            // source={groupOneImages[0]}
+            source={{uri: selectedGroup[0]?.uri}}
             style={[
               styles.thumbnail,
               {
@@ -113,9 +128,10 @@ const ProductImageComponent = () => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => handleGroupChange(groupTwoImages, 'groupTwo')}>
+        // onPress={() => handleGroupChange(groupTwoImages, 'groupTwo')}
+        >
           <Image
-            source={groupTwoImages[0]}
+            // source={groupTwoImages[0]}
             style={[
               styles.thumbnail,
               {
@@ -126,6 +142,33 @@ const ProductImageComponent = () => {
             ]}
           />
         </TouchableOpacity>
+      </View> */}
+
+      {/* Thumbnails */}
+      <View style={styles.thumbnailsRow}>
+        {variantImages.map((imgs, index) => {
+          const thumbUri = imgs?.[0]?.uri;
+
+          if (!thumbUri) return null;
+
+          return (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleGroupChange(index)}
+              style={{marginRight: hp(20)}}>
+              <Image
+                source={{uri: thumbUri}}
+                style={[
+                  styles.thumbnail,
+                  {
+                    borderWidth: selectedVariantIndex === index ? 2 : 0,
+                    borderColor: '#8225AF',
+                  },
+                ]}
+              />
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </SafeAreaView>
   );
