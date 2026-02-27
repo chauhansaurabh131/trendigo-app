@@ -1,222 +1,3 @@
-// import React from 'react';
-// import {
-//   FlatList,
-//   Image,
-//   SafeAreaView,
-//   StyleSheet,
-//   View,
-//   Text,
-//   Dimensions,
-//   TouchableOpacity,
-// } from 'react-native';
-// import {images, icons, StarIcon, GradientLikeIcon} from '../../assets'; // Add your heart icon, star icon, etc.
-// import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
-// import {colors} from '../../utils/colors';
-// import {useNavigation} from '@react-navigation/native';
-// import {useDispatch, useSelector} from 'react-redux';
-// import {useEffect} from 'react';
-// import {getProductRequest} from '../../redux/actions/productActions';
-// import {wishlistRequest} from '../../redux/actions/wishlistActions';
-// import {getProductByReviewRequest} from '../../redux/actions/productByReviewActions';
-
-// const screenWidth = Dimensions.get('window').width;
-
-// // const products = [
-// //   {
-// //     id: 1,
-// //     image: images.trending_one,
-// //     title: 'Designer Traditional Dress1',
-// //     price: 780,
-// //     mrp: 1280,
-// //     discount: '34% Off',
-// //     rating: '4.2',
-// //     reviews: 122,
-// //   },
-// //   {
-// //     id: 2,
-// //     image: images.trending_two,
-// //     title: 'Designer Traditional Dress2',
-// //     price: 780,
-// //     mrp: 1280,
-// //     discount: '34% Off',
-// //     rating: '4.2',
-// //     reviews: 122,
-// //   },
-// //   {
-// //     id: 3,
-// //     image: images.trending_three,
-// //     title: 'Designer Traditional Dress3',
-// //     price: 780,
-// //     mrp: 1280,
-// //     discount: '34% Off',
-// //     rating: '4.2',
-// //     reviews: 122,
-// //   },
-// //   {
-// //     id: 4,
-// //     image: images.trending_one,
-// //     title: 'Designer Traditional Dress',
-// //     price: 780,
-// //     mrp: 1280,
-// //     discount: '34% Off',
-// //     rating: '4.2',
-// //     reviews: 122,
-// //   },
-// //   {
-// //     id: 5,
-// //     image: images.trending_two,
-// //     title: 'Designer Traditional Dress',
-// //     price: 780,
-// //     mrp: 1280,
-// //     discount: '34% Off',
-// //     rating: '4.2',
-// //     reviews: 122,
-// //   },
-// //   {
-// //     id: 6,
-// //     image: images.trending_three,
-// //     title: 'Designer Traditional Dress',
-// //     price: 780,
-// //     mrp: 1280,
-// //     discount: '34% Off',
-// //     rating: '4.2',
-// //     reviews: 122,
-// //   },
-// //   // ...add more as needed
-// // ];
-
-// const HomeTrendingComponent = () => {
-//   const navigation = useNavigation();
-//   const dispatch = useDispatch();
-//   // const imageUrl = item.images?.[0]?.url;
-
-//   // const {products, loading} = useSelector(state => state.product);
-//   const {products, loading} = useSelector(state => state.productByReview);
-//   //second useEffect to get all products
-//   useEffect(() => {
-//     dispatch(getProductByReviewRequest());
-//   }, []);
-//   useEffect(() => {
-//     console.log('Products in UI...:', products);
-//   }, [products]);
-//   // useEffect(() => {
-//   //   dispatch(getProductRequest());
-//   // }, []);
-
-//   if (loading) return <Text>Loading...</Text>;
-
-//   return (
-//     <SafeAreaView>
-//       <Text
-//         style={{
-//           paddingHorizontal: 10,
-//           fontSize: fontSize(16),
-//           color: colors.pureBlack,
-//           fontFamily: fontFamily.poppins700,
-//           marginBottom: hp(25),
-//           marginLeft: hp(5),
-//         }}>
-//         Trending
-//       </Text>
-//       <FlatList
-//         data={products}
-//         // keyExtractor={item => item.id.toString()}
-//         keyExtractor={item => item.id}
-//         numColumns={2}
-//         columnWrapperStyle={{
-//           justifyContent: 'space-between',
-//           paddingHorizontal: wp(10), // 👈 ONLY HERE spacing control
-//         }}
-//         contentContainerStyle={styles.container}
-//         renderItem={({item}) => {
-//           const mainVariant =
-//             item.variants?.find(v =>
-//               v.images?.some(img => img.isSelectedForMainScreen),
-//             ) || item.variants?.[0];
-//           const mainImage = mainVariant?.images?.find(
-//             img => img.isSelectedForMainScreen,
-//           );
-//           const imageUrl = mainImage?.imageUrl;
-
-//           // const imageUrl = item.images?.[0]?.url;
-//           console.log(
-//             // 'PRODUCT ITEM HOMETRENDIGOCOMPONENT=>',
-//             JSON.stringify(item, null, 2),
-//           );
-
-//           return (
-//             <TouchableOpacity
-//               style={styles.card}
-//               activeOpacity={0.6}
-//               onPress={() => {
-//                 navigation.navigate('ProductDetails', {product: item});
-//               }}>
-//               {/* <Image source={item.image} style={styles.image} /> */}
-//               <Image
-//                 source={
-//                   imageUrl ? {uri: imageUrl} : images.trending_one // fallback image
-//                 }
-//                 style={styles.image}
-//               />
-
-//               <View style={styles.content}>
-//                 <Text
-//                   numberOfLines={1}
-//                   ellipsizeMode="tail"
-//                   style={styles.title}>
-//                   {item.title}
-//                 </Text>
-
-//                 <View style={styles.priceRow}>
-//                   {/* <Text style={styles.price}>Rs. {item.price}</Text>
-//                   <Text style={styles.mrp}>MRP {item.mrp}</Text>
-//                   <Text style={styles.discount}>{item.discount}</Text> */}
-//                   <Text style={styles.price}>
-//                     Rs. {mainVariant?.price || 0}
-//                   </Text>
-//                   <Text style={styles.mrp}>MRP {mainVariant?.mrp || 0}</Text>
-//                   <Text style={styles.discount}>
-//                     {mainVariant?.discount
-//                       ? `${mainVariant.discount}% Off`
-//                       : ''}
-//                   </Text>
-//                 </View>
-
-//                 <View style={styles.ratingRow}>
-//                   <View style={styles.ratingBox}>
-//                     {/* <Text style={styles.ratingText}>{item.rating}</Text> */}
-//                     {/* <Text style={styles.ratingText}>{item.rating || '0'}</Text> */}
-//                     <Text style={styles.ratingText}>
-//                       {item.averageRating ? item.averageRating.toFixed(1) : '0'}
-//                     </Text>
-
-//                     <StarIcon style={{top: -1, width: hp(9), height: hp(8)}} />
-//                   </View>
-//                   {/* <Text style={styles.reviews}>
-//                     {item.reviews ? `(${item.reviews})` : '(0)'}
-//                   </Text> */}
-//                   <Text style={styles.reviews}>
-//                     {item.totalReviews ? `(${item.totalReviews})` : '(00)'}
-//                   </Text>
-//                   <TouchableOpacity
-//                     style={styles.heartButton}
-//                     onPress={() => {
-//                       console.log('❤️ Product ID sending:', item.id);
-//                       dispatch(wishlistRequest(item.id));
-//                     }}>
-//                     {/*<Text style={{fontSize: 18}}>♡</Text>*/}
-//                     <GradientLikeIcon />
-//                   </TouchableOpacity>
-//                 </View>
-//               </View>
-//             </TouchableOpacity>
-//           );
-//         }}
-//       />
-//     </SafeAreaView>
-//   );
-// };
-
 import React from 'react';
 import {
   FlatList,
@@ -243,7 +24,7 @@ import {useEffect} from 'react';
 import {getProductRequest} from '../../redux/actions/productActions';
 import {wishlistRequest} from '../../redux/actions/wishlistActions';
 import {getProductByReviewRequest} from '../../redux/actions/productByReviewActions';
-
+import {ToastAndroid} from 'react-native';
 const screenWidth = Dimensions.get('window').width;
 
 // const products = [
@@ -353,8 +134,8 @@ const HomeTrendingComponent = () => {
     }
 
     // First time click → alert
-    alert('Product saved in wishlist');
-
+    // alert('Product saved in wishlist');
+    ToastAndroid.show('Product saved in your wishlist', ToastAndroid.SHORT);
     // Mark product as just added (for gradient icon)
     setJustAdded(prev => [...prev, productId]);
 
@@ -396,7 +177,7 @@ const HomeTrendingComponent = () => {
           );
           const imageUrl = mainImage?.imageUrl;
           console.log('ITEM ID in home component:', item.id, item._id);
-
+          console.log('HOME PRODUCT RATING 👉', item.averageRating);
           // const imageUrl = item.images?.[0]?.url;
           // console.log(
           //   // 'PRODUCT ITEM HOMETRENDIGOCOMPONENT=>',

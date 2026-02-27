@@ -38,6 +38,8 @@ import {wishlistRequest} from '../../redux/actions/wishlistActions';
 import {productDetailsRequest} from '../../redux/actions/productDetailsAction';
 import {getUserReviewsRequest} from '../../redux/actions/reviewActions';
 import {getStoreRequest} from '../../redux/actions/storeActions';
+import {ToastAndroid} from 'react-native';
+import {addRecentlyViewedRequest} from '../../redux/actions/recentlyViewedActions';
 export const CustomStarIcon = ({
   width = 24,
   height = 24,
@@ -133,6 +135,12 @@ const ProductDetailsScreen = () => {
   //shop image
   // const shopImage = storeData?.shopImage;
   const shopImage = storeData?.profileImage;
+  useEffect(() => {
+    if (productId) {
+      dispatch(addRecentlyViewedRequest(productId));
+      console.log('ADD REVENTLY VIEW PRODUCT ID====>', productId);
+    }
+  }, [productId]);
   const scrollToReviews = () => {
     reviewsRef.current?.measureLayout(scrollRef.current, (x, y) => {
       scrollRef.current.scrollTo({y: y, animated: true});
@@ -335,8 +343,8 @@ const ProductDetailsScreen = () => {
     }
 
     // First time click → alert
-    alert('Product saved in wishlist');
-
+    // alert('Product saved in wishlist');
+    ToastAndroid.show('Product saved in your wishlist', ToastAndroid.SHORT);
     // Mark product as just added (for gradient icon)
     setJustAdded(prev => [...prev, productId]);
 
@@ -345,9 +353,10 @@ const ProductDetailsScreen = () => {
     console.log(' Product ID sending:', productId);
   };
   const ReviewItem = ({item}) => {
-    console.log('REVIEW IMAGES 👉', item.images);
+    console.log('REVIEW IMAGES 👉', item.productImages);
     console.log('FULL ITEM 👉', item);
     console.log('USER DATA 👉', item.user);
+    console.log('Review item:', item);
     return (
       <View style={{marginHorizontal: 17, marginTop: hp(24)}}>
         {/* Review Title */}
@@ -377,10 +386,9 @@ const ProductDetailsScreen = () => {
             'No description yet.'}
         </Text>
         {/* Review Images (if any) */}
-        {item?.images && item.images.length > 0 ? (
-          // ✅ Images available → show images
+        {item?.productImages && item.productImages.length > 0 ? (
           <View style={{marginTop: hp(20), flexDirection: 'row'}}>
-            {item.images.map((img, index) => (
+            {item.productImages.map((img, index) => (
               <Image
                 key={index}
                 source={{uri: img}}

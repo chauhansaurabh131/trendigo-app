@@ -5,6 +5,9 @@ import {
   GET_USER_REVIEWS_REQUEST,
   GET_USER_REVIEWS_SUCCESS,
   GET_USER_REVIEWS_FAILURE,
+  GET_PRESIGNED_URL_REQUEST,
+  GET_PRESIGNED_URL_SUCCESS,
+  GET_PRESIGNED_URL_FAILURE,
 } from '../actions/reviewActions';
 
 const initialState = {
@@ -16,6 +19,7 @@ const initialState = {
   userReviews: [],
   // loading: false,
   // error: null,
+  presignedData: null, // 🔥 ADD THIS
 };
 
 export default function reviewReducer(state = initialState, action) {
@@ -64,7 +68,26 @@ export default function reviewReducer(state = initialState, action) {
         loading: false,
         error: action.payload,
       };
+    case GET_PRESIGNED_URL_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
 
+    case GET_PRESIGNED_URL_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        presignedData: action.payload,
+      };
+
+    case GET_PRESIGNED_URL_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
     default:
       return state;
   }

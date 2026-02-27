@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ToastAndroid,
 } from 'react-native';
 import {colors} from '../../utils/colors';
 import {fontFamily, fontSize, hp} from '../../utils/helpers';
@@ -26,6 +27,7 @@ import {
   removeWishlistRequest,
 } from '../../redux/actions/wishlistActions';
 import {getProductRequest} from '../../redux/actions/productActions';
+
 // const products = [
 //   {
 //     id: 1,
@@ -350,6 +352,10 @@ const WishlistScreen = () => {
                           item.wishlistId,
                         );
                         dispatch(removeWishlistRequest(item.wishlistId));
+                        ToastAndroid.show(
+                          'Product Remove in your wishlist',
+                          ToastAndroid.SHORT,
+                        );
                       }}
                     />
                   </TouchableOpacity>

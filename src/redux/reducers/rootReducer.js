@@ -16,6 +16,7 @@ import reviewByUserIdReducer from './reviewByUserIdReducer';
 import storeReducer from './storeReducer';
 import storeProductReducer from './storeProductReducer';
 import {productDetailsReducer} from './productDetailsReducer';
+import recentlyViewedReducer from './recentlyViewedReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -34,6 +35,7 @@ const appReducer = combineReducers({
   reviewByUserId: reviewByUserIdReducer,
   sellerStore: storeReducer,
   storeProduct: storeProductReducer,
+  recentlyView: recentlyViewedReducer,
 });
 
 const rootReducer = (state, action) => {

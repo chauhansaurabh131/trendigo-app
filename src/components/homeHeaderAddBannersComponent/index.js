@@ -90,7 +90,8 @@ const HomeHeaderAddBannersComponent = () => {
             <View style={{width: SCREEN_WIDTH}}>
               <Image
                 source={{uri: item}}
-                resizeMode="stretch"
+                // resizeMode="stretch"
+                resizeMode="cover"
                 style={{
                   width: SCREEN_WIDTH,
                   height: hp(169),

@@ -21,44 +21,118 @@ import {Modal} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useDispatch} from 'react-redux';
 import {addReviewRequest} from '../../redux/actions/reviewActions';
+import {GET_PRESIGNED_URL_REQUEST} from '../../redux/actions/reviewActions';
 const ReviewandRatingsScreen = () => {
   const dispatch = useDispatch();
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
   const [model, setModel] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
   // const {product} = route.params;
   // ✅ FIRST destructure
-  const {product, rating: initialRating} = route.params || {};
+  // const {product, rating: initialRating} = route.params || {};
+  const {product: productArray, rating: initialRating} = route.params || {};
+
+  const product = Array.isArray(productArray) ? productArray[0] : productArray;
   console.log('Review Product 👉', product);
   const productId = product?._id || product?.id;
   const sellerId = product?.storeId?.id;
   const [rating, setRating] = useState(initialRating || 0);
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewDesc, setReviewDesc] = useState('');
+  // const handleSubmitReview = () => {
+  //   // if (!rating || !reviewTitle || !reviewDesc) {
+  //   //   alert('Please fill all fields');
+  //   //   return;
+  //   // }
+
+  //   const payload = {
+  //     productId: product._id.trim(),
+  //     sellerId: product.storeId.id.trim(),
+  //     title: reviewTitle?.trim(),
+  //     description: reviewDesc?.trim(),
+  //     rating: Number(rating),
+  //     isAdminAprove: true,
+  //   };
+
+  //   console.log(' REVIEW PAYLOAD ..', payload);
+
+  //   dispatch(addReviewRequest(payload));
+  // setModel(true); // success modal (later move this on success)
+  // };
   const handleSubmitReview = () => {
-    // if (!rating || !reviewTitle || !reviewDesc) {
-    //   alert('Please fill all fields');
-    //   return;
-    // }
+    if (!rating || !reviewTitle || !reviewDesc) {
+      alert('Please fill all fields');
+      return;
+    }
 
-    const payload = {
-      productId: product._id.trim(),
-      sellerId: product.storeId.id.trim(),
-      title: reviewTitle?.trim(),
-      description: reviewDesc?.trim(),
-      rating: Number(rating),
-      isAdminAprove: true,
-    };
+    // 🔥 If image selected → call presigned saga
+    if (selectedImage) {
+      dispatch({
+        type: GET_PRESIGNED_URL_REQUEST,
+        payload: {
+          name:
+            selectedImage.fileName ||
+            selectedImage.uri.split('/').pop() ||
+            `review_${Date.now()}.jpg`,
 
-    console.log(' REVIEW PAYLOAD ..', payload);
+          key:
+            selectedImage.fileName ||
+            selectedImage.uri.split('/').pop() ||
+            `review_${Date.now()}.jpg`,
+          file: selectedImage, // 🔥🔥🔥 THIS IS MISSING
 
-    dispatch(addReviewRequest(payload));
+          contentType: selectedImage.type || 'image/jpeg',
+          productId: product?._id?.trim() || '',
+          sellerId: product?.storeId?.id?.trim() || '',
+          title: reviewTitle.trim(),
+          description: reviewDesc.trim(),
+          rating: Number(rating),
+          isAdminAprove: true,
+        },
+      });
+    } else {
+      // 🔥 No image → direct review submit
+      const payload = {
+        productId: product._id.trim(),
+        sellerId: product.storeId.id.trim(),
+        title: reviewTitle.trim(),
+        description: reviewDesc.trim(),
+        rating: Number(rating),
+        isAdminAprove: true,
+      };
+
+      dispatch(addReviewRequest(payload));
+    }
     setModel(true); // success modal (later move this on success)
   };
-  // open gallery
+
+  // const openGallery = () => {
+  //   const options = {
+  //     mediaType: 'photo',
+  //     maxWidth: 1024,
+  //     maxHeight: 1024,
+  //     quality: 0.8,
+  //   };
+
+  //   launchImageLibrary(options, response => {
+  //     if (response.didCancel) {
+  //       console.log('User cancelled');
+  //     } else if (response.errorCode) {
+  //       console.log('ImagePicker Error:', response.errorMessage);
+  //     } else if (response.assets && response.assets.length > 0) {
+  //       const image = response.assets[0];
+  //       console.log('Selected Image123:', image);
+  //       setSelectedImage(image); // ✅ store image
+  //       console.log('Selected Image:', selectedImage);
+  //     }
+  //   });
+  // };
   const openGallery = () => {
-    let options = {
-      mediaType: 'photo', // 'photo' | 'video' | 'mixed'
+    const options = {
+      mediaType: 'photo',
+      selectionLimit: 3, // 🔥 allow 3 images
       maxWidth: 1024,
       maxHeight: 1024,
       quality: 0.8,
@@ -66,17 +140,17 @@ const ReviewandRatingsScreen = () => {
 
     launchImageLibrary(options, response => {
       if (response.didCancel) {
-        console.log('User cancelled image picker');
+        console.log('User cancelled');
       } else if (response.errorCode) {
-        console.log('ImagePicker Error: ', response.errorMessage);
-      } else {
-        // ✅ selected image
-        console.log('Selected Image:', response.assets[0]);
-        // response.assets[0].uri = image path
+        console.log('ImagePicker Error:', response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        setSelectedImages(prev => {
+          const newImages = [...prev, ...response.assets];
+          return newImages.slice(0, 3); // max 3 images
+        });
       }
     });
   };
-
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
       <View
@@ -225,67 +299,48 @@ const ReviewandRatingsScreen = () => {
             Share Photo
           </Text>
         </View>
-        <View
+        {/* <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <View
-            style={{
-              marginTop: hp(19),
-              marginHorizontal: wp(18),
-              position: 'relative',
-            }}>
-            <Image
-              source={images.reviews_image}
-              style={{width: wp(60), height: hp(60)}}
-            />
-            <TouchableOpacity
+          {selectedImage && (
+            <View
               style={{
-                width: wp(15),
-                height: hp(15),
-                borderRadius: 10,
-                backgroundColor: '#000',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'absolute',
-                marginLeft: wp(40),
-                marginTop: hp(41),
+                marginTop: hp(19),
+                marginHorizontal: wp(18),
+                position: 'relative',
               }}>
               <Image
-                source={images.review_delete}
-                style={{width: wp(8.18), height: hp(8.18)}}
+                source={{uri: selectedImage.uri}}
+                style={{
+                  width: wp(60),
+                  height: hp(60),
+                  borderRadius: 10,
+                }}
               />
-            </TouchableOpacity>
-          </View>
-          <View
-            style={{
-              marginTop: hp(19),
-              // marginLeft: wp(10),
-              position: 'relative',
-            }}>
-            <Image
-              source={images.reviews_image}
-              style={{width: wp(60), height: hp(60)}}
-            />
-            <TouchableOpacity
-              style={{
-                width: wp(15),
-                height: hp(15),
-                borderRadius: 10,
-                backgroundColor: '#000',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'absolute',
-                marginLeft: wp(40),
-                marginTop: hp(41),
-              }}>
-              <Image
-                source={images.review_delete}
-                style={{width: wp(8.18), height: hp(8.18)}}
-              />
-            </TouchableOpacity>
-          </View>
+
+              <TouchableOpacity
+                onPress={() => setSelectedImage(null)}
+                style={{
+                  width: wp(15),
+                  height: hp(15),
+                  borderRadius: 10,
+                  backgroundColor: '#000',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  right: 0,
+                  bottom: 0,
+                }}>
+                <Image
+                  source={images.review_delete}
+                  style={{width: wp(8.18), height: hp(8.18)}}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View
             style={{
               width: wp(60),
@@ -301,10 +356,81 @@ const ReviewandRatingsScreen = () => {
             <TouchableOpacity onPress={openGallery}>
               <Image
                 source={images.camera_icon}
-                style={{width: wp(20.6), height: hp(18.81)}}
+                style={{
+                  width: wp(20.6),
+                  height: hp(18.81),
+                }}
               />
             </TouchableOpacity>
           </View>
+        </View> */}
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: hp(19),
+            marginHorizontal: wp(18),
+          }}>
+          {/* 🖼 Selected Images FIRST */}
+          {selectedImages.map((item, index) => (
+            <View key={index} style={{marginRight: 10}}>
+              <Image
+                source={{uri: item.uri}}
+                style={{
+                  width: wp(60),
+                  height: hp(60),
+                  borderRadius: 10,
+                }}
+              />
+
+              {/* ❌ Delete Button */}
+              <TouchableOpacity
+                onPress={() => {
+                  const updated = selectedImages.filter((_, i) => i !== index);
+                  setSelectedImages(updated);
+                }}
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: '#000',
+                  width: wp(15),
+                  height: hp(15),
+                  borderRadius: 10,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Image
+                  source={images.review_delete}
+                  style={{width: wp(8.18), height: hp(8.18)}}
+                />
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          {/* 📷 Camera LAST */}
+          {selectedImages.length < 3 && (
+            <TouchableOpacity
+              onPress={openGallery}
+              style={{
+                width: wp(60),
+                height: hp(60),
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: '#9317CF',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Image
+                source={images.camera_icon}
+                style={{
+                  width: wp(20.6),
+                  height: hp(18.81),
+                }}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
       <View style={{bottom: hp(16), marginHorizontal: wp(18)}}>

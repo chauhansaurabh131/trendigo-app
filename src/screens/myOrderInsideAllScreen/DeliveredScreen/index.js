@@ -17,17 +17,31 @@ import {useNavigation, useRoute} from '@react-navigation/native';
 DeliveredScreen = () => {
   const navigation = useNavigation();
   const [rating, setRating] = useState(0);
-  const product = {
-    _id: '695f9b9e37424f1de0c4a436',
-    title: 'Designer Traditional Dress',
-    image: images.trending_one,
-    size: 'S',
-    color: 'Sky Blue',
-    qty: 1,
-    storeId: {
-      id: '6960ba8237424f1de0c4a7e3',
+  const product = [
+    // {
+    //   _id: '695f9b9e37424f1de0c4a436',
+    //   title: 'Designer Traditional Dress',
+    //   image: images.trending_one,
+    //   size: 'S',
+    //   color: 'Sky Blue',
+    //   qty: 1,
+    //   storeId: {
+    //     id: '6960ba8237424f1de0c4a7e3',
+    //   },
+    // },
+    {
+      _id: '6960f31037424f1de0c4a918',
+      title: 'Men graphic Black T-shirt',
+      image: images.trending_one,
+      size: 'S',
+      color: 'Sky Blue',
+      qty: 1,
+      storeId: {
+        id: '6960ba8237424f1de0c4a7e3',
+      },
     },
-  };
+  ];
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View style={{marginHorizontal: 18}}>
@@ -177,7 +191,7 @@ DeliveredScreen = () => {
                     }}>
                     {' '}
                     {/* 1{' '} */}
-                    <Text>{product.quantity}</Text>
+                    <Text>{product.qty}</Text>
                   </Text>
                 </View>
               </View>
