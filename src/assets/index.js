@@ -28,6 +28,13 @@ import UniIcon from './svgIcons/uni_icon.svg';
 import Adidas from './svgIcons/adidas_icon.svg';
 import LevisIcon from './svgIcons/levis_icon.svg';
 import CalvinIcon from './svgIcons/calvin_icon.svg';
+import DeleteIcoon from './svgIcons/delete_icoon.svg';
+import DeliverIcon from './svgIcons/deliver_icon.svg';
+import TrackIcon from './svgIcons/track_icon.svg';
+import ReceiptIcon from './svgIcons/receipt_icon.svg';
+import RemoveIcon from './svgIcons/remove_icon.svg';
+import EditIcon from './svgIcons/edit_icon.svg';
+import SendEquiry1 from './svgIcons/send_equiry1.svg';
 export {
   WhiteTrendiGo,
   RightSideArrow,
@@ -59,6 +66,13 @@ export {
   Adidas,
   CalvinIcon,
   LevisIcon,
+  DeleteIcoon,
+  DeliverIcon,
+  TrackIcon,
+  ReceiptIcon,
+  RemoveIcon,
+  EditIcon,
+  SendEquiry1,
 };
 
 export const images = {

@@ -5,7 +5,7 @@ import {Text, View} from 'react-native';
 import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import LinearGradient from 'react-native-linear-gradient';
-
+import {useSelector} from 'react-redux';
 // Screens
 import HomeScreen from '../screens/homeScreen';
 import SearchScreen from '../screens/searchScreen';
@@ -116,6 +116,10 @@ const BagStackScreen = () => (
    MAIN TAB NAVIGATOR
 --------------------------- */
 const MainTabNavigator = () => {
+  const {loading, cartData, error} = useSelector(state => state.addToCard);
+  const cartCount = cartData?.productDetailList?.length || 0;
+
+  console.log('TAB CART COUNT =>', cartCount);
   return (
     <Tab.Navigator
       screenOptions={({route}) => {
@@ -177,12 +181,45 @@ const MainTabNavigator = () => {
               height: hp(20),
             };
 
+            // return (
+            //   <View style={{width: sizeStyle.width, height: sizeStyle.height}}>
+            //     <IconComponent
+            //       width={sizeStyle.width}
+            //       height={sizeStyle.height}
+            //     />
+            //   </View>
+            // );
             return (
               <View style={{width: sizeStyle.width, height: sizeStyle.height}}>
                 <IconComponent
                   width={sizeStyle.width}
                   height={sizeStyle.height}
                 />
+
+                {route.name === 'BagStack' && cartCount > 0 && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      right: -11,
+                      top: -8,
+                      backgroundColor: '#9333EA',
+                      borderRadius: 10,
+                      minWidth: 16,
+                      height: 16,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      paddingHorizontal: 3,
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontSize: fontSize(10),
+                        fontFamily: fontFamily.poppins400,
+                      }}>
+                      {cartCount}
+                    </Text>
+                  </View>
+                )}
               </View>
             );
           },

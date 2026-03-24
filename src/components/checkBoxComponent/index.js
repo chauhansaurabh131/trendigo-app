@@ -9,16 +9,16 @@ import {
 import {fontFamily, fontSize} from '../../utils/helpers';
 import {colors} from '../../utils/colors';
 
-const CheckBoxComponent = () => {
-  const [isChecked, setIsChecked] = useState(false);
+const CheckBoxComponent = ({isDefault, onPress}) => {
+  // const [isChecked, setIsChecked] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity
-        style={[styles.checkboxBase, isChecked && styles.checkboxChecked]}
-        onPress={() => setIsChecked(!isChecked)}
+        style={[styles.checkboxBase, isDefault && styles.checkboxChecked]}
+        onPress={onPress}
         activeOpacity={0.7}>
-        {isChecked && <Text style={styles.checkmark}>✔</Text>}
+        {isDefault && <Text style={styles.checkmark}>✔</Text>}
       </TouchableOpacity>
 
       <Text style={styles.label}>Make it default address</Text>

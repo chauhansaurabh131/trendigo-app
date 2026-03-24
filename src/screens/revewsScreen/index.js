@@ -94,7 +94,7 @@ const RevewsScreen = () => {
       <View
         style={{
           // width: '100%',
-          height: hp(380),
+          height: hp(370),
           borderColor: '#E8E8E8',
           borderWidth: 1,
           marginHorizontal: wp(18),

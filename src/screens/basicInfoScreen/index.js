@@ -54,16 +54,16 @@ const BasicInfoScreen = () => {
   const [showEditOtpMobileModel, setShowEditOtpMobileModel] = useState(false);
 
   const {imageUrl} = useSelector(state => state.profileImage || {});
-  console.log('imageUrl1.............', imageUrl);
+  // console.log('imageUrl1.............', imageUrl);
 
-  useEffect(() => {
-    if (imageUrl) {
-      setProfileImage(imageUrl);
-    }
-  }, [imageUrl]);
+  // useEffect(() => {
+  //   if (imageUrl) {
+  //     setProfileImage(imageUrl);
+  //   }
+  // }, [imageUrl]);
   const profileImageState = useSelector(state => state.profileImage);
 
-  console.log('REDUX STATE', profileImageState);
+  // console.log('REDUX STATE', profileImageState);
 
   const {loading, userData, error} = useSelector(state => state.updateUser);
 
@@ -193,6 +193,9 @@ const BasicInfoScreen = () => {
     if (!user) return;
 
     setName(user.name || '');
+    if (user.profilePic) {
+      setProfileImage(user.profilePic); // 🔥 ADD THIS
+    }
     setGender(
       user.gender
         ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1)

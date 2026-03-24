@@ -20,6 +20,8 @@ import {watchReviewByUserId} from './reviewByUserIdSaga';
 import {watchStoreSaga} from './storeSaga';
 import {watchStoreProducts} from './storeProductSaga';
 import {watchRecentlyViewed} from './recentlyViewedSaga';
+import cartSaga from './cartSaga';
+import productVariantSaga from './productVariantSaga';
 
 export default function* rootSaga() {
   yield all([
@@ -43,5 +45,7 @@ export default function* rootSaga() {
     watchStoreSaga(),
     watchStoreProducts(),
     watchRecentlyViewed(),
+    cartSaga(),
+    productVariantSaga(),
   ]);
 }

@@ -1,0 +1,7 @@
+export const GET_PRODUCT_VARIANT_REQUEST = 'GET_PRODUCT_VARIANT_REQUEST';
+export const GET_PRODUCT_VARIANT_SUCCESS = 'GET_PRODUCT_VARIANT_SUCCESS';
+export const GET_PRODUCT_VARIANT_FAILURE = 'GET_PRODUCT_VARIANT_FAILURE';
+export const getProductVariantRequest = productId => ({
+  type: GET_PRODUCT_VARIANT_REQUEST,
+  productId,
+});

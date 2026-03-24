@@ -15,7 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 const {width} = Dimensions.get('window');
 
 // const ProductImageComponent = ({product}) => {
-const ProductImageComponent = ({product, selectedVariant}) => {
+const ProductImageComponent = ({product, setSelectedColor}) => {
   const navigation = useNavigation();
 
   // const groupOneImages = [
@@ -48,13 +48,35 @@ const ProductImageComponent = ({product, selectedVariant}) => {
   // const [selectedGroup, setSelectedGroup] = useState(mainImages);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [selectedGroup, setSelectedGroup] = useState(variantImages[0] || []);
+  // const [selectedColor, setSelectedColor] = useState(null);
+  // const handleGroupChange = index => {
+  //   console.log('THUMBNAIL CLICKED INDEX:', index);
+  //   console.log('SELECTED VARIANT IMAGES:', variantImages[index]);
+
+  //   setSelectedVariantIndex(index);
+  //   setSelectedGroup(variantImages[index]);
+  //   setActiveIndex(0);
+  //   flatListRef.current?.scrollToIndex({index: 0, animated: false});
+  // };
   const handleGroupChange = index => {
+    console.log('THUMBNAIL CLICKED INDEX:', index);
+    console.log('SELECTED VARIANT IMAGES:', variantImages[index]);
+
+    const variant = product?.variants[index];
+
+    const colorObj = variant?.variants?.find(v => v.key === 'color');
+
+    if (colorObj && setSelectedColor) {
+      console.log('COLOR FROM THUMBNAIL:', colorObj.value);
+      setSelectedColor(colorObj.value);
+    }
+
     setSelectedVariantIndex(index);
     setSelectedGroup(variantImages[index]);
     setActiveIndex(0);
+
     flatListRef.current?.scrollToIndex({index: 0, animated: false});
   };
-
   const handleScroll = event => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setActiveIndex(index);
@@ -193,8 +215,8 @@ const styles = StyleSheet.create({
   mainImage: {
     width: width,
     height: 457,
-    resizeMode: 'contain',
-    borderRadius: 15, // Add border radius to large image
+    // resizeMode: 'contain',
+    // borderRadius: 15, // Add border radius to large image
   },
   paginationContainer: {
     position: 'absolute',

@@ -19,7 +19,9 @@ import edit_address_icon from '../../assets/images/adress_icon.png';
 import delete_icon from '../../assets/images/delete_address_icon.png';
 import check_icon from '../../assets/images/check_right_icon.png';
 import location_icon from '../../assets/images/location_address_icon.png';
+import LinearGradient from 'react-native-linear-gradient';
 import GradientButton from '../../components/gradientButton';
+import {RemoveIcon, EditIcon} from '../../assets';
 import {FlatList} from 'react-native';
 import {KeyboardAvoidingView} from 'react-native';
 // IMPORT ACTION CREATORS (ensure these exist / match names)
@@ -59,6 +61,7 @@ const AddressScreen = () => {
     pincode: '',
     address: '',
     locality: '',
+
     isDefault: false,
   });
 
@@ -186,7 +189,11 @@ const AddressScreen = () => {
         <FlatList
           data={addresses}
           // keyExtractor={item => item._id} // 👈 FIX
-          keyExtractor={item => item.id}
+
+          // keyExtractor={item => item.id}
+          keyExtractor={(item, index) =>
+            item?.id ? item.id.toString() : index.toString()
+          }
           contentContainerStyle={styles.scrollContainer}
           showsVerticalScrollIndicator={false}
           scrollEnabled={false}
@@ -203,44 +210,163 @@ const AddressScreen = () => {
             </Text>
           }
           renderItem={({item}) => {
-            const addressText = `${item.addressLineOne}, ${item.addressLineTwo}`;
+            if (!item) return null; // ✅ IMPORTANT
+
+            const addressText = `${item.addressLineOne || ''}, ${
+              item.addressLineTwo || ''
+            }`;
             const isDefault = item.isDefaultAddress;
+
+            // const addressText = `${item.addressLineOne}, ${item.addressLineTwo}`;
+            // const isDefault = item.isDefaultAddress;
             console.log('ITEM:', item); // <-- ADD THIS HERE
             return (
               <View style={styles.card}>
-                {isDefault && (
+                <View
+                  style={{
+                    // width: '100%',
+                    height: hp(244),
+                    borderWidth: 1,
+                    borderColor: '#E8E8E8',
+                    borderRadius: 14,
+                    paddingHorizontal: wp(18),
+                    marginTop: hp(28),
+                    marginHorizontal: wp(24), // 👈 ADD THIS
+                  }}>
                   <View style={styles.defaultRow}>
-                    <View style={styles.defaultTag}>
-                      <Text style={styles.defaultText}>Default</Text>
+                    {/* <View
+                        style={{
+                          marginTop: hp(25),
+
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}>
+                        <LinearGradient
+                          colors={['#8B5CF6', '#A855F7']}
+                          start={{x: 0, y: 0}}
+                          end={{x: 1, y: 0}}
+                          style={{
+                            width: wp(81),
+                            height: hp(23),
+                            borderRadius: 20,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text style={styles.defaultText}>Default</Text>
+                        </LinearGradient>
+
+                        <Text
+                          style={{
+                            color: '#9CA3AF',
+                            fontSize: fontSize(12),
+                            fontFamily: fontFamily.poppins500,
+                            marginLeft: wp(10),
+                          }}>
+                          Home
+                        </Text>
+                      </View> */}
+
+                    <View
+                      style={{
+                        marginTop: hp(25),
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}>
+                      {isDefault && (
+                        <LinearGradient
+                          colors={['#8B5CF6', '#A855F7']}
+                          start={{x: 0, y: 0}}
+                          end={{x: 1, y: 0}}
+                          style={{
+                            width: wp(81),
+                            height: hp(23),
+                            borderRadius: 20,
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}>
+                          <Text style={styles.defaultText}>Default</Text>
+                        </LinearGradient>
+                      )}
+                      <Text
+                        style={{
+                          color: '#9CA3AF',
+                          fontSize: fontSize(12),
+                          fontFamily: fontFamily.poppins500,
+                          // marginLeft: wp(10),
+                          left: wp(271),
+                        }}>
+                        {item.type || 'Office'}
+                      </Text>
                     </View>
                   </View>
-                )}
 
-                <View style={styles.row}>
-                  <Text style={styles.name}>{item.name}</Text>
-                  <Text style={styles.type}>{item.type}</Text>
-                </View>
+                  <View style={styles.row}>
+                    <Text style={styles.name}>{item.name}</Text>
+                    <Text style={styles.type}>{item.type}</Text>
+                  </View>
 
-                <Text style={styles.address}>{addressText}</Text>
+                  <Text style={styles.address}>{addressText}</Text>
 
-                <Text style={styles.mobile}>
-                  <Text style={styles.mobileLabel}>Mobile :</Text>{' '}
-                  {item.mobileNumber}
-                </Text>
+                  <Text style={styles.mobile}>
+                    <Text style={styles.mobileLabel}>Mobile :</Text>{' '}
+                    {item.mobileNumber}
+                  </Text>
 
-                <View style={styles.actions}>
-                  <TouchableOpacity
-                    style={styles.iconButton}
-                    onPress={() => openEditSheet(item)}>
-                    <Image source={edit_address_icon} style={styles.icon} />
-                  </TouchableOpacity>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginTop: hp(31),
+                      marginLeft: wp(177),
+                      right: wp(20),
+                    }}>
+                    {/* // {styles.actions} */}
 
-                  <TouchableOpacity
-                    style={styles.iconButton}
-                    // onPress={() => confirmDelete(item._id)}
-                    onPress={() => confirmDelete(item.id)}>
-                    <Image source={delete_icon} style={styles.icon} />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      // style={styles.iconButton}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        paddingRight: wp(16),
+                        borderRightWidth: 1,
+                        borderRightColor: '#E5E5E5',
+                      }}
+                      onPress={() => openEditSheet(item)}>
+                      {/* <Image source={edit_address_icon} style={styles.icon} /> */}
+                      <EditIcon />
+                      <Text
+                        style={{
+                          color: '#6366F1',
+                          fontSize: fontSize(14),
+                          fontFamily: fontFamily.poppins500,
+                        }}>
+                        Edit
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        marginLeft: wp(16),
+                      }}
+                      // style={styles.iconButton}
+                      // onPress={() => confirmDelete(item._id)}
+                      onPress={() => confirmDelete(item.id)}>
+                      {/* <Image source={delete_icon} style={styles.icon} /> */}
+                      <RemoveIcon />
+                      <Text
+                        style={{
+                          color: '#F43F5E',
+                          fontSize: fontSize(14),
+                          fontFamily: fontFamily.poppins500,
+                        }}>
+                        Remove
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
             );
@@ -421,17 +547,18 @@ const styles = StyleSheet.create({
     marginRight: 30,
     marginLeft: 30,
   },
-  scrollContainer: {padding: wp(5)},
+  scrollContainer: {
+    // padding: wp(5)
+  },
   card: {
     backgroundColor: '#fff',
-    padding: wp(15),
     marginBottom: wp(15),
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
   },
   defaultRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    // flexDirection: 'row',
+    // alignItems: 'center',
     marginBottom: wp(10),
   },
   checkIcon: {
@@ -454,11 +581,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   name: {
-    fontSize: 16,
-    fontFamily: fontFamily.poppins600,
+    fontSize: fontSize(16),
+    fontFamily: fontFamily.poppins700,
     color: '#000000',
-    fontWeight: 'bold',
-    marginTop: 10,
+
+    marginTop: 2,
   },
   type: {
     fontSize: 12,
@@ -466,20 +593,21 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
   },
   address: {
-    fontSize: 12,
+    fontSize: fontSize(16),
     fontFamily: fontFamily.poppins400,
     color: '#000000',
-    marginTop: 10,
+    marginTop: 2,
   },
   mobile: {
-    fontFamily: fontFamily.poppins400,
+    fontFamily: fontFamily.poppins500,
     color: '#000000',
-    marginTop: 10,
+    marginTop: 2,
+    fontSize: fontSize(14),
   },
   mobileLabel: {
     fontFamily: fontFamily.poppins500,
-    fontSize: 13,
-    color: '#000000',
+    fontSize: fontSize(14),
+    color: '#94A3B8',
   },
   actions: {
     flexDirection: 'row',

@@ -15,19 +15,20 @@ const CancelledScreen = () => {
             borderColor: '#E8E8E8',
             borderRadius: 14,
             paddingHorizontal: 13,
+            height: hp(192),
           }}>
           <Text
             style={{
-              marginTop: hp(13),
+              marginTop: hp(14),
               color: '#FF0000',
-              fontSize: fontSize(10),
+              fontSize: fontSize(12),
               lineHeight: hp(16),
-              fontFamily: fontFamily.poppins700,
+              fontFamily: fontFamily.poppins500,
             }}>
             Cancelled
           </Text>
 
-          <View
+          {/* <View
             style={{
               width: '97%',
               height: 1,
@@ -35,23 +36,28 @@ const CancelledScreen = () => {
               marginBottom: hp(18),
               backgroundColor: '#E8E8E8',
             }}
-          />
+          /> */}
 
-          <View style={{flexDirection: 'row', marginBottom: hp(14)}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginBottom: hp(20),
+              marginTop: hp(28),
+            }}>
             <Image
               source={images.trending_one}
-              style={{width: wp(73), height: hp(88)}}
+              style={{width: wp(93), height: hp(112)}}
               borderRadius={8}
             />
 
             <View style={{marginLeft: wp(23)}}>
               <Text
                 style={{
-                  fontSize: fontSize(11),
-                  fontFamily: fontFamily.poppins500,
+                  fontSize: fontSize(15),
+                  fontFamily: fontFamily.poppins600,
                   color: colors.pureBlack,
                 }}>
-                Designer Traditional Dress
+                Designer Traditional {'\n'}Dress
               </Text>
 
               <View style={{marginTop: isIOS ? hp(15) : hp(7)}}>
@@ -59,17 +65,17 @@ const CancelledScreen = () => {
                   <Text
                     style={{
                       width: 40,
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins700,
+                      color: '#64748B',
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins400,
                     }}>
                     Size
                   </Text>
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
                     }}>
                     {' '}
                     :{' '}
@@ -77,8 +83,8 @@ const CancelledScreen = () => {
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
                     }}>
                     {' '}
                     S{' '}
@@ -89,17 +95,19 @@ const CancelledScreen = () => {
                   <Text
                     style={{
                       width: 40,
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins700,
+                      color: '#64748B',
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins400,
+                      lineHeight: hp(18),
                     }}>
                     Color
                   </Text>
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
+                      lineHeight: hp(18),
                     }}>
                     {' '}
                     :{' '}
@@ -107,8 +115,9 @@ const CancelledScreen = () => {
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      lineHeight: hp(18),
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
                     }}>
                     {' '}
                     Sky Blue{' '}
@@ -119,17 +128,19 @@ const CancelledScreen = () => {
                   <Text
                     style={{
                       width: 40,
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins700,
+                      color: '#64748B',
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins400,
+                      lineHeight: hp(18),
                     }}>
                     Qty
                   </Text>
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      lineHeight: hp(18),
+                      fontFamily: fontFamily.poppins600,
                     }}>
                     {' '}
                     :{' '}
@@ -137,8 +148,9 @@ const CancelledScreen = () => {
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      lineHeight: hp(18),
+                      fontFamily: fontFamily.poppins600,
                     }}>
                     {' '}
                     1{' '}
@@ -150,9 +162,11 @@ const CancelledScreen = () => {
             <View
               style={{
                 alignSelf: 'center',
-                marginLeft: wp(70),
+                // marginLeft: wp(70),
+                // marginLeft:wp(30)
+                // marginRight: wp(20),
               }}>
-              <NavigationArrowIcon stroke="black" />
+              {/* <NavigationArrowIcon stroke="#ACACAC" /> */}
             </View>
           </View>
         </View>

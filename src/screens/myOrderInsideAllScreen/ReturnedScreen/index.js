@@ -22,26 +22,27 @@ const ReturnedScreen = () => {
             borderColor: '#E8E8E8',
             borderRadius: 14,
             paddingHorizontal: 13,
+            height: hp(192),
           }}>
           <Text
             style={{
               marginTop: hp(13),
               color: '#2B9909',
-              fontSize: fontSize(10),
+              fontSize: fontSize(12),
               lineHeight: hp(16),
-              fontFamily: fontFamily.poppins700,
+              fontFamily: fontFamily.poppins500,
             }}>
             Returned On :{' '}
             <Text
               style={{
                 color: colors.pureBlack,
-                fontFamily: fontFamily.poppins400,
+                fontFamily: fontFamily.poppins500,
               }}>
               {' '}
               Monday , 19 Dec. 2024{' '}
             </Text>
           </Text>
-
+          {/* 
           <View
             style={{
               width: '97%',
@@ -50,23 +51,28 @@ const ReturnedScreen = () => {
               marginBottom: hp(18),
               backgroundColor: '#E8E8E8',
             }}
-          />
+          /> */}
 
-          <View style={{flexDirection: 'row', marginBottom: hp(14)}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginBottom: hp(20),
+              marginTop: hp(28),
+            }}>
             <Image
               source={images.trending_one}
-              style={{width: wp(73), height: hp(88)}}
+              style={{width: wp(93), height: hp(112)}}
               borderRadius={8}
             />
 
             <View style={{marginLeft: wp(23)}}>
               <Text
                 style={{
-                  fontSize: fontSize(11),
-                  fontFamily: fontFamily.poppins500,
+                  fontSize: fontSize(15),
+                  fontFamily: fontFamily.poppins600,
                   color: colors.pureBlack,
                 }}>
-                Designer Traditional Dress
+                Designer Traditional {'\n'}Dress
               </Text>
 
               <View style={{marginTop: isIOS ? hp(15) : hp(7)}}>
@@ -74,17 +80,17 @@ const ReturnedScreen = () => {
                   <Text
                     style={{
                       width: 40,
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins700,
+                      color: '#64748B',
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins400,
                     }}>
                     Size
                   </Text>
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
                     }}>
                     {' '}
                     :{' '}
@@ -92,8 +98,8 @@ const ReturnedScreen = () => {
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
                     }}>
                     {' '}
                     S{' '}
@@ -104,17 +110,19 @@ const ReturnedScreen = () => {
                   <Text
                     style={{
                       width: 40,
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins700,
+                      color: '#64748B',
+                      fontSize: fontSize(12),
+                      lineHeight: hp(18),
+                      fontFamily: fontFamily.poppins400,
                     }}>
                     Color
                   </Text>
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
+                      lineHeight: hp(18),
                     }}>
                     {' '}
                     :{' '}
@@ -122,8 +130,9 @@ const ReturnedScreen = () => {
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
+                      lineHeight: hp(18),
                     }}>
                     {' '}
                     Sky Blue{' '}
@@ -134,17 +143,19 @@ const ReturnedScreen = () => {
                   <Text
                     style={{
                       width: 40,
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins700,
+                      color: '#64748B',
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins400,
+                      lineHeight: hp(18),
                     }}>
                     Qty
                   </Text>
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      lineHeight: hp(18),
+                      fontFamily: fontFamily.poppins600,
                     }}>
                     {' '}
                     :{' '}
@@ -152,8 +163,9 @@ const ReturnedScreen = () => {
                   <Text
                     style={{
                       color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins600,
+                      lineHeight: hp(18),
                     }}>
                     {' '}
                     1{' '}
@@ -165,9 +177,11 @@ const ReturnedScreen = () => {
             <View
               style={{
                 alignSelf: 'center',
-                marginLeft: wp(70),
+                // marginLeft: wp(70),
+                // marginLeft:wp(30)
+                // marginRight: wp(20),
               }}>
-              <NavigationArrowIcon stroke="black" />
+              {/* <NavigationArrowIcon stroke="#ACACAC" /> */}
             </View>
           </View>
         </View>

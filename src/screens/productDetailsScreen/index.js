@@ -15,6 +15,8 @@ import ProductImageComponent from '../../components/productImageComponent';
 import {colors} from '../../utils/colors';
 import {fontFamily, fontSize, hp, Touchable, wp} from '../../utils/helpers';
 import {useSelector} from 'react-redux';
+import RenderHTML from 'react-native-render-html';
+import {useWindowDimensions} from 'react-native';
 import {
   BackIcon,
   BagIcon,
@@ -24,6 +26,8 @@ import {
   images,
   SearchFilterIcon,
   SellerShopIcon,
+  SendEquiry,
+  SendEquiry1,
   StarIcon,
 } from '../../assets';
 import SizeChartComponent from '../../components/sizeChartComponent';
@@ -60,11 +64,16 @@ export const CustomStarIcon = ({
 );
 
 const ProductDetailsScreen = () => {
+  const {width} = useWindowDimensions();
+
   const route = useRoute();
   // const ratingsRef = useRef(null);
   const scrollRef = useRef(null); // Ref for ScrollView
   const reviewsRef = useRef(null); // Ref for Reviews section
   // ✅ FIRST define product
+  const {loading, cartData, error} = useSelector(state => state.addToCard);
+  const cartCount = cartData?.productDetailList?.length || 0;
+  console.log('CART COUNT =>', cartCount);
   const userReviews = useSelector(state => state.review.userReviews);
   console.log('USER REVIEWS FROM REDUX 👉', userReviews);
   // const reviews = useSelector(
@@ -131,6 +140,10 @@ const ProductDetailsScreen = () => {
     console.log('Product Store Object:', product?.storeId);
     console.log('Store ID Used For API:', storeId);
     console.log('StoreData From Redux:', storeData);
+    console.log(product?.productDetails ?? 'Product Details Descriptionsssss');
+    {
+      /* {product?.productDetails ?? ''} */
+    }
   }, [product]);
   //shop image
   // const shopImage = storeData?.shopImage;
@@ -201,80 +214,136 @@ const ProductDetailsScreen = () => {
   //   console.log('product description', product.description);
   // console.log('product Details...', product.productDetails);
 
+  // const handleAddToCart = () => {
+  //   if (token) {
+  //     navigation.navigate('MainTabs', {
+  //       screen: 'BagStack',
+  //     });
+  //   } else {
+  //     navigation.navigate('StartingScreen', {
+  //       redirectTo: 'BagStack',
+  //     });
+  //   }
+  // };
+  // Add to Card Function
   const handleAddToCart = () => {
-    if (token) {
-      navigation.navigate('MainTabs', {
-        screen: 'BagStack',
-      });
-    } else {
+    if (!token) {
       navigation.navigate('StartingScreen', {
         redirectTo: 'BagStack',
       });
+      return;
     }
+
+    if (!selectedVariant) {
+      alert('Please select size and color');
+      return;
+    }
+
+    const payload = {
+      productDetailList: [
+        {
+          productId: productId,
+          variants: selectedVariant?._id || selectedVariant?.id,
+          quantity: 1,
+        },
+      ],
+      deliveryAddress: deliveryAddressId,
+    };
+
+    console.log('ADD TO CART PAYLOAD ', payload);
+
+    dispatch({
+      type: 'ADD_TO_CART_REQUEST',
+      payload: payload,
+      token: token,
+    });
+    ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
   };
   // console.log('PRODUCT12345:', route.params.product);
   //html covert to the stings
 
-  const htmlString = '&lt;p>women t shirt&lt;/p&gt;';
+  // const htmlString = '&lt;p>women t shirt&lt;/p&gt;';
 
-  // Convert HTML entities
-  const normalString = htmlString
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&');
+  // // Convert HTML entities
+  // const normalString = htmlString
+  //   .replace(/&lt;/g, '<')
+  //   .replace(/&gt;/g, '>')
+  //   .replace(/&amp;/g, '&');
 
-  // Remove HTML tags
-  const plainText = normalString.replace(/<[^>]+>/g, '');
+  // // Remove HTML tags
+  // const plainText = normalString.replace(/<[^>]+>/g, '');
 
-  // console.log(plainText); // "women t shirt"
-  // decode html code convert to the strings
-  const decodeHtml = html =>
-    html?.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-  const getBulletPoints = html => {
-    if (!html) return [];
+  // // console.log(plainText); // "women t shirt"
+  // // decode html code convert to the strings
+  // const decodeHtml = html =>
+  //   html?.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+  // const getBulletPoints = html => {
+  //   if (!html) return [];
 
-    const decoded = decodeHtml(html);
+  //   const decoded = decodeHtml(html);
 
-    return (
-      decoded
-        .match(/<li>(.*?)<\/li>/g)
-        ?.map(item => item.replace(/<[^>]+>/g, '').trim()) || []
-    );
-  };
+  //   return (
+  //     decoded
+  //       .match(/<li>(.*?)<\/li>/g)
+  //       ?.map(item => item.replace(/<[^>]+>/g, '').trim()) || []
+  //   );
+  // };
 
   //  find out the variants
 
+  // const findVariant = (product, color, size) => {
+  //   console.log('--- FIND VARIANT CALLED ---');
+  //   console.log('Selected Color:', color);
+  //   console.log('Selected Size:', size);
+
+  //   if (!product || !color || !size) {
+  //     console.log('❌ Missing product / color / size');
+  //     return null;
+  //   }
+
+  //   const result = product.variants.find((v, index) => {
+  //     console.log(`Checking variant ${index}:`, v.variants);
+
+  //     const hasColor = v.variants.some(
+  //       x => x.key === 'color' && x.value.toLowerCase() === color.toLowerCase(),
+  //     );
+
+  //     const hasSize = v.variants.some(
+  //       x => x.key === 'size' && x.value.toLowerCase() === size.toLowerCase(),
+  //     );
+
+  //     console.log('  color match:', hasColor);
+  //     console.log('  size match:', hasSize);
+
+  //     return hasColor && hasSize;
+  //   });
+
+  //   console.log('✅ MATCHED VARIANT:', result);
+  //   return result || null;
+  // };
   const findVariant = (product, color, size) => {
-    console.log('--- FIND VARIANT CALLED ---');
-    console.log('Selected Color:', color);
-    console.log('Selected Size:', size);
+    if (!product?.variants) return null;
+    console.log('ALL PRODUCT VARIANTS:', product.variants);
+    return (
+      product.variants.find(v => {
+        const colorMatch = v.variants.some(
+          x =>
+            x.key === 'color' &&
+            x.value?.trim().toLowerCase() === color?.trim().toLowerCase(),
+        );
 
-    if (!product || !color || !size) {
-      console.log('❌ Missing product / color / size');
-      return null;
-    }
-
-    const result = product.variants.find((v, index) => {
-      console.log(`Checking variant ${index}:`, v.variants);
-
-      const hasColor = v.variants.some(
-        x => x.key === 'color' && x.value.toLowerCase() === color.toLowerCase(),
-      );
-
-      const hasSize = v.variants.some(
-        x => x.key === 'size' && x.value.toLowerCase() === size.toLowerCase(),
-      );
-
-      console.log('  color match:', hasColor);
-      console.log('  size match:', hasSize);
-
-      return hasColor && hasSize;
-    });
-
-    console.log('✅ MATCHED VARIANT:', result);
-    return result || null;
+        const sizeMatch = v.variants.some(
+          x =>
+            x.key === 'size' &&
+            x.value?.trim().toLowerCase() === size?.trim().toLowerCase(),
+        );
+        console.log('CHECKING VARIANT:', v);
+        console.log('COLOR MATCH:', colorMatch);
+        console.log('SIZE MATCH:', sizeMatch);
+        return colorMatch && sizeMatch;
+      }) || null
+    );
   };
-
   const handleColorChange = color => {
     console.log('--- COLOR SELECTED ---', color);
 
@@ -352,13 +421,27 @@ const ProductDetailsScreen = () => {
     dispatch(wishlistRequest(productId));
     console.log(' Product ID sending:', productId);
   };
+  //Helper Function (Initials name show)
+  const getInitials = name => {
+    if (!name || typeof name !== 'string') return 'NN';
+
+    const words = name.trim().split(' ').filter(Boolean);
+
+    // Only one word (e.g., "Dax")
+    if (words.length === 1) {
+      return words[0][0].toUpperCase();
+    }
+
+    // Multiple words (e.g., "Riya Shah")
+    return words[0][0].toUpperCase() + words[words.length - 1][0].toUpperCase();
+  };
   const ReviewItem = ({item}) => {
     console.log('REVIEW IMAGES 👉', item.productImages);
     console.log('FULL ITEM 👉', item);
     console.log('USER DATA 👉', item.user);
     console.log('Review item:', item);
     return (
-      <View style={{marginHorizontal: 17, marginTop: hp(24)}}>
+      <View style={{marginTop: hp(24)}}>
         {/* Review Title */}
         <Text
           style={{
@@ -366,6 +449,7 @@ const ProductDetailsScreen = () => {
             fontSize: fontSize(14),
             lineHeight: hp(24),
             fontFamily: fontFamily.poppins700,
+            marginHorizontal: 17,
           }}>
           {item?.title || 'No title'}
         </Text>
@@ -378,6 +462,7 @@ const ProductDetailsScreen = () => {
             lineHeight: hp(24),
             fontFamily: fontFamily.poppins400,
             marginTop: hp(25),
+            marginHorizontal: 17,
           }}>
           {item?.description ||
             item?.review ||
@@ -387,7 +472,12 @@ const ProductDetailsScreen = () => {
         </Text>
         {/* Review Images (if any) */}
         {item?.productImages && item.productImages.length > 0 ? (
-          <View style={{marginTop: hp(20), flexDirection: 'row'}}>
+          <View
+            style={{
+              marginTop: hp(20),
+              marginHorizontal: 17,
+              flexDirection: 'row',
+            }}>
             {item.productImages.map((img, index) => (
               <Image
                 key={index}
@@ -408,6 +498,7 @@ const ProductDetailsScreen = () => {
               fontSize: fontSize(12),
               color: '#999',
               fontFamily: fontFamily.poppins400,
+              marginHorizontal: 17,
             }}>
             No images added in this review
           </Text>
@@ -420,14 +511,35 @@ const ProductDetailsScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
+            marginHorizontal: 17,
           }}>
           {/* User info */}
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Image
-              source={{uri: item.user.profilePic}}
-              style={{width: hp(34), height: hp(34), borderRadius: 50}}
-            />
-
+            {item?.user?.profilePic ? (
+              <Image
+                source={{uri: item.user.profilePic}}
+                style={{width: hp(34), height: hp(34), borderRadius: 50}}
+              />
+            ) : (
+              <View
+                style={{
+                  width: hp(34),
+                  height: hp(34),
+                  borderRadius: 50,
+                  backgroundColor: '#F7E7FF',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#000000',
+                    fontFamily: fontFamily.poppins500,
+                    fontSize: fontSize(15),
+                  }}>
+                  {getInitials(item?.user?.name || 'No Name')}
+                </Text>
+              </View>
+            )}
             <Text
               style={{
                 marginLeft: wp(11),
@@ -472,9 +584,31 @@ const ProductDetailsScreen = () => {
             </Text>
           </View>
         </View>
+        <View
+          style={{
+            width: '100%',
+            borderWidth: 0.7,
+            marginTop: hp(26),
+            borderColor: '#E7E7E7',
+          }}
+        />
       </View>
     );
   };
+
+  const htmlContent = product?.productDetails
+    ?.replace(/&lt;/g, '<')
+    ?.replace(/&gt;/g, '>')
+    ?.replace(/&amp;/g, '&')
+    ?.replace(/<li>\s*<p>/g, '<li>')
+    ?.replace(/<\/p>\s*<\/li>/g, '</li>')
+    ?.replace(/<p><\/p>/g, '')
+    ?.replace(/<\/ul>\s*<ul>/g, ''); // 🔥 gap fix// remove empty p
+  const addressList = useSelector(state => state.addresses?.list || []);
+  const deliveryAddressId = addressList[0]?.id;
+
+  console.log('ADDRESS LIST ', addressList);
+  console.log('DELIVERY ID ', deliveryAddressId);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       {/*<Text>{product.title}</Text>*/}
@@ -516,7 +650,7 @@ const ProductDetailsScreen = () => {
             <SearchFilterIcon />
           </Touchable>
 
-          <Touchable
+          {/* <Touchable
             style={{
               marginLeft: 10,
               width: 50,
@@ -525,7 +659,54 @@ const ProductDetailsScreen = () => {
               alignItems: 'center',
             }}>
             <BagIcon width={20} height={20} />
-          </Touchable>
+          </Touchable> */}
+          <View>
+            <Touchable
+              style={{
+                marginLeft: 10,
+                width: 50,
+                height: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+              onPress={() =>
+                navigation.navigate('MainTabs', {
+                  screen: 'BagStack',
+                  params: {
+                    screen: 'BagScreen',
+                    params: {
+                      product: product,
+                    },
+                  },
+                })
+              }>
+              <BagIcon width={20} height={20} />
+
+              {cartCount > 0 && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    right: 5,
+                    top: 5,
+                    backgroundColor: '#9333EA',
+                    borderRadius: 10,
+                    width: 18,
+                    height: 18,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      color: '#fff',
+                      fontSize: fontSize(12),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    {cartCount ?? '0'}
+                  </Text>
+                </View>
+              )}
+            </Touchable>
+          </View>
         </View>
       </View>
 
@@ -627,8 +808,17 @@ const ProductDetailsScreen = () => {
       </View>
 
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
-        <View style={{marginTop: 10}}>
-          <ProductImageComponent product={route.params.product} />
+        <View
+          style={
+            {
+              // marginTop: 10,
+            }
+          }>
+          <ProductImageComponent
+            product={route.params.product}
+            // selectedVariant={handleColorChange}
+            setSelectedColor={setSelectedColor}
+          />
         </View>
 
         <View style={{marginHorizontal: 17, marginTop: hp(31)}}>
@@ -643,6 +833,8 @@ const ProductDetailsScreen = () => {
             {product?.title ?? ''}
           </Text>
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={{
               fontSize: fontSize(12),
               lineHeight: hp(16),
@@ -659,23 +851,31 @@ const ProductDetailsScreen = () => {
             onPress={scrollToReviews}
             // onPress={handleSubmitReview}
             style={{
+              width: wp(161),
+              height: hp(28),
+              borderColor: '#D2D2D2',
+              borderWidth: 1,
+              borderRadius: 16,
+              marginTop: hp(19),
               flexDirection: 'row',
               alignItems: 'center',
-              borderWidth: 1,
-              borderRadius: 30,
-              paddingVertical: 4,
-              alignSelf: 'flex-start',
-              borderColor: '#D2D2D2',
-              width: hp(200),
-              height: hp(35),
-              marginTop: 19,
+              // flexDirection: 'row',
+              // alignItems: 'center',
+              // borderWidth: 1,
+              // borderRadius: 30,
+              // paddingVertical: 4,
+              // alignSelf: 'flex-start',
+              // borderColor: '#D2D2D2',
+              // width: hp(200),
+              // height: hp(35),
+              // marginTop: 19,
             }}>
             <Text
               style={{
-                fontSize: 18,
+                fontSize: fontSize(13),
                 fontFamily: fontFamily.poppins400,
                 color: '#8225AF',
-                marginLeft: 15,
+                marginLeft: wp(10),
               }}>
               {/* 4.2
                */}
@@ -690,16 +890,16 @@ const ProductDetailsScreen = () => {
               style={{
                 width: hp(15),
                 height: hp(15),
-                marginLeft: 10,
+                marginLeft: wp(7),
                 marginBottom: 2,
               }}
             />
             <View
               style={{
                 width: 1,
-                height: 23,
+                height: 18,
                 backgroundColor: '#D2D2D2',
-                marginHorizontal: 8,
+                // marginHorizontal: 8,
                 marginLeft: wp(10),
               }}
             />
@@ -707,9 +907,10 @@ const ProductDetailsScreen = () => {
             <Text
               style={{
                 color: colors.pureBlack,
+
                 fontFamily: fontFamily.poppins500,
-                marginLeft: 10,
-                fontSize: 16,
+                marginLeft: wp(14),
+                fontSize: fontSize(13),
               }}>
               {/* 122 Ratings */}
               {/* {product?.ratingCount ?? '0.0 Ratings'} */}
@@ -724,14 +925,14 @@ const ProductDetailsScreen = () => {
             width: '100%',
             borderColor: '#E7E7E7',
             borderWidth: 0.5,
-            marginTop: hp(26),
+            marginTop: hp(22),
           }}
         />
 
         <View
           style={{
             marginHorizontal: 17,
-            marginTop: hp(19),
+            marginTop: hp(25),
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
@@ -744,7 +945,7 @@ const ProductDetailsScreen = () => {
               {/* Rs.780
                */}
               {/* ₹{product?.variants?.[0]?.price ?? ''}₹ */}
-              {selectedVariant?.price ?? product?.variants[0]?.price}
+              Rs.{selectedVariant?.price ?? product?.variants[0]?.price}
             </Text>
             <Text
               style={{
@@ -765,7 +966,7 @@ const ProductDetailsScreen = () => {
                 fontFamily: fontFamily.poppins400,
               }}>
               {/* Rs.3443₹{product?.variants?.[0]?.mrp ?? '000'}₹ */}
-              {selectedVariant?.mrp ?? product?.variants[0]?.mrp}
+              Rs.{selectedVariant?.mrp ?? product?.variants[0]?.mrp ?? '000'}
             </Text>
 
             <Text
@@ -896,6 +1097,7 @@ const ProductDetailsScreen = () => {
               marginTop: hp(23),
               flexDirection: 'row',
               justifyContent: 'space-between',
+              // backgroundColor: 'pink',
             }}>
             <TextInput
               value={pincode}
@@ -904,7 +1106,7 @@ const ProductDetailsScreen = () => {
               placeholderTextColor={'black'}
               style={{
                 width: wp(228),
-                height: hp(44),
+                // height: hp(44),
                 backgroundColor: '#F4F4F4',
                 borderRadius: 50,
                 paddingHorizontal: hp(30),
@@ -923,7 +1125,7 @@ const ProductDetailsScreen = () => {
               title={'Check'}
               buttonStyle={{
                 width: wp(99),
-                height: hp(44),
+                // height: hp(44),
                 opacity: pincode.length === 6 ? 1 : 0.7,
               }}
               disabled={pincode.length !== 6} // Disable button if pincode is not exactly 6 digits
@@ -950,157 +1152,49 @@ const ProductDetailsScreen = () => {
             }}>
             Product Details
           </Text>
-
-          <Text
-            style={{
-              marginTop: hp(24),
-              color: '#6B6B6B',
-              fontSize: fontSize(14),
-              lineHeight: hp(18),
-              fontFamily: fontFamily.poppins400,
-            }}>
-            {/* Pink, blue & gold toned yoke design Kurta with{'\n'}Trousers with
-            dupatta */}
-            {/* {product?.productDetails ?? ''} */}
-            {product?.productDetails
-              ?.replace(/&lt;/g, '<')
-              ?.replace(/&gt;/g, '>')
-              ?.replace(/&amp;/g, '&')
-              ?.replace(/<[^>]+>/g, '') ?? ''}
-          </Text>
-
-          <View style={{marginTop: hp(16)}}>
-            {/* <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
+          <View style={{marginTop: hp(24)}}>
+            <RenderHTML
+              contentWidth={width}
+              source={{html: htmlContent || ''}}
+              tagsStyles={{
+                p: {
                   color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>Ethnic motifs yoke design</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
+                  fontSize: fontSize(14),
+                  lineHeight: hp(22),
+                  // marginBottom: 6, // ✅ normal spacing // 🔥 reduce space
+                  marginTop: 0,
+                  marginBottom: 3,
+                },
+                ul: {
+                  paddingLeft: 15, // ✅ proper indent
+                  marginBottom: 8,
+                  // backgroundColor: 'pink',
+                },
+                strong: {
+                  fontFamily: fontFamily.poppins700, // 🔥 MUST
+                  color: '#000',
+                  fontSize: fontSize(14),
+                },
+                li: {
                   color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>Straight shape</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>Regular style</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>
-                Round neck, three-quarter regular sleeves
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>Gotta patti detail</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>
-                Calf length length with straight hem
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>
-                Cotton blend machine weave fabric
-              </Text>
-            </View> */}
-            {/* <View style={{marginTop: hp(16)}}> */}
+                  fontSize: fontSize(14),
+                  lineHeight: hp(22),
+                  marginBottom: 5,
+                  flexDirection: 'row', // 🔥 important
+                  alignItems: 'center',
+                },
+              }}
+              renderersProps={{
+                ul: {
+                  markerTextStyle: {
+                    fontSize: fontSize(13),
+                    lineHeight: hp(23),
+                  },
+                },
+              }}
+            />
+          </View>
+          {/* <View style={{marginTop: hp(16)}}>
             {getBulletPoints(product?.productDetails).map((point, index) => (
               <View
                 key={index}
@@ -1121,8 +1215,12 @@ const ProductDetailsScreen = () => {
                 <Text style={{color: '#6B6B6B'}}>{point}</Text>
               </View>
             ))}
-          </View>
-
+          </View> */}
+          {/* {product?.productDetails
+              ?.replace(/&lt;/g, '<')
+              ?.replace(/&gt;/g, '>')
+              ?.replace(/&amp;/g, '&')
+              ?.replace(/<[^>]+>/g, '') ?? ''} */}
           <Text
             style={{
               color: colors.pureBlack,
@@ -1506,7 +1604,7 @@ const ProductDetailsScreen = () => {
               </Text>
 
               <View style={{flexDirection: 'row', zIndex: 99, top: 30}}>
-                <LinearGradient
+                {/* <LinearGradient
                   colors={['#0F52BA', '#8225AF']}
                   start={{x: 0, y: 0}}
                   end={{x: 1, y: 1}}
@@ -1517,31 +1615,33 @@ const ProductDetailsScreen = () => {
                     justifyContent: 'center',
                     width: wp(82), // total size INCLUDING border
                     height: hp(32),
-                  }}>
-                  <TouchableOpacity
-                    onPress={() => setModalVisible(true)}
+                  }}> */}
+                <TouchableOpacity
+                  onPress={() => setModalVisible(true)}
+                  style={{
+                    width: wp(95), // smaller than container
+                    height: hp(40),
+                    borderRadius: 50,
+                    borderColor: '#CDCDCD',
+                    borderWidth: 1,
+                    backgroundColor: 'white', // Inner background
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  activeOpacity={0.8}>
+                  <Text
                     style={{
-                      width: wp(79), // smaller than container
-                      height: hp(29),
-                      borderRadius: 50,
-                      backgroundColor: 'white', // Inner background
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    activeOpacity={0.8}>
-                    <Text
-                      style={{
-                        color: 'black',
-                        fontSize: fontSize(12),
-                        lineHeight: hp(14),
-                        fontFamily: fontFamily.poppins400,
-                      }}>
-                      Profile
-                    </Text>
-                  </TouchableOpacity>
-                </LinearGradient>
+                      color: colors.pureBlack,
+                      fontSize: fontSize(12),
+                      lineHeight: hp(14),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    Visit Store
+                  </Text>
+                </TouchableOpacity>
+                {/* </LinearGradient> */}
 
-                <LinearGradient
+                {/* <LinearGradient
                   colors={['#0F52BA', '#8225AF']}
                   start={{x: 0, y: 0}}
                   end={{x: 1, y: 1}}
@@ -1553,28 +1653,34 @@ const ProductDetailsScreen = () => {
                     width: wp(125), // total size INCLUDING border
                     height: hp(32),
                     marginLeft: hp(12),
-                  }}>
-                  <TouchableOpacity
+                  }}> */}
+                <TouchableOpacity
+                  style={{
+                    width: wp(141), // smaller than container
+                    height: hp(40),
+                    borderRadius: 50,
+                    borderColor: '#CDCDCD',
+                    borderWidth: 1,
+                    backgroundColor: 'white', // Inner background
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: hp(15),
+                    flexDirection: 'row',
+                  }}
+                  activeOpacity={0.8}>
+                  <SendEquiry1 />
+                  <Text
                     style={{
-                      width: wp(122), // smaller than container
-                      height: hp(29),
-                      borderRadius: 50,
-                      backgroundColor: 'white', // Inner background
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                    activeOpacity={0.8}>
-                    <Text
-                      style={{
-                        color: 'black',
-                        fontSize: fontSize(12),
-                        lineHeight: hp(14),
-                        fontFamily: fontFamily.poppins400,
-                      }}>
-                      Send Enquiry
-                    </Text>
-                  </TouchableOpacity>
-                </LinearGradient>
+                      color: colors.pureBlack,
+                      fontSize: fontSize(12),
+                      lineHeight: hp(14),
+                      fontFamily: fontFamily.poppins400,
+                      marginLeft: hp(10),
+                    }}>
+                    Send Enquiry
+                  </Text>
+                </TouchableOpacity>
+                {/* </LinearGradient> */}
               </View>
             </View>
           </View>
@@ -1583,9 +1689,9 @@ const ProductDetailsScreen = () => {
         <View
           style={{
             width: '100%',
-            borderWidth: 4,
-            borderColor: '#F7F7F7',
-            marginTop: hp(45),
+            borderWidth: 1,
+            borderColor: '#E7E7E7',
+            marginTop: hp(55),
           }}
         />
 
@@ -1635,17 +1741,6 @@ const ProductDetailsScreen = () => {
             </LinearGradient>
           </MaskedView>
 
-          {/*<Text*/}
-          {/*  style={{*/}
-          {/*    color: colors.pureBlack,*/}
-          {/*    fontSize: fontSize(14),*/}
-          {/*    fontFamily: fontFamily.poppins400,*/}
-          {/*    lineHeight: hp(18),*/}
-          {/*    top: -15,*/}
-          {/*  }}>*/}
-          {/*  122 <Text style={{color: '#8F8F8F'}}>Verified Buyers</Text>*/}
-          {/*</Text>*/}
-
           <View style={{top: -20}}>
             <ReviewRatingComponent
               ratingBreakdown={ratingBreakdown}
@@ -1663,102 +1758,6 @@ const ProductDetailsScreen = () => {
           }}
         />
 
-        {/* <View style={{marginHorizontal: 17, marginTop: hp(24)}}>
-          <Text
-            style={{
-              color: colors.pureBlack,
-              fontSize: fontSize(14),
-              lineHeight: hp(24),
-              fontFamily: fontFamily.poppins700,
-            }}>
-            Great Product
-          </Text>
-
-          <Text
-            style={{
-              color: colors.pureBlack,
-              fontSize: fontSize(14),
-              lineHeight: hp(24),
-              fontFamily: fontFamily.poppins400,
-              marginTop: hp(25),
-            }}>
-            Great Product I love this kurta set from Libas. The fitting is nice
-            too but in the top it's a little too accurate, if this shrunk in the
-            wash it won't fit me. I hope it doesn't shrink. The kurta and
-            Palazzo have dark grey floral print going on it.
-          </Text>
-
-          <View style={{marginTop: hp(20), flexDirection: 'row'}}>
-            <Image
-              source={images.productImageFive}
-              style={{width: wp(60), height: hp(80), borderRadius: 14}}
-            />
-            <Image
-              source={images.productImageFive}
-              style={{
-                width: wp(60),
-                height: hp(80),
-                borderRadius: 14,
-                marginLeft: wp(11),
-              }}
-            />
-          </View>
-
-          <View
-            style={{
-              marginTop: hp(27),
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Image
-                source={images.image_two}
-                style={{width: hp(34), height: hp(34), borderRadius: 50}}
-              />
-              <Text
-                style={{
-                  marginLeft: wp(11),
-                  color: colors.pureBlack,
-                  fontSize: fontSize(14),
-                  lineHeight: hp(18),
-                  fontFamily: fontFamily.poppins700,
-                }}>
-                Riya Shah
-              </Text>
-
-              <Text
-                style={{
-                  marginLeft: wp(12),
-                  fontSize: fontSize(10),
-                  lineHeight: hp(24),
-                  fontFamily: fontFamily.poppins400,
-                  color: '#C1C1C1',
-                  top: 1,
-                }}>
-                21 May 2024
-              </Text>
-            </View>
-
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <CustomStarIcon
-                width={hp(15)}
-                height={hp(14)}
-                fill="#8225AF"
-                style={{marginRight: 10}}
-              />
-              <Text
-                style={{
-                  fontSize: fontSize(14),
-                  lineHeight: hp(24),
-                  fontFamily: fontFamily.poppins700,
-                  color: '#8225AF',
-                  top: 2,
-                }}>
-                4.2
-              </Text>
-            </View>
-          </View> */}
         <FlatList
           data={reviews}
           keyExtractor={item => item._id}
@@ -1767,14 +1766,14 @@ const ProductDetailsScreen = () => {
         />
         {/* </View> */}
 
-        <View
+        {/* <View
           style={{
             width: '100%',
             borderWidth: 0.8,
             borderColor: '#E7E7E7',
             marginTop: hp(26),
           }}
-        />
+        /> */}
 
         <Touchable>
           <Text

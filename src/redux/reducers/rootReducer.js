@@ -17,6 +17,8 @@ import storeReducer from './storeReducer';
 import storeProductReducer from './storeProductReducer';
 import {productDetailsReducer} from './productDetailsReducer';
 import recentlyViewedReducer from './recentlyViewedReducer';
+import cartReducer from './cartReducer';
+import productVariantReducer from './productVariantReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -36,6 +38,8 @@ const appReducer = combineReducers({
   sellerStore: storeReducer,
   storeProduct: storeProductReducer,
   recentlyView: recentlyViewedReducer,
+  addToCard: cartReducer,
+  productVariant: productVariantReducer,
 });
 
 const rootReducer = (state, action) => {
