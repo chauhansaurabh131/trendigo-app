@@ -374,7 +374,10 @@ import {
   verifyEmailOtpRequest,
   resetAuthFlow,
   resendOtpRequest,
+  setLoginType,
 } from '../../redux/actions/authActions';
+import {set} from 'mongoose';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Platform-specific TouchableOpacity
 const Touchable =
@@ -385,7 +388,8 @@ const Touchable =
 const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
   // const [email, setEmail] = useState('');
   const [input, setInput] = useState(''); // email OR mobile
-  const [loginType, setLoginType] = useState(null); // 'email' | 'mobile'
+  // const [loginType, setLoginType] = useState(null); // 'email' | 'mobile'
+  const loginType = useSelector(state => state.auth.loginType);
 
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(60);
@@ -401,7 +405,13 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
 
   // 📌 Redux
   const dispatch = useDispatch();
-  const {loading, otpSent, token, error} = useSelector(state => state.auth);
+  const {
+    // loading,
+    loading: authLoading,
+    otpSent,
+    token,
+    error,
+  } = useSelector(state => state.auth);
   const detectLoginType = value => {
     const emailRegex = /^\S+@\S+\.\S+$/;
     const mobileRegex = /^[0-9]{8,15}$/;
@@ -469,16 +479,28 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
   //   dispatch(fetchUserRequest(token));
   // };
 
-  const onContinuePress = () => {
-    if (!loginType) {
+  const onContinuePress = async () => {
+    // if (!loginType) {
+    //   alert('Enter valid Email or Mobile number');
+    //   return;
+    // }
+
+    const type = detectLoginType(input);
+
+    if (!type) {
       alert('Enter valid Email or Mobile number');
       return;
     }
+    // ✅ SAVE HERE
+    await AsyncStorage.setItem('loginType', type);
 
+    const check = await AsyncStorage.getItem('loginType');
+    console.log('AFTER SAVE CHECK:', check);
     dispatch(resetAuthFlow());
-
+    dispatch(setLoginType(type));
     const payload =
-      loginType === 'email'
+      // loginType === 'email'
+      type === 'email'
         ? {email: input}
         : {
             mobileNumber: input,
@@ -486,6 +508,8 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
           };
 
     dispatch(registerRequest(payload));
+    console.log('REGISTER REQUEST DISPATCHED with payload:', payload);
+    console.log('LOGIN TYPE SET:', type);
   };
 
   // =============================
@@ -538,16 +562,8 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
       loginType === 'email' ? {email: input, otp} : {mobileNumber: input, otp};
 
     dispatch(verifyEmailOtpRequest(payload));
+    console.log('VERIFY OTP REQUEST DISPATCHED with payload:', payload);
   };
-
-  // const handleResend = () => {
-  //   setOtp('');
-  //   setTimer(60);
-  //   setResendVisible(false);
-  //   setIsOtpExpired(false);
-
-  //   dispatch(resendOtpRequest(email));
-  // };
 
   const handleResend = () => {
     setOtp('');
@@ -564,6 +580,7 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
           };
 
     dispatch(resendOtpRequest(payload)); // ✅ CORRECT
+    console.log('RESEND OTP REQUEST DISPATCHED with payload:', payload);
   };
 
   useEffect(() => {
@@ -636,7 +653,7 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
               }}>
               <TextInput
                 style={{
-                  marginLeft: hp(22),
+                  // marginLeft: hp(22),/
                   flex: 1,
                   height: hp(50),
                   fontSize: 16,
@@ -679,14 +696,14 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
               /> */}
 
               <GradientButton
-                title={loading ? 'Please wait...' : 'Continue'}
+                title={authLoading ? 'Please wait...' : 'Continue'}
                 onPress={onContinuePress}
-                disabled={!input || loading}
+                disabled={!input || authLoading}
                 buttonStyle={{
                   width: '100%',
                   height: hp(50),
                   borderRadius: 25,
-                  opacity: input && !loading ? 1 : 0.5,
+                  opacity: input && !authLoading ? 1 : 0.5,
                 }}
                 textStyle={{
                   fontSize: fontSize(16),
@@ -779,6 +796,7 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
                 numberOfDigits={4}
                 type="numeric"
                 onTextChange={handleOtpChange}
+                lo
                 theme={{
                   pinCodeContainerStyle: {
                     width: hp(69),
@@ -849,6 +867,7 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
                 <GradientButton
                   title="Verify"
                   onPress={onVerifyPress}
+                  loading={authLoading}
                   disabled={otp.length !== 4}
                   buttonStyle={{
                     width: '100%',

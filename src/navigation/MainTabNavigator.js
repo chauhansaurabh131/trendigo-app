@@ -1,11 +1,11 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Text, View} from 'react-native';
 import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import LinearGradient from 'react-native-linear-gradient';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 // Screens
 import HomeScreen from '../screens/homeScreen';
 import SearchScreen from '../screens/searchScreen';
@@ -34,6 +34,8 @@ import {
 // Utils
 import {fontFamily, fontSize, hp, isIOS} from '../utils/helpers';
 import RevewsScreen from '../screens/revewsScreen';
+import SellerProfileScreen from '../screens/sellerProfileScreen';
+import {GET_CART_REQUEST} from '../redux/actions/cartActions';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -91,6 +93,7 @@ const HomeStackScreen = () => {
 const SearchStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
     <Stack.Screen name="SearchScreen" component={SearchScreen} />
+    <Stack.Screen name="SellerProfile" component={SellerProfileScreen} />
   </Stack.Navigator>
 );
 
@@ -116,10 +119,23 @@ const BagStackScreen = () => (
    MAIN TAB NAVIGATOR
 --------------------------- */
 const MainTabNavigator = () => {
+  const dispatch = useDispatch();
+  const token = useSelector(state => state.auth.token);
   const {loading, cartData, error} = useSelector(state => state.addToCard);
   const cartCount = cartData?.productDetailList?.length || 0;
 
   console.log('TAB CART COUNT =>', cartCount);
+
+  useEffect(() => {
+    if (token) {
+      console.log('ALLING CART API FROM PRODUCT DETAILS');
+
+      dispatch({
+        type: GET_CART_REQUEST,
+        token: token,
+      });
+    }
+  }, [token]);
   return (
     <Tab.Navigator
       screenOptions={({route}) => {
@@ -129,10 +145,14 @@ const MainTabNavigator = () => {
         const isMainScreen =
           (route.name === 'HomeStack' &&
             (childRouteName === '' || childRouteName === 'HomeScreen')) ||
+          // (route.name === 'SearchStack' &&
+          //   (childRouteName === '' || childRouteName === 'SearchScreen')) ||
           (route.name === 'SearchStack' &&
-            (childRouteName === '' || childRouteName === 'SearchScreen')) ||
-          (route.name === 'CategoryStack' &&
-            (childRouteName === '' || childRouteName === 'CategoryScreen')) ||
+            (childRouteName === '' ||
+              childRouteName === 'SearchScreen' ||
+              childRouteName === 'SellerProfile')); // ✅ ADD THIS
+        (route.name === 'CategoryStack' &&
+          (childRouteName === '' || childRouteName === 'CategoryScreen')) ||
           (route.name === 'ChatStack' &&
             (childRouteName === '' || childRouteName === 'ChatScreen')) ||
           (route.name === 'BagStack' &&
@@ -140,7 +160,21 @@ const MainTabNavigator = () => {
 
         return {
           headerShown: false,
-          tabBarStyle: {height: isIOS ? hp(75) : hp(70), paddingTop: 5},
+          // tabBarStyle: {height: isIOS ? hp(75) : hp(70), paddingTop: 5},
+          tabBarStyle: {
+            height:
+              route.name === 'BagStack' &&
+              (childRouteName === 'BagScreen' || childRouteName === '')
+                ? 0
+                : isIOS
+                ? hp(75)
+                : hp(70),
+            display:
+              route.name === 'BagStack' &&
+              (childRouteName === 'BagScreen' || childRouteName === '')
+                ? 'none'
+                : 'flex',
+          },
           tabBarIcon: ({focused}) => {
             const iconSizeStyles = {
               HomeStack: {width: hp(15), height: hp(16)},
@@ -160,6 +194,7 @@ const MainTabNavigator = () => {
                 IconComponent =
                   focused && isMainScreen ? ColorSearchIcon : SearchIcon;
                 break;
+
               case 'CategoryStack':
                 IconComponent =
                   focused && isMainScreen ? ColorCategoryIcon : CategoryIcon;

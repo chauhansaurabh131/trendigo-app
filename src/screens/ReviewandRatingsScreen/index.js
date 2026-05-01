@@ -41,26 +41,7 @@ const ReviewandRatingsScreen = () => {
   const [rating, setRating] = useState(initialRating || 0);
   const [reviewTitle, setReviewTitle] = useState('');
   const [reviewDesc, setReviewDesc] = useState('');
-  // const handleSubmitReview = () => {
-  //   // if (!rating || !reviewTitle || !reviewDesc) {
-  //   //   alert('Please fill all fields');
-  //   //   return;
-  //   // }
 
-  //   const payload = {
-  //     productId: product._id.trim(),
-  //     sellerId: product.storeId.id.trim(),
-  //     title: reviewTitle?.trim(),
-  //     description: reviewDesc?.trim(),
-  //     rating: Number(rating),
-  //     isAdminAprove: true,
-  //   };
-
-  //   console.log(' REVIEW PAYLOAD ..', payload);
-
-  //   dispatch(addReviewRequest(payload));
-  // setModel(true); // success modal (later move this on success)
-  // };
   const handleSubmitReview = () => {
     if (!rating || !reviewTitle || !reviewDesc) {
       alert('Please fill all fields');
@@ -108,27 +89,6 @@ const ReviewandRatingsScreen = () => {
     setModel(true); // success modal (later move this on success)
   };
 
-  // const openGallery = () => {
-  //   const options = {
-  //     mediaType: 'photo',
-  //     maxWidth: 1024,
-  //     maxHeight: 1024,
-  //     quality: 0.8,
-  //   };
-
-  //   launchImageLibrary(options, response => {
-  //     if (response.didCancel) {
-  //       console.log('User cancelled');
-  //     } else if (response.errorCode) {
-  //       console.log('ImagePicker Error:', response.errorMessage);
-  //     } else if (response.assets && response.assets.length > 0) {
-  //       const image = response.assets[0];
-  //       console.log('Selected Image123:', image);
-  //       setSelectedImage(image); // ✅ store image
-  //       console.log('Selected Image:', selectedImage);
-  //     }
-  //   });
-  // };
   const openGallery = () => {
     const options = {
       mediaType: 'photo',

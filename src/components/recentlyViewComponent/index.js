@@ -22,13 +22,14 @@
 // };
 // export default RecentlyViewComponent;
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   FlatList,
   Image,
   SafeAreaView,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -45,246 +46,337 @@ import {useNavigation} from '@react-navigation/native';
 import HomeTrendingComponent from '../../components/homeTrendingComponent';
 import {getRecentlyViewedRequest} from '../../redux/actions/recentlyViewedActions';
 import {useDispatch, useSelector} from 'react-redux';
+import {
+  getWishlistRequest,
+  REMOVE_WISHLIST_REQUEST,
+  removeWishlistRequest,
+  WISHLIST_REQUEST,
+  wishlistRequest,
+} from '../../redux/actions/wishlistActions';
 
-const products = [
-  {
-    id: 1,
-    image: images.trending_one,
-    title: 'Designer Traditional Dress1',
-    price: 780,
-    mrp: 1280,
-    discount: '34% Off',
-    rating: '4.2',
-    reviews: 122,
-  },
-  {
-    id: 2,
-    image: images.trending_two,
-    title: 'Designer Traditional Dress2',
-    price: 780,
-    mrp: 1280,
-    discount: '34% Off',
-    rating: '4.2',
-    reviews: 122,
-  },
-  // {
-  //   id: 3,
-  //   image: images.trending_three,
-  //   title: 'Designer Traditional Dress3',
-  //   price: 780,
-  //   mrp: 1280,
-  //   discount: '34% Off',
-  //   rating: '4.2',
-  //   reviews: 122,
-  // },
-  // {
-  //   id: 4,
-  //   image: images.trending_one,
-  //   title: 'Designer Traditional Dress',
-  //   price: 780,
-  //   mrp: 1280,
-  //   discount: '34% Off',
-  //   rating: '4.2',
-  //   reviews: 122,
-  // },
-
-  // ...add more as needed
-];
 const screenWidth = Dimensions.get('window').width;
 const cardWidth = (screenWidth - 40) / 2;
 
 const RecentlyViewComponent = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
   const {data, loading} = useSelector(state => state.recentlyView);
-  const user = useSelector(state => state.auth.user);
-  const userId = user?.id || user?._id;
-  console.log('RECENTLY VIEW COM => USER ID:', userId);
-  const token = useSelector(state => state.auth.token);
-  console.log('RECENTLY VIEW COM => TOKEN:', token);
+  const [localWishlist, setLocalWishlist] = useState([]);
+  const {wishlistData} = useSelector(state => state.wishlist);
+  useEffect(() => {
+    if (Array.isArray(wishlistData)) {
+      setLocalWishlist(wishlistData);
+    }
+  }, [wishlistData]);
+  const hasData = data?.results && data.results.length > 0;
 
   useEffect(() => {
-    if (userId && token) {
-      console.log('Fetching recently viewed products for user:', userId);
-      dispatch(getRecentlyViewedRequest({token}));
-    }
-  }, [userId, token]);
-  // console.log(data?.results, 'images');
+    dispatch(getRecentlyViewedRequest());
+  }, []);
+
+  const {products} = useSelector(state => state.product);
+
+  useEffect(() => {
+    dispatch(getWishlistRequest()); // ✅ ADD THIS
+  }, []);
+  // console.log('Products in UI...:', products);
+
+  const token = useSelector(state => state.auth.token);
+  console.log('Auth Token in HomeTrendingComponent:', token);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      <View style={{marginLeft: wp(17)}}>
-        <Text
-          style={{
-            color: '#000',
-            fontFamily: fontFamily.poppins600,
-            fontSize: fontSize(18),
-          }}>
-          Recently Viewed
-        </Text>
-      </View>
-      <View style={{marginLeft: wp(17), marginRight: wp(17)}}>
-        <FlatList
-          data={data?.results || []}
-          keyExtractor={item => item._id || item.id.toString()}
-          numColumns={2}
-          contentContainerStyle={{
-            paddingHorizontal: 0,
-            justifyContent: 'space-between',
-          }}
-          renderItem={({item, index}) => {
-            console.log('Images:', item.images);
-            console.log('Variants:', item.variants);
+      {hasData && (
+        <>
+          <View style={{marginLeft: wp(17)}}>
+            <Text
+              style={{
+                color: '#000',
+                fontFamily: fontFamily.poppins600,
+                fontSize: fontSize(18),
+              }}>
+              Recently Viewed
+            </Text>
+          </View>
+          <View style={{marginLeft: wp(17), marginRight: wp(17)}}>
+            <FlatList
+              data={data?.results || []}
+              keyExtractor={item => item._id || item.id.toString()}
+              numColumns={2}
+              contentContainerStyle={{
+                paddingHorizontal: 0,
+                justifyContent: 'space-between',
+              }}
+              renderItem={({item, index}) => {
+                // Now check if product exist in wishlist
+                const safeWishlist = Array.isArray(wishlistData)
+                  ? wishlistData
+                  : [];
 
-            const variant = item?.variants?.[0];
-            const price = Number(variant?.price || 0);
-            const mrp = Number(variant?.mrp || item?.mrp || 0);
+                // const isWishlisted = safeWishlist.some(w => {
+                //   const productId = w.productId?.id || w.productId?._id;
+                //   return String(productId) === String(item._id);
+                // });
 
-            const discount =
-              mrp && price ? Math.round(((mrp - price) / mrp) * 100) : 0;
-            const mainImage =
-              variant?.images?.find(img => img.isSelectedForMainScreen)
-                ?.imageUrl ||
-              variant?.images?.[0]?.imageUrl ||
-              '';
-            return (
-              <TouchableOpacity
-                style={{
-                  width: cardWidth,
-                  // marginBottom: 15,
-                  // marginHorizontal: 5,
-                  marginRight: index % 2 === 0 ? 10 : 0, // 👈 Only left card right gap
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: '#eee',
-                  backgroundColor: '#fff',
-                  overflow: 'hidden',
-                  marginTop: hp(22),
-                }}
-                activeOpacity={0.6}
-                onPress={() => {
-                  navigation.navigate('ProductDetails', {product: item});
-                }}>
-                <Image
-                  // source={item.image}
-                  source={mainImage ? {uri: mainImage} : null}
-                  style={{
-                    width: '100%',
-                    height: hp(170),
-                    resizeMode: 'cover',
-                    borderBottomLeftRadius: 14,
-                    borderBottomRightRadius: 14,
-                  }}
-                />
+                const isWishlisted = localWishlist.some(w => {
+                  const productId = w.productId?.id || w.productId?._id;
+                  return String(productId) === String(item._id);
+                });
 
-                <View style={{padding: 10}}>
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
+                // console.log('ITEM:', item._id);
+                // console.log(' WISHLIST CHECK:', isWishlisted);
+
+                // console.log('wishlistData:', wishlistData);
+                // console.log('current item:', item._id);
+                console.log('Images:', item.images);
+                console.log('Variants:', item.variants);
+
+                const variant = item?.variants?.[0];
+                const price = Number(variant?.price || 0);
+                const mrp = Number(variant?.mrp || item?.mrp || 0);
+
+                const discount =
+                  mrp && price ? Math.round(((mrp - price) / mrp) * 100) : 0;
+                const mainImage =
+                  variant?.images?.find(img => img.isSelectedForMainScreen)
+                    ?.imageUrl ||
+                  variant?.images?.[0]?.imageUrl ||
+                  '';
+                return (
+                  <TouchableOpacity
                     style={{
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
-                      lineHeight: hp(14),
-                      color: colors.black,
+                      width: cardWidth,
+                      // marginBottom: 15,
+                      // marginHorizontal: 5,
+                      marginRight: index % 2 === 0 ? 10 : 0, // 👈 Only left card right gap
+                      borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: '#eee',
+                      backgroundColor: '#fff',
+                      overflow: 'hidden',
+                      marginTop: hp(22),
+                    }}
+                    activeOpacity={0.6}
+                    onPress={() => {
+                      navigation.navigate('ProductDetails', {product: item});
                     }}>
-                    {item.title}
-                  </Text>
+                    <Image
+                      // source={item.image}
+                      source={mainImage ? {uri: mainImage} : null}
+                      style={{
+                        width: '100%',
+                        height: hp(170),
+                        resizeMode: 'cover',
+                        borderBottomLeftRadius: 14,
+                        borderBottomRightRadius: 14,
+                      }}
+                    />
 
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      marginTop: 6,
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text
-                      style={{
-                        marginRight: 6,
-                        fontSize: fontSize(12),
-                        fontFamily: fontFamily.poppins700,
-                        lineHeight: hp(16),
-                        color: colors.black,
-                      }}>
-                      {/* Rs. {item.price} */}
-                      Rs. {variant?.price ?? ''}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: fontSize(10),
-                        color: '#A5A5A5',
-                        textDecorationLine: 'line-through',
-                        marginRight: 6,
-                        fontFamily: fontFamily.poppins500,
-                        lineHeight: hp(14),
-                      }}>
-                      MRP {item.mrp}
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: fontSize(10),
-                        color: '#2B9909',
-                        fontFamily: fontFamily.poppins600,
-                        lineHeight: hp(14),
-                      }}>
-                      {/* {item.discount} */}
-                      {variant?.discount ? `${variant.discount}% Off` : ''}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      marginTop: 6,
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: '#8225AF',
-                        paddingHorizontal: 5,
-                        borderRadius: 16,
-                        width: hp(42),
-                        height: hp(18),
-                        justifyContent: 'center',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
+                    <View style={{padding: 10}}>
                       <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
                         style={{
-                          color: '#fff',
-                          fontSize: fontSize(9),
-                          fontFamily: fontFamily.poppins500,
-                          marginRight: hp(5),
+                          fontSize: fontSize(10),
+                          fontFamily: fontFamily.poppins400,
+                          lineHeight: hp(14),
+                          color: colors.black,
                         }}>
-                        {/* {item.rating} */}
-                        {item?.averageRating}
+                        {item.title}
                       </Text>
-                      <StarIcon
-                        style={{top: -1, width: hp(9), height: hp(8)}}
-                      />
-                    </View>
-                    <Text
-                      style={{
-                        fontSize: fontSize(10),
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins500,
-                        marginLeft: hp(12),
-                      }}>
-                      {/* {item.reviews} */}
-                      {`(${item?.totalReviews ?? 0})`}
-                    </Text>
 
-                    <TouchableOpacity style={{marginLeft: 'auto'}}>
-                      {/*<Text style={{fontSize: 18}}>♡</Text>*/}
-                      <GradientLikeIcon />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      </View>
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginTop: 6,
+                          justifyContent: 'space-between',
+                        }}>
+                        <Text
+                          style={{
+                            marginRight: 6,
+                            fontSize: fontSize(12),
+                            fontFamily: fontFamily.poppins700,
+                            lineHeight: hp(16),
+                            color: colors.black,
+                          }}>
+                          {/* Rs. {item.price} */}
+                          Rs. {variant?.price ?? ''}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: fontSize(10),
+                            color: '#A5A5A5',
+                            textDecorationLine: 'line-through',
+                            marginRight: 6,
+                            fontFamily: fontFamily.poppins500,
+                            lineHeight: hp(14),
+                          }}>
+                          MRP {item.mrp}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: fontSize(10),
+                            color: '#2B9909',
+                            fontFamily: fontFamily.poppins600,
+                            lineHeight: hp(14),
+                          }}>
+                          {/* {item.discount} */}
+                          {variant?.discount ? `${variant.discount}% Off` : ''}
+                        </Text>
+                      </View>
+
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          marginTop: 6,
+                        }}>
+                        <View
+                          style={{
+                            backgroundColor: '#8225AF',
+                            paddingHorizontal: 5,
+                            borderRadius: 16,
+                            width: hp(42),
+                            height: hp(18),
+                            justifyContent: 'center',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: '#fff',
+                              fontSize: fontSize(9),
+                              fontFamily: fontFamily.poppins500,
+                              marginRight: hp(5),
+                            }}>
+                            {/* {item.rating} */}
+                            {item?.averageRating}
+                          </Text>
+                          <StarIcon
+                            style={{top: -1, width: hp(9), height: hp(8)}}
+                          />
+                        </View>
+                        <Text
+                          style={{
+                            fontSize: fontSize(10),
+                            color: colors.pureBlack,
+                            fontFamily: fontFamily.poppins500,
+                            marginLeft: hp(12),
+                          }}>
+                          {/* {item.reviews} */}
+                          {`(${item?.totalReviews ?? 0})`}
+                        </Text>
+
+                        <TouchableOpacity
+                          style={{marginLeft: 'auto'}}
+                          onPress={() => {
+                            console.log(' CLICK:', item._id);
+
+                            const alreadyExists = isWishlisted;
+
+                            console.log(
+                              ' BEFORE LOCAL WISHLIST:',
+                              localWishlist,
+                            );
+                            console.log(' ALREADY EXISTS:', alreadyExists);
+
+                            if (alreadyExists) {
+                              // 🔍 find wishlist item
+                              const wishlistItem = localWishlist.find(w => {
+                                const pid = w.productId?.id || w.productId?._id;
+                                return String(pid) === String(item._id);
+                              });
+
+                              console.log(
+                                ' FOUND ITEM FOR REMOVE:',
+                                wishlistItem,
+                              );
+
+                              if (!wishlistItem?.id) {
+                                console.log(
+                                  ' REMOVE FAILED: Wishlist ID not found',
+                                );
+                                ToastAndroid.show(
+                                  'Remove failed',
+                                  ToastAndroid.SHORT,
+                                );
+                                return;
+                              }
+
+                              //  UI instant update
+                              setLocalWishlist(prev =>
+                                prev.filter(
+                                  w =>
+                                    (w.productId?.id || w.productId?._id) !==
+                                    item._id,
+                                ),
+                              );
+
+                              console.log('UI UPDATED (REMOVED)');
+
+                              // 🚀 API call
+                              dispatch({
+                                type: REMOVE_WISHLIST_REQUEST,
+                                payload: wishlistItem.id,
+                              });
+
+                              console.log(
+                                ' REMOVE API CALLED:',
+                                wishlistItem.id,
+                              );
+
+                              // Toast
+                              ToastAndroid.show(
+                                'Removed from Wishlist',
+                                ToastAndroid.SHORT,
+                              );
+                            } else {
+                              console.log(' ADD FLOW START');
+
+                              // ✅ UI instant update
+                              setLocalWishlist(prev => [
+                                ...prev,
+                                {productId: {id: item._id}},
+                              ]);
+
+                              console.log(' UI UPDATED (ADDED)');
+
+                              //  API call
+                              dispatch({
+                                type: WISHLIST_REQUEST,
+                                payload: {productId: item._id},
+                              });
+
+                              console.log(' ADD API CALLED');
+
+                              //  Toast
+                              ToastAndroid.show(
+                                'Added to Wishlist',
+                                ToastAndroid.SHORT,
+                              );
+                            }
+
+                            console.log(
+                              ' AFTER LOCAL WISHLIST:',
+                              localWishlist,
+                            );
+                          }}>
+                          {isWishlisted ? (
+                            <GradientFullFillLike />
+                          ) : (
+                            <GradientLikeIcon />
+                          )}
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                );
+              }}
+            />
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
 };

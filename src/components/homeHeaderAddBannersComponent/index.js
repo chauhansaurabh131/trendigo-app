@@ -94,7 +94,8 @@ const HomeHeaderAddBannersComponent = () => {
                 resizeMode="cover"
                 style={{
                   width: SCREEN_WIDTH,
-                  height: hp(169),
+                  // height: hp(169),
+                  height: hp(200),
                 }}
               />
             </View>

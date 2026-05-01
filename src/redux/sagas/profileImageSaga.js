@@ -5,31 +5,40 @@ import {
   uploadProfilePicSuccess,
   uploadProfilePicFailure,
 } from '../actions/profileImageActions';
-
+import api from '../../api/apiClient';
 /* =========================
    SELECTOR
 ========================= */
-const getToken = state => state.auth.token;
+// const getToken = state => state.auth.token;
 
 /* =========================
    API FUNCTIONS (same file)
 ========================= */
 
-const getUploadUrlApi = (token, fileName, contentType) => {
-  return fetch('https://mntrendigo.mntech.website/api/v1/s3/profilepic', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      key: fileName,
-      contentType: contentType,
-      profileType: 'profileImage',
-      isProfilePic: true,
-    }),
-  }).then(res => res.json());
+// const getUploadUrlApi = (token, fileName, contentType) => {
+// return fetch('https://mntrendigo.mntech.website/api/v1/s3/profilepic', {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json',
+//     Authorization: `Bearer ${token}`,
+//   },
+//   body: JSON.stringify({
+//     key: fileName,
+//     contentType: contentType,
+//     profileType: 'profileImage',
+//     isProfilePic: true,
+//   }),
+// }).then(res => res.json());
+
+const getUploadUrlApi = (fileName, contentType) => {
+  return api.post('/s3/profilepic', {
+    key: fileName,
+    contentType: contentType,
+    profileType: 'profileImage',
+    isProfilePic: true,
+  });
 };
+// };
 
 // 2️⃣ S3 upload (PUT)
 const uploadToS3Api = (uploadUrl, image) => {
@@ -51,24 +60,32 @@ function* uploadProfilePicSaga(action) {
     console.log('🟢 SAGA STARTED', action.payload);
 
     const image = action.payload;
-    const token = yield select(getToken);
+    // const token = yield select(getToken);
 
     const fileName = `profile_${Date.now()}.jpg`;
 
     // 1️⃣ get presigned URL
-    const response = yield call(getUploadUrlApi, token, fileName, image.type);
+    // const response = yield call(getUploadUrlApi, token, fileName, image.type);
+    const response = yield call(getUploadUrlApi, fileName, image.type);
+    console.log(' PRESIGNED URL RESPONSE', response.data);
 
-    console.log('🟢 API RESPONSE', response);
+    const uploadUrl = response.data?.data?.url; // ✅ correct
+    console.log(' UPLOAD URL', uploadUrl);
+    console.log(' API RESPONSE', response);
 
     // 2️⃣ upload to S3 (VERY IMPORTANT FIX)
-    yield call(uploadToS3Api, response.data.url, image);
+    // yield call(uploadToS3Api, response.data.url, image);
+    yield call(uploadToS3Api, uploadUrl, image);
 
+    // 3️⃣ Send clean URL to redux
+    const cleanUrl = uploadUrl.split('?')[0];
+    yield put(uploadProfilePicSuccess(cleanUrl)); // ✅ correct
     // 3️⃣ success
-    yield put(
-      uploadProfilePicSuccess(
-        response.data.url.split('?')[0], // clean image url
-      ),
-    );
+    // yield put(
+    //   uploadProfilePicSuccess(
+    //     response.data.url.split('?')[0], // clean image url
+    //   ),
+    // );
   } catch (error) {
     console.log('🔴 SAGA ERROR', error);
     yield put(uploadProfilePicFailure(error.message));

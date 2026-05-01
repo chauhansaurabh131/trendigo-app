@@ -78,7 +78,7 @@ function* getCartSaga(action) {
 
     const response = yield call(getCartApi, action.token);
 
-    console.log('GET CART RESPONSE ', JSON.stringify(response.data, null, 2));
+    // console.log('GET CART RESPONSE ', JSON.stringify(response.data, null, 2));
 
     yield put({
       type: GET_CART_SUCCESS,
@@ -122,6 +122,7 @@ function* updateCartSaga(action) {
     const response = yield call(updateCartApi, payload, token);
 
     console.log('UPDATE CART RESPONSE:', response.data);
+    console.log('UPDATE CART RESPONSE DATA:', response);
 
     yield put({
       type: UPDATE_CART_SUCCESS,
@@ -166,9 +167,17 @@ function* removeCartSaga(action) {
     console.log(action.payload, 'FULL PAYLOAD IN REMOVE SAGA');
     const response = yield call(removeCartApi, cartId, itemId, token);
     console.log(response, 'REMOVE SAGA RESPONSE');
+    console.log('REMOVE CART RESPONSE:', response);
+    console.log('REMOVE CART RESPONSE DATA:', response.data);
     yield put({
       type: REMOVE_CART_SUCCESS,
-      payload: {itemId},
+      // payload: {itemId},
+      payload: response, // 👈 API response
+    });
+    // 👇 VERY IMPORTANT (ADD THIS)
+    yield put({
+      type: GET_CART_REQUEST,
+      token: token,
     });
   } catch (error) {
     console.log(error, 'Error=====>');

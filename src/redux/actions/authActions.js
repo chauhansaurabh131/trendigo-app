@@ -12,7 +12,7 @@ export const RESEND_OTP_FAILURE = 'RESEND_OTP_FAILURE';
 export const REFRESH_TOKEN_REQUEST = 'REFRESH_TOKEN_REQUEST';
 export const REFRESH_TOKEN_SUCCESS = 'REFRESH_TOKEN_SUCCESS';
 export const REFRESH_TOKEN_FAILURE = 'REFRESH_TOKEN_FAILURE';
-
+export const SET_LOGIN_TYPE = 'SET_LOGIN_TYPE';
 export const LOGOUT = 'LOGOUT';
 
 export const logout = () => ({
@@ -85,4 +85,14 @@ export const loadTokenFromStorage = token => ({
 export const refreshTokenRequest = refreshToken => ({
   type: REFRESH_TOKEN_REQUEST,
   payload: refreshToken,
+});
+
+export const setAuthToken = token => ({
+  type: 'SET_AUTH_TOKEN',
+  payload: token,
+});
+
+export const setLoginType = type => ({
+  type: SET_LOGIN_TYPE,
+  payload: type,
 });

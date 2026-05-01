@@ -1,3 +1,5 @@
+import {VERIFY_EMAIL_OTP_FAILURE} from './authActions';
+export const RESET_ACCOUNT_ERROR = 'RESET_ACCOUNT_ERROR';
 // SEND OTP
 export const SEND_EMAIL_OTP_REQUEST = 'SEND_EMAIL_OTP_REQUEST';
 export const SEND_EMAIL_OTP_SUCCESS = 'SEND_EMAIL_OTP_SUCCESS';
@@ -39,23 +41,19 @@ export const VERIFY_CHANGE_MOBILE_OTP_SUCCESS =
   'VERIFY_CHANGE_MOBILE_OTP_SUCCESS';
 export const VERIFY_CHANGE_MOBILE_OTP_FAILURE =
   'VERIFY_CHANGE_MOBILE_OTP_FAILURE';
-export const sendMobileOtpRequest = (
-  token,
-  currentMobileNumber,
-  newMobileNumber,
-) => ({
-  type: SEND_MOBILE_OTP_REQUEST,
-  payload: {token, currentMobileNumber, newMobileNumber},
-});
 
+export const sendMobileOtpRequest = payload => ({
+  type: SEND_MOBILE_OTP_REQUEST,
+  payload,
+});
 export const verifyMobileOtpRequest = (
-  token,
+  // token,
   currentMobileNumber,
   newMobileNumber,
   otp,
 ) => ({
   type: VERIFY_CHANGE_MOBILE_OTP_REQUEST,
-  payload: {token, currentMobileNumber, newMobileNumber, otp},
+  payload: {currentMobileNumber, newMobileNumber, otp},
 });
 
 // userAccountActions.js
@@ -65,24 +63,24 @@ export const resetEmailVerifyStatus = () => ({
   type: RESET_EMAIL_VERIFY_STATUS,
 });
 
-export const getMeRequest = token => ({
+export const getMeRequest = () => ({
   type: GET_ME_REQUEST,
-  payload: {token},
+  // payload: {token},
 });
 
-export const sendEmailOtpRequest = (token, currentEmail, newEmail) => ({
+export const sendEmailOtpRequest = (currentEmail, newEmail) => ({
   type: SEND_EMAIL_OTP_REQUEST,
-  payload: {token, currentEmail, newEmail},
+  payload: {currentEmail, newEmail},
 });
 
-export const verifyEmailOtpRequest = (token, currentEmail, newEmail, otp) => ({
-  type: VERIFY_EMAIL_OTP_REQUEST,
-  payload: {token, currentEmail, newEmail, otp},
+export const verifyEmailOtpRequest = (currentEmail, newEmail, otp) => ({
+  type: VERIFY_EMAIL_OTP_FAILURE,
+  payload: {currentEmail, newEmail, otp},
 });
 
 export const deleteAccountRequest = token => ({
   type: DELETE_ACCOUNT_REQUEST,
-  payload: token,
+  // payload: token,
 });
 
 export const deleteAccountSuccess = () => ({
@@ -92,4 +90,7 @@ export const deleteAccountSuccess = () => ({
 export const deleteAccountFailure = error => ({
   type: DELETE_ACCOUNT_FAILURE,
   payload: error,
+});
+export const resetAccountError = () => ({
+  type: RESET_ACCOUNT_ERROR,
 });

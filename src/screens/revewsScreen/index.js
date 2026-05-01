@@ -94,7 +94,8 @@ const RevewsScreen = () => {
       <View
         style={{
           // width: '100%',
-          height: hp(370),
+          // height: hp(370),
+          // height: hp(401),
           borderColor: '#E8E8E8',
           borderWidth: 1,
           marginHorizontal: wp(18),
@@ -104,7 +105,7 @@ const RevewsScreen = () => {
         <View style={{marginTop: hp(15), paddingHorizontal: wp(13)}}>
           <Text
             style={{
-              fontSize: fontSize(9),
+              fontSize: fontSize(12),
               color: '#000',
               fontFamily: fontFamily.poppins400,
             }}>
@@ -113,7 +114,7 @@ const RevewsScreen = () => {
           <View
             style={{
               width: '100%',
-              borderWidth: 1,
+              borderWidth: 0.4,
               borderColor: '#E8E8E8',
               marginTop: hp(12),
               // marginHorizontal: wp(13),
@@ -224,7 +225,7 @@ const RevewsScreen = () => {
         <View
           style={{
             // width: '100%',
-            borderWidth: 1,
+            borderWidth: 0.3,
             borderColor: '#E8E8E8',
             marginTop: hp(22),
             marginHorizontal: wp(13),
@@ -237,6 +238,7 @@ const RevewsScreen = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             marginTop: hp(16),
+            marginBottom: hp(16),
           }}>
           <Text
             style={{
@@ -297,7 +299,7 @@ const RevewsScreen = () => {
                   fontSize: fontSize(14),
                   fontFamily: fontFamily.poppins400,
                   textAlign: 'center',
-                  lineHeight: hp(20),
+                  lineHeight: hp(24),
                 }}>
                 Are you sure you want to{'\n'}
                 delete this review?

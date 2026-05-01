@@ -533,8 +533,12 @@ const MenCategoryScreen = () => {
             <FlatList
               data={filteredProducts}
               keyExtractor={item => item._id}
-              numColumns={2}
+              numColumns={3}
               showsVerticalScrollIndicator={false}
+              // columnWrapperStyle={{
+              //   justifyContent: 'space-between', // important for spacing
+              //   marginBottom: 10,
+              // }}
               scrollEnabled={false}
               renderItem={({item}) => (
                 <View style={styles.card}>
@@ -659,7 +663,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 6,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
     borderRadius: 10,
   },
   cardText: {

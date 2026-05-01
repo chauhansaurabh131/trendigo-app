@@ -97,14 +97,26 @@ const GradientButton = ({
           colors={['#0F52BA', '#8225AF']}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1.2}}
-          style={{
-            width: '100%',
-            height: hp(50),
-            borderRadius: 50,
-            alignItems: 'center',
-            justifyContent: 'center',
-            alignSelf: 'center',
-          }}>
+          // style={{
+          //   width: '100%',
+          //   height: hp(50),
+          //   borderRadius: 50,
+          //   alignItems: 'center',
+          //   justifyContent: 'center',
+          //   alignSelf: 'center',
+          // }}>
+          style={[
+            {
+              width: '100%',
+              height: hp(50),
+              borderRadius: 50,
+              alignItems: 'center',
+              justifyContent: 'center',
+              alignSelf: 'center',
+              overflow: 'hidden',
+            },
+            buttonStyle,
+          ]}>
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (

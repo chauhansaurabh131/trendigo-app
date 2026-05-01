@@ -5,11 +5,14 @@ import {
   GET_STORE_SUCCESS,
   GET_STORE_FAILURE,
 } from '../actions/storeActions';
+import api from '../../api/apiClient';
 function* getStoreSaga(action) {
   try {
     const response = yield call(
-      axios.get,
-      `https://mntrendigo.mntech.website/api/v1/user/store/by-storeId/${action.payload}`,
+      api.get,
+      // `https://mntrendigo.mntech.website/api/v1/user/store/by-storeId/${action.payload}`,
+
+      `/user/store/by-storeId/${action.payload}`,
     );
 
     console.log('STORE FULL RESPONSE ', response);

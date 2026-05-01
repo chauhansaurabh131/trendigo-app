@@ -22,6 +22,9 @@ import {productDetailsReducer} from './reducers/productDetailsReducer';
 import recentlyViewedReducer from './reducers/recentlyViewedReducer';
 import cartReducer from './reducers/cartReducer';
 import productVariantReducer from './reducers/productVariantReducer';
+import searchReducer from './reducers/searchReducer';
+import emailAndMobile from './reducers/emailAndMobileReducer';
+import otpReducer from './reducers/otpReducer';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -46,6 +49,9 @@ const rootReducer = combineReducers({
   recentlyView: recentlyViewedReducer,
   addToCard: cartReducer,
   productVariant: productVariantReducer,
+  search: searchReducer,
+  emailAndMobile: emailAndMobile,
+  optVerify: otpReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));

@@ -15,6 +15,7 @@ import {
 } from '../actions/authActions';
 
 const initialState = {
+  loginType: null, // 👈 ADD THIS
   loading: false,
   otpSent: false,
   token: null,
@@ -90,6 +91,7 @@ export default function authReducer(state = initialState, action) {
     //     user: action.payload.user,
     //   };
     case VERIFY_EMAIL_OTP_SUCCESS:
+      console.log('REDUCER PAYLOAD:', action.payload);
       return {
         ...state,
         loading: false,
@@ -97,7 +99,17 @@ export default function authReducer(state = initialState, action) {
         user: action.payload.user,
         error: null,
       };
+    case 'SET_AUTH_TOKEN':
+      return {
+        ...state,
+        token: action.payload,
+      };
 
+    case 'SET_LOGIN_TYPE':
+      return {
+        ...state,
+        loginType: action.payload,
+      };
     case LOGOUT:
       return {
         ...initialState, // 🔥 everything reset

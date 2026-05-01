@@ -6,14 +6,16 @@ import {
   productCategorySuccess,
   productCategoryFailure,
 } from '../actions/productCategoryActions';
+import api from '../../api/apiClient';
 
 /* ===============================
    🔹 API FUNCTION (same file)
 ================================ */
 const getProductByCategoryApi = (category, page, ProductType) => {
-  return axios.get(
+  return api.get(
     // `https://mntrendigo.mntech.website/api/v1/user/product/by-product-category/${category}?page=${page}`,
-    `https://mntrendigo.mntech.website/api/v1/user/product/by-product-category/Topwear?page=1`,
+    // `https://mntrendigo.mntech.website/api/v1/user/product/by-product-category/Topwear?page=1`,
+    `user/product/by-product-category/Topwear?page=1`,
   );
 };
 
@@ -36,7 +38,10 @@ function* productCategorySaga(action) {
       productType,
     );
     // console.log(' FULL RESPONSE:', response);
+    console.log(' STATUS:', response.status);
+    console.log('full response', response);
     console.log(' API DATA:', response.data.data);
+
     // Success
     yield put(productCategorySuccess(response.data));
   } catch (error) {

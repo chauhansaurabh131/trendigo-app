@@ -5,47 +5,34 @@ import {
   getProductSuccess,
   getProductFailure,
 } from '../actions/productActions';
+import api from '../../api/apiClient';
 
-// /* API */
-// const getProductApi = () => {
-//   return axios.get('https://mntrendigo.mntech.website/api/v1/user/product/', {
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//   });
-// };
-
-// /* SAGA */
-// function* getProductSaga() {
-//   try {
-//     const response = yield call(getProductApi);
-//     console.log('PRODUCT RESPONSE ===>', response.data);
-
-//     yield put(getProductSuccess(response.data.data));
-//   } catch (error) {
-//     console.log('PRODUCT ERROR ===>', error);
-//     yield put(getProductFailure(error.message));
-//   }
-// }
 const API_BASE = 'https://mntrendigo.mntech.website/api/v1/user';
 
-const getProductApi = () =>
-  axios.get(`${API_BASE}/product/listProductByReview`);
+// const getProductApi = () =>
+//   axios.get(`${API_BASE}/product/listProductByReview`);
+
+const getProductApi = () => api.get('/user/product/listProductByReview');
 
 function* getProductSaga() {
   try {
+    console.log(' PRODUCT SAGA START');
+
     const response = yield call(getProductApi);
+
     console.log('PRODUCT RESPONSE ===>', response.data);
 
-    // yield put(getProductSuccess(response.data.data));
     yield put(getProductSuccess(response.data.results));
   } catch (error) {
-    console.log('PRODUCT ERROR ===>', error.response?.data || error.message);
+    console.log(
+      ' PRODUCT SAGA ERROR ===>',
+      error.response?.data || error.message,
+    );
     yield put(getProductFailure(error.message));
   }
 }
 
 export default function* productSaga() {
-  console.log(' productSaga WATCHING...');
+  console.log('PRODUCT SAGA WATCHING...');
   yield takeLatest(GET_PRODUCT_REQUEST, getProductSaga);
 }

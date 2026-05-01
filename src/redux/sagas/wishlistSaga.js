@@ -1,7 +1,7 @@
 import {call, put, takeLatest} from 'redux-saga/effects';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-
+import api from '../../api/apiClient';
 import {
   WISHLIST_REQUEST,
   wishlistSuccess,
@@ -13,22 +13,11 @@ import {
   REMOVE_WISHLIST_REQUEST,
   removeWishlistSuccess,
   removeWishlistFailure,
+  getWishlistRequest,
 } from '../actions/wishlistActions';
 
-/* =========================
-   API FUNCTION (same file)
-========================= */
-const wishlistApi = (productId, token) => {
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/user/userWishlist/',
-    {productId},
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+const wishlistApi = productId => {
+  return api.post('/user/userWishlist/', {productId});
 };
 
 /* =========================
@@ -39,60 +28,39 @@ function* wishlistWorker(action) {
     console.log('WISHLIST SAGA CALLED');
     console.log(' Product ID:', action.payload.productId);
 
-    // 1️⃣ Get token
-    const token = yield call(AsyncStorage.getItem, 'authToken');
-    console.log('Token:', token);
-
-    if (!token) {
-      throw new Error('Token missing');
-    }
-
-    // 2️⃣ API call
-    const response = yield call(wishlistApi, action.payload.productId, token);
+    const response = yield call(wishlistApi, action.payload.productId);
 
     console.log('add Wishlist Success123:', response.data);
+    console.log('Wishlist added successfully in saga', response),
+      yield put(wishlistSuccess(response.data));
 
-    // 3️⃣ Dispatch success
-    yield put(wishlistSuccess(response.data));
+    // yield put({type: GET_WISHLIST_REQUEST});
+    yield put(getWishlistRequest());
   } catch (error) {
     console.log(' Wishlist Error:', error?.response?.data || error.message);
 
-    // 4️⃣ Dispatch failure
     yield put(wishlistFailure(error?.response?.data || error.message));
   }
 }
 
-/* ===========================
-   API FUNCTION (SAME FILE)
-=========================== */
-const getWishlistApi = token => {
-  return axios.get(
-    'https://mntrendigo.mntech.website/api/v1/user/userWishlist/userWishlist',
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+const getWishlistApi = () => {
+  return api.get('/user/userWishlist/userWishlist');
 };
-
-/* ===========================
-   WORKER SAGA
-=========================== */
 
 function* getWishlistWorker() {
   try {
     console.log('📥 GET WISHLIST SAGA CALLED');
 
-    const token = yield call(AsyncStorage.getItem, 'authToken');
+    // const token = yield call(AsyncStorage.getItem, 'authToken');
 
-    if (!token) {
-      throw new Error('Token missing');
-    }
+    // if (!token) {
+    //   throw new Error('Token missing');
+    // }
 
-    const response = yield call(getWishlistApi, token);
+    const response = yield call(getWishlistApi);
 
     console.log('✅ Wishlist list...:', response.data.data);
+    console.log('Wishlist fetched successfully in saga', response);
 
     yield put({
       type: GET_WISHLIST_SUCCESS,
@@ -104,47 +72,66 @@ function* getWishlistWorker() {
   }
 }
 // 🔹 API CALL (same file)
-const removeWishlistApi = (token, wishlistId) => {
-  return axios.delete(
-    `https://mntrendigo.mntech.website/api/v1/user/userWishlist/${wishlistId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+// const removeWishlistApi = (token, wishlistId) => {
+//   return axios.delete(
+//     `https://mntrendigo.mntech.website/api/v1/user/userWishlist/${wishlistId}`,
+//     {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     },
+//   );
+// };
+
+const removeWishlistApi = wishlistId => {
+  return api.delete(`/user/userWishlist/${wishlistId}`);
 };
+
 function* removeWishlistSaga(action) {
   try {
     console.log(' REMOVE_WISHLIST_SAGA STARTED');
-
-    console.log(' Action received ', action);
-    console.log(' Wishlist ID ', action.payload);
-
-    const token = yield AsyncStorage.getItem('authToken');
-    console.log('Token from AsyncStorage ', token);
-
-    if (!token) {
-      console.log(' Token missing');
+    if (!action.payload) {
+      console.log('Wishlist ID missing, stopping saga');
       return;
     }
 
-    console.log('🌐 Calling DELETE wishlist API...');
-    yield call(removeWishlistApi, token, action.payload);
+    console.log(' Wishlist ID ', action.payload);
 
-    console.log('✅ Wishlist removed successfully in saga');
+    console.log(' Calling DELETE wishlist API...');
+    yield call(removeWishlistApi, action.payload);
+
+    console.log(' Wishlist removed successfully in saga');
 
     // success → reducer ko id bhejo
     yield put(removeWishlistSuccess(action.payload));
-    console.log('📤 REMOVE_WISHLIST_SUCCESS dispatched');
+    console.log(' REMOVE_WISHLIST_SUCCESS dispatched', action.payload);
   } catch (error) {
-    console.log('Error in removeWishlistSaga 👉', error);
-    console.log('Error response 👉', error?.response);
+    console.log('Error in removeWishlistSaga ', error);
+    console.log('Error response ', error?.response);
 
     yield put(removeWishlistFailure(error?.response?.data || error.message));
   }
 }
 
+// function* removeWishlistSaga(action) {
+//   try {
+//     console.log(' REMOVE_WISHLIST_SAGA STARTED');
+
+//     if (!action.payload) {
+//       console.log('❌ Wishlist ID missing, stopping saga');
+//       return;
+//     }
+
+//     console.log(' Wishlist ID ', action.payload);
+
+//     yield call(removeWishlistApi, action.payload);
+//     console.log(' Wishlist removed successfully in saga', action.payload);
+//     yield put(removeWishlistSuccess(action.payload));
+//     console.log(' REMOVE_WISHLIST_SUCCESS dispatched', action.payload);
+//   } catch (error) {
+//     console.log('Error in removeWishlistSaga ', error);
+//   }
+// }
 /* =========================
    WATCHER SAGA
 ========================= */

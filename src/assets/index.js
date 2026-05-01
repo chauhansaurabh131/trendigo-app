@@ -35,6 +35,7 @@ import ReceiptIcon from './svgIcons/receipt_icon.svg';
 import RemoveIcon from './svgIcons/remove_icon.svg';
 import EditIcon from './svgIcons/edit_icon.svg';
 import SendEquiry1 from './svgIcons/send_equiry1.svg';
+import MapIcon from './svgIcons/map-icon.svg';
 export {
   WhiteTrendiGo,
   RightSideArrow,
@@ -73,6 +74,7 @@ export {
   RemoveIcon,
   EditIcon,
   SendEquiry1,
+  MapIcon,
 };
 
 export const images = {

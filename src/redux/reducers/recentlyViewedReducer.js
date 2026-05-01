@@ -11,39 +11,27 @@ import {
 
 const initialState = {
   loading: false,
-  data: [],
+  data: [], // store recently viewed products
   error: null,
 };
 
 export default function recentlyViewedReducer(state = initialState, action) {
   switch (action.type) {
     case ADD_RECENTLY_VIEWED_REQUEST:
-      return {...state, loading: true};
-    case ADD_RECENTLY_VIEWED_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        data: action.payload?.data || action.payload || [],
-      };
-    case ADD_RECENTLY_VIEWED_FAILURE:
-      return {...state, loading: false, error: action.payload};
-
     case GET_RECENTLY_VIEWED_REQUEST:
       return {...state, loading: true};
 
+    case ADD_RECENTLY_VIEWED_SUCCESS:
+      return {...state, loading: false};
+
+    case ADD_RECENTLY_VIEWED_FAILURE:
+      return {...state, loading: false, error: action.payload};
+
     case GET_RECENTLY_VIEWED_SUCCESS:
-      return {
-        ...state,
-        loading: false,
-        data: action.payload,
-      };
+      return {...state, loading: false, data: action.payload}; // api data here
 
     case GET_RECENTLY_VIEWED_FAILURE:
-      return {
-        ...state,
-        loading: false,
-        error: action.payload,
-      };
+      return {...state, loading: false, error: action.payload, data: []};
 
     default:
       return state;

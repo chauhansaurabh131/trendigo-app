@@ -23,22 +23,37 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {user, loading} = useSelector(state => state.user);
+  const {token} = useSelector(state => state.auth);
 
+  // const token = useSelector(state => state.auth.token);
+  // useEffect(() => {
+  //   const loadToken = async () => {
+  //     const token = await AsyncStorage.getItem('authToken');
+  //     console.log('PROFILE SCREEN TOKEN:', token);
+
+  //     if (token) {
+  //       dispatch(fetchUserRequest(token));
+  //     } else {
+  //       console.log('No token found');
+  //     }
+  //   };
+
+  //   loadToken();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (token) {
+  //     dispatch(fetchUserRequest(token));
+  //   } else {
+  //     console.log('NO TOKEN');
+  //   }
+  // }, [token]);
+  // simple useEffect without token dependency (since apiClient handles it)
   useEffect(() => {
-    const loadToken = async () => {
-      const token = await AsyncStorage.getItem('authToken');
-      console.log('PROFILE SCREEN TOKEN:', token);
-
-      if (token) {
-        dispatch(fetchUserRequest(token));
-      } else {
-        console.log('No token found');
-      }
-    };
-
-    loadToken();
-  }, []);
-
+    if (token) {
+      dispatch(fetchUserRequest());
+    }
+  }, [token]);
   const getInitials = fullName => {
     if (!fullName) return 'U';
 
@@ -51,15 +66,21 @@ const ProfileScreen = () => {
     // First letter of first word + first letter of second word
     return (parts[0][0] + parts[1][0]).toUpperCase();
   };
-  //Logout function
-  const onLogoutPress = () => {
-    dispatch(logout());
 
+  const onLogoutPress = async () => {
+    // await AsyncStorage.multiRemove(['authToken', 'refreshToken']); // 🔥 BOTH REMOVE
+    await AsyncStorage.clear(); // 🔥 BEST
+
+    dispatch(logout());
+    dispatch({type: 'RESET_WISHLIST'});
+    dispatch({type: 'RESET_CART'});
     navigation.reset({
       index: 0,
       routes: [{name: 'StartingScreen'}],
     });
   };
+
+  console.log('PROFILE PIC 👉', user?.profilePic);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.profileContainer}>
@@ -76,10 +97,28 @@ const ProfileScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* User Info */}
         <View style={styles.userContainer}>
-          <View style={styles.avatar}>
+          {/* <View style={styles.avatar}>
             <Text style={styles.avatarText}>
               {getInitials(user?.name || user?.email)}
             </Text>
+          </View>
+
+          <Text style={styles.nameText}>
+            {user?.name || user?.email || user?.mobileNumber || 'No User'}
+          </Text> */}
+
+          <View style={styles.avatar}>
+            {user?.profilePic ? (
+              <Image
+                source={{uri: user.profilePic}}
+                // style={styles.avatarImage}
+                style={{width: '100%', height: '100%', borderRadius: hp(25)}}
+              />
+            ) : (
+              <Text style={styles.avatarText}>
+                {getInitials(user?.name || user?.email)}
+              </Text>
+            )}
           </View>
 
           <Text style={styles.nameText}>

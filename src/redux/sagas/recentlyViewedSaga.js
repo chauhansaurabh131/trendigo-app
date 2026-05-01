@@ -3,7 +3,7 @@
 import {call, put, takeLatest} from 'redux-saga/effects';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ make sure imported
-
+import api from '../../api/apiClient';
 import {
   ADD_RECENTLY_VIEWED_REQUEST,
   ADD_RECENTLY_VIEWED_SUCCESS,
@@ -14,32 +14,19 @@ import {
 } from '../actions/recentlyViewedActions';
 console.log('RecentlyView Working on now...');
 
-const BASE_URL = 'https://mntrendigo.mntech.website/api';
 function addRecentlyViewedApi(data, token) {
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/user/recentlyViewed/',
-    data,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+  return api.post('/user/recentlyViewed/', data);
 }
 
 function* addRecentlyViewedSaga(action) {
   try {
     console.log('ADD_RECENTLY_VIEWED_REQUEST TRIGGERED');
     console.log('ADD_RECENTLY_VIEWED Action Payload:', action.payload);
+    console.log('Sending Product ID:', action.payload?.productId);
 
-    const token = yield call(AsyncStorage.getItem, 'authToken');
-    console.log('🔑 TOKEN:', token);
-
-    const response = yield call(
-      addRecentlyViewedApi,
-      {productId: action.payload?.productId},
-      token,
-    );
+    const response = yield call(addRecentlyViewedApi, {
+      productId: action.payload?.productId,
+    });
 
     console.log('ADD_RECENTLY_VIEWED FULL RESPONSE:', response);
     console.log('ADD_RECENTLY_VIEWED RESPONSE.DATA:', response?.data);
@@ -47,6 +34,10 @@ function* addRecentlyViewedSaga(action) {
     yield put({
       type: ADD_RECENTLY_VIEWED_SUCCESS,
       payload: response?.data,
+    });
+
+    yield put({
+      type: GET_RECENTLY_VIEWED_REQUEST,
     });
   } catch (error) {
     console.log('❌ API ERROR:', error);
@@ -61,23 +52,13 @@ function* addRecentlyViewedSaga(action) {
 }
 
 function getRecentlyViewedApi(token) {
-  const url = `${BASE_URL}/v1/user/recentlyViewed/by-user/`;
-  console.log('Calling URL:', url);
-
-  return axios.get(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  return api.get('/user/recentlyViewed/by-user/');
 }
 function* getRecentlyViewedSaga(action) {
   try {
-    // const {token} = action.payload;
-    const token = yield call(AsyncStorage.getItem, 'authToken');
-    console.log('REcently......, TOKEN:', token);
     console.log('GET_RECENTLY_VIEWED_SAGA started');
 
-    const response = yield call(getRecentlyViewedApi, token);
+    const response = yield call(getRecentlyViewedApi);
 
     console.log('GET_RECENTLY-VIEW API Response:', response.data);
 
@@ -86,7 +67,10 @@ function* getRecentlyViewedSaga(action) {
       payload: response.data,
     });
   } catch (error) {
-    console.error('API Error:', error.response?.data || error.message);
+    console.error(
+      ' RECENTLY VIEWED API Error :',
+      error.response?.data || error.message,
+    );
 
     yield put({
       type: GET_RECENTLY_VIEWED_FAILURE,

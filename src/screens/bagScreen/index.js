@@ -33,11 +33,16 @@ import {
 } from '../../redux/actions/cartActions';
 import {FlatList} from 'react-native-gesture-handler';
 import {GET_PRODUCT_VARIANT_REQUEST} from '../../redux/actions/productVariantActions';
-import {ADD_ADDRESS_REQUEST} from '../../redux/actions/addressActions';
+import {
+  ADD_ADDRESS_REQUEST,
+  getAddressRequest,
+} from '../../redux/actions/addressActions';
+import {ActivityIndicator} from 'react-native';
 const BagScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const dispatch = useDispatch();
+  const [removingItemId, setRemovingItemId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [colorOptions, setColorOptions] = useState([]);
@@ -50,13 +55,13 @@ const BagScreen = () => {
   // const variants = selectedItem?.productId?.variants || [];
   // const variants = product?.variants || [];
   const {variants} = useSelector(state => state.productVariant);
-  console.log('Variants 👉', variants);
+  // console.log('Variants 👉', variants);
   // console.log(variants, 'Variants =======>');
   const {cartData, loading, error} = useSelector(state => state.addToCard);
-  console.log('Cart Data', cartData);
+  // console.log('Cart Data', cartData);
   const token = useSelector(state => state.auth.token);
   console.log('TOKEN IN BagScreen:', token);
-  console.log('SELECTED ITEM:', selectedItem);
+  // console.log('SELECTED ITEM:', selectedItem);
   // console.log('VARIANTS:', selectedItem?.variants);
   useEffect(() => {
     if (token) {
@@ -68,8 +73,24 @@ const BagScreen = () => {
     }
   }, [token]);
   // user id
-  const user = useSelector(state => state.auth.user);
-  const userId = user?.id || user?._id;
+  // const user = useSelector(state => state.auth.user);
+  const userId = useSelector(state => state.user?.user?.id);
+  // const userId = user?.id || user?._id;
+
+  useEffect(() => {
+    dispatch({type: 'FETCH_USER_REQUEST'});
+  }, []);
+
+  console.log('USER ID in BagScreen:', userId);
+
+  useEffect(() => {
+    if (userId) {
+      console.log('Calling GET ADDRESS API with userId:', userId);
+
+      dispatch(getAddressRequest(userId));
+    }
+  }, [userId]);
+
   // const addressList = useSelector(state => state.addresses?.list || []);
   const addressList = useSelector(state => state?.addresses?.list ?? []);
   console.log(addressList, 'ADDRESS LIST IN BAG SCREEN=====>');
@@ -79,6 +100,8 @@ const BagScreen = () => {
   useEffect(() => {
     if (!addressState.loading && !addressState.error) {
       sheetRef2.current?.close();
+
+      resetForm(); // ✅ clear after submit
     }
   }, [addressState.loading, addressState.error]);
 
@@ -92,140 +115,183 @@ const BagScreen = () => {
   const sheetRef3 = useRef(); // Third bottom sheet - Edit Item
 
   // State for selected color and size
-  const [selectedColor, setSelectedColor] = useState('sky_blue');
-  const [selectedSize, setSelectedSize] = useState('S');
-  const [selectedQuantity, setSelectedQuantity] = useState(1);
+  // const [selectedColor, setSelectedColor] = useState(null);
+  // const [selectedSize, setSelectedSize] = useState(null);
+  // const [selectedQuantity, setSelectedQuantity] = useState('1');
 
-  // Color options with their respective images - Replace these with your actual image paths
-  // const colorOptions = [
-  //   {
-  //     id: 'sky_blue',
-  //     name: 'Sky Blue',
-  //     image: images.trending_one,
-  //   },
-  //   {
-  //     id: 'purple',
-  //     name: 'Purple',
-  //     image: images.purple_image,
-  //   },
-  //   {
-  //     id: 'pink',
-  //     name: 'Pink',
-  //     image: images.pink_image,
-  //   },
-  // ];
-  useEffect(() => {
-    console.log('=== VARIANTS FETCHED ===', variants);
+  // // Color options with their respective images - Replace these with your actual image paths
+  // // const colorOptions = [
+  // //   {
+  // //     id: 'sky_blue',
+  // //     name: 'Sky Blue',
+  // //     image: images.trending_one,
+  // //   },
+  // //   {
+  // //     id: 'purple',
+  // //     name: 'Purple',
+  // //     image: images.purple_image,
+  // //   },
+  // //   {
+  // //     id: 'pink',
+  // //     name: 'Pink',
+  // //     image: images.pink_image,
+  // //   },
+  // // ];
+  // useEffect(() => {
+  //   // console.log('=== VARIANTS FETCHED ===', variants);
 
-    if (variants && variants.length > 0) {
-      const colors = variants.map((variant, index) => {
-        console.log(`--- VARIANT ${index} ---`, variant);
+  //   if (variants && variants.length > 0) {
+  //     const colors = variants.map((variant, index) => {
+  //       console.log(`--- VARIANT ${index} ---`, variant);
 
-        const colorObj = variant.variants.find(v => v.key === 'color');
-        console.log('ColorObj:', colorObj);
+  //       const colorObj = variant.variants.find(v => v.key === 'color');
+  //       console.log('ColorObj:', colorObj);
 
-        const mainImage =
-          variant.images.find(i => i.isSelectedForMainScreen) ||
-          variant.images[0];
-        console.log('Main Image:', mainImage);
+  //       const mainImage =
+  //         variant.images.find(i => i.isSelectedForMainScreen) ||
+  //         variant.images[0];
+  //       console.log('Main Image:', mainImage);
 
-        return {
-          id: colorObj?.value,
-          name: colorObj?.value,
-          image: {uri: mainImage?.imageUrl},
-        };
-      });
+  //       return {
+  //         id: colorObj?.value,
+  //         name: colorObj?.value,
+  //         image: {uri: mainImage?.imageUrl},
+  //       };
+  //     });
 
-      console.log('Color Options (Before filter):', colors);
+  //     console.log('Color Options (Before filter):', colors);
 
-      // Remove duplicates and empty ids
-      const uniqueColors = colors
-        .filter(c => c.id)
-        .filter((c, idx, self) => self.findIndex(v => v.id === c.id) === idx);
-      console.log('Color Options (Unique & valid):', uniqueColors);
+  //     // Remove duplicates and empty ids
+  //     const uniqueColors = colors
+  //       .filter(c => c.id)
+  //       .filter((c, idx, self) => self.findIndex(v => v.id === c.id) === idx);
+  //     console.log('Color Options (Unique & valid):', uniqueColors);
 
-      setColorOptions(uniqueColors);
-    }
-  }, [variants]);
-  // const colorOptions = [
-  //   ...new Map(
-  //     [selectedItem?.variants]?.map(v => {
-  //       console.log('VARIANT:', v);
-
-  //       const colorObj = v?.variants?.find(x => x.key === 'color');
-
-  //       console.log('COLOR OBJ:', colorObj);
-
-  //       const imageObj = v?.images?.find(i => i.isSelectedForMainScreen);
-
-  //       console.log('IMAGE:', imageObj?.imageUrl);
-
-  //       return [
-  //         colorObj?.value,
-  //         {
-  //           id: colorObj?.value,
-  //           image: {uri: imageObj?.imageUrl},
-  //         },
-  //       ];
-  //     }) || [],
-  //   ).values(),
-  // ];
-
-  // console.log('COLOR OPTIONS:', colorOptions);
-
-  // const colorOptions = [
-  //   ...new Map(
-  //     (variants || []).map(v => {
-  //       const colorObj = v?.variants?.find(x => x.key === 'color');
-
-  //       const imageObj = v?.images?.find(
-  //         i => i.isSelectedForMainScreen === true,
-  //       );
-
-  //       return [
-  //         colorObj?.value,
-  //         {
-  //           id: colorObj?.value,
-  //           image: {uri: imageObj?.imageUrl},
-  //         },
-  //       ];
-  //     }),
-  //   ).values(),
-  // ];
-
-  // console.log('COLOR OPTIONS:', colorOptions);
-  // Size options
-  const sizeOptions = ['S', 'M', 'L', 'XL', 'XXL'];
+  //     setColorOptions(uniqueColors);
+  //   }
+  // }, [variants]);
+  // // Size options
+  // const sizeOptions = ['S', 'M', 'L', 'XL', 'XXL'];
 
   // useEffect(() => {
-  //   if (variants?.length > 0) {
+  //   if (variants?.length > 0 && !selectedItem) {
   //     const firstVariant = variants[0];
 
   //     const colorObj = firstVariant?.variants?.find(x => x.key === 'color');
 
-  //     const imageObj = firstVariant?.images?.find(
-  //       i => i.isSelectedForMainScreen === true,
-  //     );
-
   //     setSelectedColor(colorObj?.value);
-  //     setSelectedImage(imageObj?.imageUrl);
+
+  //     // ✅ set sizes for first color
+  //     const sizes = variants
+  //       .filter(v =>
+  //         v.variants.some(
+  //           x => x.key === 'color' && x.value === colorObj?.value,
+  //         ),
+  //       )
+  //       .map(v => v.variants.find(x => x.key === 'size')?.value);
+
+  //     const uniqueSizes = [...new Set(sizes)];
+
+  //     setAvailableSizes(uniqueSizes);
+
+  //     if (uniqueSizes.length > 0) {
+  //       setSelectedSize(uniqueSizes[0]);
+  //     }
   //   }
-  // }, [variants]); //Quantity options
+  // }, [variants]);
 
+  // const handleColorSelect = colorId => {
+  //   setSelectedColor(colorId);
+
+  //   const sizes = variants
+  //     ?.filter(v =>
+  //       v.variants.some(
+  //         x =>
+  //           x.key === 'color' &&
+  //           x.value?.toLowerCase() === colorId?.toLowerCase(),
+  //       ),
+  //     )
+  //     ?.map(v => v.variants.find(x => x.key === 'size')?.value);
+
+  //   const uniqueSizes = [...new Set(sizes)];
+
+  //   setAvailableSizes(uniqueSizes);
+
+  //   // ✅ FIX HERE
+  //   const isCurrentSizeAvailable = uniqueSizes.includes(selectedSize);
+
+  //   if (isCurrentSizeAvailable) {
+  //     setSelectedSize(selectedSize);
+  //   } else if (uniqueSizes.length > 0) {
+  //     setSelectedSize(uniqueSizes[0]);
+  //   }
+
+  //   // image
+  //   const selectedVariant = variants.find(v =>
+  //     v.variants.some(x => x.key === 'color' && x.value === colorId),
+  //   );
+
+  //   const mainImage =
+  //     selectedVariant?.images.find(i => i.isSelectedForMainScreen) ||
+  //     selectedVariant?.images[0];
+
+  //   setSelectedImage(mainImage?.imageUrl);
+  // };
+
+  // const quantityOptions = ['1', '2', '3', '4', '5'];
+  // // Get current selected color image for main display
+  // const getCurrentColorImage = () => {
+  //   const selectedColorObj = colorOptions.find(
+  //     color => color.id === selectedColor,
+  //   );
+  //   return selectedColorObj ? selectedColorObj.image : images.trending_one;
+  // };
+
+  //  Selected states initially null then dynamic data set )
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedQuantity, setSelectedQuantity] = useState('1');
+
+  //  Color options prepare  on  a variants
   useEffect(() => {
-    if (variants?.length > 0) {
-      const firstVariant = variants[0];
+    if (variants && variants.length > 0) {
+      // every  variant for  color + image
+      const colors = variants.map(variant => {
+        // color find
+        const colorObj = variant.variants.find(v => v.key === 'color');
 
-      const colorObj = firstVariant?.variants?.find(x => x.key === 'color');
+        // main image find out and  if is selected otherWise first)
+        const mainImage =
+          variant.images.find(i => i.isSelectedForMainScreen) ||
+          variant.images[0];
 
-      setSelectedColor(colorObj?.value);
+        return {
+          id: colorObj?.value, // color id (ex: white, black)
+          name: colorObj?.value,
+          image: {uri: mainImage?.imageUrl}, // image for UI
+        };
+      });
 
-      // ✅ set sizes for first color
+      // duplicate colors remove
+      const uniqueColors = colors
+        .filter(c => c.id)
+        .filter((c, idx, self) => self.findIndex(v => v.id === c.id) === idx);
+
+      setColorOptions(uniqueColors);
+    }
+  }, [variants]);
+
+  // Default selection (only when NOT editing item)
+  useEffect(() => {
+    if (selectedItem && variants?.length > 0) {
+      const color = selectedItem?.variants?.variants?.find(
+        v => v.key === 'color',
+      )?.value;
+
+      // selected color માટે sizes filter
       const sizes = variants
         .filter(v =>
-          v.variants.some(
-            x => x.key === 'color' && x.value === colorObj?.value,
-          ),
+          v.variants.some(x => x.key === 'color' && x.value === color),
         )
         .map(v => v.variants.find(x => x.key === 'size')?.value);
 
@@ -233,37 +299,20 @@ const BagScreen = () => {
 
       setAvailableSizes(uniqueSizes);
 
-      if (uniqueSizes.length > 0) {
-        setSelectedSize(uniqueSizes[0]);
-      }
+      // selected item size set
+      const size = selectedItem?.variants?.variants?.find(
+        v => v.key === 'size',
+      )?.value;
+
+      setSelectedSize(size);
     }
-  }, [variants]);
-  // const handleColorSelect = colorId => {
-  //   setSelectedColor(colorId);
-
-  //   // find selected variant by color
-  //   const selectedVariant = variants.find(v =>
-  //     v.variants.some(x => x.key === 'color' && x.value === colorId),
-  //   );
-
-  //   // update main image
-  //   const mainImage =
-  //     selectedVariant?.images.find(i => i.isSelectedForMainScreen) ||
-  //     selectedVariant?.images[0];
-  //   setSelectedImage(mainImage?.imageUrl);
-
-  //   // update sizes
-  //   const sizes = selectedVariant?.variants
-  //     .filter(v => v.key === 'size')
-  //     .map(s => s.value);
-
-  //   // setSizeOptions(sizes);
-  // };
-
+  }, [selectedItem, variants]);
+  // ✅ Color select handler
   const handleColorSelect = colorId => {
+    // selected color update
     setSelectedColor(colorId);
 
-    // ✅ FILTER SIZES BASED ON COLOR
+    // selected color  accoding sizes filter
     const sizes = variants
       ?.filter(v =>
         v.variants.some(
@@ -274,17 +323,26 @@ const BagScreen = () => {
       )
       ?.map(v => v.variants.find(x => x.key === 'size')?.value);
 
-    // remove duplicates
     const uniqueSizes = [...new Set(sizes)];
 
+    // sizes state update
     setAvailableSizes(uniqueSizes);
 
-    // ✅ auto select first size
-    if (uniqueSizes.length > 0) {
+    // IMPORTANT LOGIC:
+    // current selected size new color in  available Is  or Not  then check
+    const isCurrentSizeAvailable = uniqueSizes
+      .map(s => s?.toLowerCase())
+      .includes(selectedSize?.toLowerCase());
+
+    if (isCurrentSizeAvailable) {
+      // If is same size available  → same
+      setSelectedSize(selectedSize);
+    } else if (uniqueSizes.length > 0) {
+      // otherWise → first size select
       setSelectedSize(uniqueSizes[0]);
     }
 
-    // existing image logic
+    // Image is a update  and acooding selected color
     const selectedVariant = variants.find(v =>
       v.variants.some(x => x.key === 'color' && x.value === colorId),
     );
@@ -295,14 +353,33 @@ const BagScreen = () => {
 
     setSelectedImage(mainImage?.imageUrl);
   };
+
+  // Quantity options (static)
   const quantityOptions = ['1', '2', '3', '4', '5'];
-  // Get current selected color image for main display
+
+  //  Current selected color image UI
   const getCurrentColorImage = () => {
     const selectedColorObj = colorOptions.find(
       color => color.id === selectedColor,
     );
+
     return selectedColorObj ? selectedColorObj.image : images.trending_one;
   };
+  const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    if (updating && !loading && !error) {
+      setTimeout(() => {
+        sheetRef3.current?.close();
+        setUpdating(false);
+      }, 3000);
+    }
+  }, [loading, error]);
+  useEffect(() => {
+    console.log('loading:', loading);
+    console.log('updating:', updating);
+  }, [loading, updating]);
+
   /// Add Address from state
   const [form, setForm] = useState({
     name: '',
@@ -312,10 +389,14 @@ const BagScreen = () => {
     locality: '',
     isDefaultAddress: false, // ✅ FIXED NAME
   });
-  console.log('FORM DATA 👉', form);
   // when i click to add address Submit Handler fnction
 
   const handleAddAddress = () => {
+    if (!userId) {
+      // console.log('User ID is missing. Cannot add address.');
+      return;
+    }
+    console.log('USER ID in handleAddAddress:', userId);
     const payload = {
       userId,
       name: form.name,
@@ -332,10 +413,10 @@ const BagScreen = () => {
     dispatch({
       type: ADD_ADDRESS_REQUEST,
       payload,
-      token,
+      // token,
     });
-    console.log('PAYLOAD OF ADD ADDRESS REQUEST', payload),
-      console.log('TOKEN', token);
+    console.log('PAYLOAD OF ADD ADDRESS REQUEST', payload);
+    // console.log('TOKEN', token)
   };
 
   // isDefault Address show
@@ -343,25 +424,42 @@ const BagScreen = () => {
   const defaultAddress = addressList?.find(
     item => item?.isDefaultAddress === true,
   );
-
-  console.log('Default Address show', defaultAddress);
+  const resetForm = () => {
+    setForm({
+      name: '',
+      mobileNumber: '',
+      pincode: '',
+      addressLineOne: '',
+      locality: '',
+      isDefaultAddress: false,
+    });
+  };
+  // console.log('Default Address show', defaultAddress);
   const renderCartItem = ({item}) => {
     const productId = item?.productId?.id;
 
     console.log('PRODUCT ID FROM CART:', productId);
-    console.log('Rendering Cart Item:', item);
-    console.log('CART DATA', cartData);
+    // console.log('Rendering Cart Item:', item);
+    // console.log('CART DATA', cartData);
     const size = item?.variants?.variants?.find(v => v.key === 'size')?.value;
     console.log('Selected Size:', size);
     const color = item?.variants?.variants?.find(v => v.key === 'color')?.value;
     console.log('Selected Color:', color);
-    const image = item?.variants?.images?.find(
-      i => i.isSelectedForMainScreen,
-    )?.imageUrl;
+    // const image = item?.variants?.images?.find(
+    //   i => i.isSelectedForMainScreen,
+    // )?.imageUrl;
+
+    const image =
+      item?.variants?.images?.find(i => i.isSelectedForMainScreen)?.imageUrl ||
+      item?.variants?.images?.[0]?.imageUrl ||
+      null;
     console.log('Selected Image:', image);
 
     const price = item?.variants?.price;
     console.log('Price:', price);
+
+    console.log('FINAL IMAGE URL 👉', image);
+    console.log('FULL IMAGES ARRAY 👉', item?.variants?.images);
     const discountedPrice = item?.variants?.discountedPrice;
     console.log('Discounted Price:', discountedPrice);
     const discount = item?.variants?.discount;
@@ -374,9 +472,10 @@ const BagScreen = () => {
           marginHorizontal: wp(18),
           borderColor: '#E8E8E8',
           borderWidth: 1,
-          height: hp(240),
+          // height: hp(240),
           borderRadius: 16,
           marginTop: hp(19),
+          justifyContent: 'space-between',
         }}>
         <View
           style={{
@@ -387,7 +486,7 @@ const BagScreen = () => {
             style={{
               color: '#9333EA',
               fontFamily: fontFamily.poppins600,
-              fontSize: fontSize(10),
+              fontSize: fontSize(12),
             }}>
             Expected Delivery 10th June
           </Text>
@@ -407,6 +506,7 @@ const BagScreen = () => {
             }}>
             <Image
               // source={getCurrentColorImage()}
+              // source={{uri: image}}
               source={{uri: image}}
               style={{
                 // width: isIOS ? 75 : wp(75),
@@ -441,32 +541,7 @@ const BagScreen = () => {
                 {/* Designer Traditional {'\n'}Dress */}
                 {item?.productId?.title}
               </Text>
-              {/* <View
-                  style={{
-                    height: 18,
-                    backgroundColor: '#F5F5F5',
-                    paddingHorizontal: 15,
-                    borderRadius: 50,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <Text
-                    style={{fontSize: fontSize(10), color: colors.pureBlack}}>
-                    Expected Delivery 10th June
-                  </Text>
-                </View> */}
             </View>
-            {/* 
-              <Text
-                style={{
-                  marginTop: hp(4),
-                  color: '#8A8A8A',
-                  fontSize: fontSize(10),
-                  fontFamily: fontFamily.poppins400,
-                }}>
-                Bandhani Printed Regular Mirror Work Kurta with Trousers &
-                Dupatta
-              </Text> */}
 
             <View
               style={{
@@ -605,6 +680,27 @@ const BagScreen = () => {
                   });
 
                   setSelectedItem(item);
+
+                  // ✅ IMPORTANT: set selected values from cart item
+                  const color = item?.variants?.variants?.find(
+                    v => v.key === 'color',
+                  )?.value;
+
+                  const size = item?.variants?.variants?.find(
+                    v => v.key === 'size',
+                  )?.value;
+
+                  setSelectedColor(color);
+                  setSelectedSize(size);
+                  setSelectedQuantity(item?.quantity?.toString());
+
+                  // ✅ also set image
+                  const img =
+                    item?.variants?.images?.find(i => i.isSelectedForMainScreen)
+                      ?.imageUrl || item?.variants?.images?.[0]?.imageUrl;
+
+                  setSelectedImage(img);
+
                   sheetRef3.current?.open();
                 }}>
                 {/* <Image
@@ -637,9 +733,10 @@ const BagScreen = () => {
         <View>
           <View
             style={{
-              marginTop: hp(10),
+              // marginTop: hp(10),
               marginHorizontal: wp(15),
               flexDirection: 'row',
+              marginVertical: hp(10),
               justifyContent: 'space-between',
               alignItems: 'center',
               // backgroundColor: '#34373b',
@@ -650,13 +747,23 @@ const BagScreen = () => {
                   cartId: cartData?.id || cartData?._id,
                   itemId: item?._id,
                 };
-                console.log(payloadData, 'payload=====>');
-                console.log(token, 'token=======>');
+                console.log('REMOVE PAYLOAD 👉', payloadData);
+
+                // loader start
+                setRemovingItemId(item?._id);
 
                 dispatch(removeCartRequest(payloadData, token));
-                ToastAndroid.show('Item removed from bag ', ToastAndroid.SHORT);
+
+                // ✅ refresh cart
+                // setTimeout(() => {
+
+                // }, 500);
               }}>
-              <DeleteIcoon />
+              {removingItemId === item?._id ? (
+                <ActivityIndicator size="small" color="#8225AF" />
+              ) : (
+                <DeleteIcoon />
+              )}
             </TouchableOpacity>
             <View
               style={{
@@ -733,7 +840,7 @@ const BagScreen = () => {
 
       <View style={{width: '100%', borderWidth: 1, borderColor: '#F2F2F2'}} />
 
-      <ScrollView contentContainerStyle={{paddingBottom: hp(20)}}>
+      <ScrollView contentContainerStyle={{paddingBottom: hp(120)}}>
         <Touchable
           style={{
             backgroundColor: '#F8FAFC',
@@ -999,7 +1106,7 @@ const BagScreen = () => {
                   fontFamily: fontFamily.poppins700,
                 }}>
                 {/* Rs. 120.00 */}
-                Rs.{cartData?.totalDiscount}
+                Rs.{cartData?.totalDiscount ?? '00'}
               </Text>
             </View>
 
@@ -1090,9 +1197,9 @@ const BagScreen = () => {
             </Text>
           </View>
         </View>
-        <View style={{marginHorizontal: wp(18), marginTop: hp(42)}}>
+        {/* <View style={{marginHorizontal: wp(18), marginTop: hp(42)}}>
           <GradientButton title={'Pay Now'} />
-        </View>
+        </View> */}
 
         {/* First Bottom Sheet - Address Selection */}
         <RBSheet
@@ -1136,12 +1243,16 @@ const BagScreen = () => {
               keyExtractor={(item, index) =>
                 item?.id ? item.id.toString() : index.toString()
               }
-              contentContainerStyle={{paddingBottom: hp(25)}}
+              contentContainerStyle={{
+                // paddingBottom: hp(25)
+                paddingBottom: hp(120),
+                flexGrow: 1,
+              }}
               renderItem={({item}) => (
                 <Touchable
                   style={{
                     backgroundColor: '#F8FAFC',
-                    height: hp(120),
+                    // height: hp(120),
                     marginHorizontal: wp(18),
                     borderRadius: 16,
                     marginTop: hp(20),
@@ -1154,19 +1265,20 @@ const BagScreen = () => {
                     <Text
                       style={{
                         color: '#8225AF',
-                        fontSize: fontSize(10),
+                        fontSize: fontSize(12),
                         lineHeight: hp(14),
                         fontFamily: fontFamily.poppins700,
                       }}>
                       {/* Home */}
                       {/* {item?.type || 'Home'} */}
-                      {item?.isDefaultAddress ? 'Home' : 'Office'}
+                      {item?.isDefaultAddress && 'Default'}
                     </Text>
 
                     <View
                       style={{
                         marginTop: hp(4),
                         flexDirection: 'row',
+                        alignItems: 'center', // ✅ IMPORTANT
                         // backgroundColor: '#1e5081',
                       }}>
                       <Text
@@ -1182,7 +1294,7 @@ const BagScreen = () => {
                       <View
                         style={{
                           width: 2,
-                          height: 24,
+                          height: 17,
                           backgroundColor: '#E6E6E6',
                           marginLeft: wp(10),
                           marginRight: hp(10),
@@ -1227,6 +1339,7 @@ const BagScreen = () => {
               title={'Add New Address'}
               onPress={() => {
                 sheetRef1.current?.close();
+                resetForm(); // ✅ clear after submit
                 setTimeout(() => {
                   sheetRef2.current?.open();
                 }, 300);
@@ -1257,9 +1370,9 @@ const BagScreen = () => {
                 textAlign: 'center',
                 marginTop: hp(25),
                 marginBottom: hp(25),
-                fontSize: fontSize(14),
+                fontSize: fontSize(16),
                 lineHeight: hp(18),
-                fontFamily: fontFamily.poppins400,
+                fontFamily: fontFamily.poppins500,
               }}>
               Add New Address
             </Text>
@@ -1427,7 +1540,10 @@ const BagScreen = () => {
               </View>
 
               <GradientButton
-                title={'Save Address'}
+                // title={'Save Address'}
+                title={loading ? 'Saving...' : 'Save Address'}
+                disabled={loading}
+                opacity={loading ? 0.7 : 1}
                 onPress={() => {
                   console.log('Save Address Clicked');
                   handleAddAddress();
@@ -1456,14 +1572,16 @@ const BagScreen = () => {
               height: hp(480),
             },
           }}>
-          <ScrollView
+          {/* <ScrollView
             style={{flex: 1, backgroundColor: colors.white}}
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}> */}
+          <View style={{flex: 1, backgroundColor: colors.white}}>
             <Text
               style={{
                 color: colors.black,
                 textAlign: 'center',
-                marginTop: hp(25),
+                // marginTop: hp(25),
+                marginTop: hp(20),
                 marginBottom: hp(15),
                 fontSize: fontSize(18),
                 marginRight: '75%',
@@ -1477,10 +1595,14 @@ const BagScreen = () => {
                 width: '100%',
                 height: 1,
                 backgroundColor: '#E3E3E3',
-                marginBottom: hp(25),
+                // marginBottom: hp(25),
+                marginBottom: hp(15),
               }}
             />
-
+            {/* {loading ? (
+              <ActivityIndicator size="large" color="#9333EA" />
+            ) : (
+              <> */}
             {/* Change Color Section */}
             <View style={{marginHorizontal: 18}}>
               <Text
@@ -1488,7 +1610,8 @@ const BagScreen = () => {
                   color: colors.black,
                   fontSize: fontSize(14),
                   fontFamily: fontFamily.poppins500,
-                  marginBottom: hp(20),
+                  // marginBottom: hp(20),
+                  marginBottom: hp(15),
                 }}>
                 Change Color
               </Text>
@@ -1496,7 +1619,10 @@ const BagScreen = () => {
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                style={{marginBottom: hp(30)}}
+                style={{
+                  // marginBottom: hp(30)
+                  marginBottom: hp(20),
+                }}
                 contentContainerStyle={{paddingRight: 20}}>
                 {colorOptions.map((color, index) => (
                   <Touchable
@@ -1504,45 +1630,23 @@ const BagScreen = () => {
                     key={`${color.id}-${index}`} // unique key
                     style={{
                       marginRight: wp(15),
-                      borderWidth: selectedColor === color.id ? 3 : 0,
+                      // borderWidth: selectedColor === color.id ? 3 : 0,
+                      // borderColor:
+                      //   selectedColor === color.id ? '#8225AF' : '#E0E0E0',
+                      borderWidth:
+                        selectedColor?.toLowerCase() === color.id?.toLowerCase()
+                          ? 3
+                          : 0,
+
                       borderColor:
-                        selectedColor === color.id ? '#8225AF' : '#E0E0E0',
+                        selectedColor?.toLowerCase() === color.id?.toLowerCase()
+                          ? '#8225AF'
+                          : '#E0E0E0',
                       borderRadius: 10,
                       // padding: 10,
                     }}
                     // onPress={() => setSelectedColor(color.id)}
-                    onPress={() => handleColorSelect(color.id)}
-                    //selected item variants code
-                    // onPress={() => {
-                    //   setSelectedColor(color.id);
-
-                    //   const variantIndex = [selectedItem?.variants]?.findIndex(
-                    //     v =>
-                    //       v?.variants?.some(
-                    //         x => x.key === 'color' && x.value === color.id,
-                    //       ),
-                    //   );
-
-                    //   console.log('SELECTED VARIANT INDEX:', variantIndex);
-                    // }}
-
-                    //after product variants code
-                    // onPress={() => {
-                    //   setSelectedColor(color.id);
-
-                    //   const selectedVariant = (variants || []).find(v =>
-                    //     v?.variants?.some(
-                    //       x => x.key === 'color' && x.value === color.id,
-                    //     ),
-                    //   );
-                    //   console.log('SELECTED VARIANT:', selectedVariant);
-                    //   const imageObj = selectedVariant?.images?.find(
-                    //     i => i.isSelectedForMainScreen === true,
-                    //   );
-                    //   console.log(imageObj, 'imageObj');
-                    //   setSelectedImage(imageObj?.imageUrl);
-                    // }}
-                  >
+                    onPress={() => handleColorSelect(color.id)}>
                     <Image
                       source={color.image}
                       style={{
@@ -1561,7 +1665,8 @@ const BagScreen = () => {
                   color: colors.black,
                   fontSize: fontSize(14),
                   fontFamily: fontFamily.poppins500,
-                  marginBottom: hp(20),
+                  // marginBottom: hp(20),
+                  marginBottom: hp(15),
                 }}>
                 Select Size
               </Text>
@@ -1570,47 +1675,64 @@ const BagScreen = () => {
                 style={{
                   flexDirection: 'row',
                   flexWrap: 'wrap',
-                  marginBottom: hp(35),
+                  // marginBottom: hp(35),
                 }}>
-                {availableSizes.map((size, index) => (
-                  <Touchable
-                    // key={size}
-                    key={`${size}-${index}`} // unique key
-                    style={{
-                      width: wp(48),
-                      height: wp(48),
-                      borderRadius: wp(32.5),
-                      borderWidth: 2,
-                      borderColor:
-                        selectedSize === size ? '#000000' : '#E0E0E0',
-                      backgroundColor:
-                        selectedSize === size ? '#F7E7FF' : colors.white,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginRight: wp(12),
-                      marginBottom: hp(15),
-                    }}
-                    onPress={() => setSelectedSize(size)}>
-                    <Text
-                      style={{
-                        fontSize: fontSize(16),
-                        fontFamily: fontFamily.poppins600,
-                        color:
-                          selectedSize === size
-                            ? colors.pureBlack
-                            : colors.pureBlack,
-                      }}>
-                      {size.toUpperCase()}
-                    </Text>
-                  </Touchable>
-                ))}
-                <View style={{marginTop: hp(29)}}>
+                {availableSizes.map(
+                  (size, index) => (
+                    console.log(availableSizes, 'AVAILABLE SIZES==>'),
+                    (
+                      <Touchable
+                        // key={size}
+                        key={`${size}-${index}`} // unique key
+                        style={{
+                          width: wp(48),
+                          height: wp(48),
+                          borderRadius: wp(32.5),
+                          borderWidth: 2,
+                          borderColor:
+                            selectedSize?.toLowerCase() === size?.toLowerCase()
+                              ? '#000000'
+                              : '#E0E0E0',
+
+                          backgroundColor:
+                            selectedSize?.toLowerCase() === size?.toLowerCase()
+                              ? '#F7E7FF'
+                              : colors.white,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginRight: wp(12),
+                          // marginBottom: hp(15),
+                          marginBottom: hp(20),
+                        }}
+                        onPress={() => setSelectedSize(size)}>
+                        <Text
+                          style={{
+                            fontSize: fontSize(16),
+                            fontFamily: fontFamily.poppins600,
+                            color:
+                              selectedSize === size
+                                ? colors.pureBlack
+                                : colors.pureBlack,
+                          }}>
+                          {size.toUpperCase()}
+                        </Text>
+                      </Touchable>
+                    )
+                  ),
+                )}
+                <View
+                  style={
+                    {
+                      // marginTop: hp(29)
+                    }
+                  }>
                   <Text
                     style={{
                       color: colors.black,
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins500,
-                      marginBottom: hp(20),
+                      // marginBottom: hp(20),
+                      marginBottom: hp(15),
                     }}>
                     Select Quantity
                   </Text>
@@ -1631,7 +1753,8 @@ const BagScreen = () => {
                           alignItems: 'center',
                           justifyContent: 'center',
                           marginRight: wp(12),
-                          marginBottom: hp(15),
+                          // marginBottom: hp(15),
+                          marginBottom: hp(25),
                         }}
                         onPress={() => setSelectedQuantity(qty)}>
                         <Text
@@ -1648,62 +1771,19 @@ const BagScreen = () => {
                 </View>
               </View>
 
-              {/* <GradientButton
-                title={'Update'}
-                onPress={() => {
-                  console.log('Selected Color:', selectedColor);
-                  console.log('Selected Size:', selectedSize);
-                  console.log('Selected Quantity:', selectedQuantity);
-                  sheetRef3.current?.close();
-                }}
-                buttonStyle={{marginBottom: hp(30)}}
-              /> */}
-
-              {/* <GradientButton
-                title={'Update'}
-                onPress={() => {
-                  const selectedVariant = variants.find(v => {
-                    const color = v.variants.find(
-                      i => i.key === 'color',
-                    )?.value;
-                    const size = v.variants.find(i => i.key === 'size')?.value;
-
-                    return color === selectedColor && size === selectedSize;
-                  });
-
-                  console.log('SELECTED VARIANT', selectedVariant);
-                  if (!selectedVariant) {
-                    console.log('Variant not found');
-                    return;
-                  }
-                  const data = {
-                    cartItemId: selectedItem?._id,
-                    variants: selectedVariant?.id,
-                    quantity: selectedQuantity,
-                  };
-
-                  dispatch(updateCartRequest(data, token));
-                  console.log(data, 'data=====>');
-                  console.log(token, 'token=======>');
-                  sheetRef3.current?.close();
-                  console.log('selectedColor', selectedColor);
-                  console.log('selectedSize', selectedSize);
-                  console.log('variants', variants);
-                }}
-                buttonStyle={{marginBottom: hp(30)}}
-              /> */}
-
               <GradientButton
-                title={'Update'}
+                title={loading ? 'Updating...' : 'Update'}
+                // loading={updating}
+                // disabled={loading}
                 onPress={() => {
-                  console.log(
-                    'FULL VARIANTS',
-                    JSON.stringify(variants, null, 2),
-                  );
+                  // console.log(
+                  //   'FULL VARIANTS',
+                  //   JSON.stringify(variants, null, 2),
+                  // );
 
                   console.log('selectedColor', selectedColor);
                   console.log('selectedSize', selectedSize);
-
+                  setUpdating(true);
                   const selectedVariant = variants.find(v => {
                     const color = v.variants.find(
                       i => i.key === 'color',
@@ -1733,14 +1813,31 @@ const BagScreen = () => {
 
                   dispatch(updateCartRequest(data, token));
 
-                  sheetRef3.current?.close();
+                  // sheetRef3.current?.close();
                 }}
-                buttonStyle={{marginBottom: hp(30)}}
-              />
+                buttonStyle={{marginBottom: hp(30)}}></GradientButton>
             </View>
-          </ScrollView>
+            {/* </ScrollView>
+             */}
+            {/* </>
+            )} */}
+          </View>
         </RBSheet>
       </ScrollView>
+      {/* ✅ FIXED BUTTON */}
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: '#fff',
+          padding: 15,
+          borderTopWidth: 1,
+          borderColor: '#eee',
+        }}>
+        <GradientButton title={'Pay Now'} />
+      </View>
     </SafeAreaView>
   );
 };

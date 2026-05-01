@@ -21,7 +21,7 @@ import check_icon from '../../assets/images/check_right_icon.png';
 import location_icon from '../../assets/images/location_address_icon.png';
 import LinearGradient from 'react-native-linear-gradient';
 import GradientButton from '../../components/gradientButton';
-import {RemoveIcon, EditIcon} from '../../assets';
+import {RemoveIcon, EditIcon, MapIcon} from '../../assets';
 import {FlatList} from 'react-native';
 import {KeyboardAvoidingView} from 'react-native';
 // IMPORT ACTION CREATORS (ensure these exist / match names)
@@ -36,19 +36,13 @@ const AddressScreen = () => {
   const navigation = useNavigation();
   const bottomSheetRef = useRef(null);
   const dispatch = useDispatch();
-
-  // --- Redux selectors (assumes you saved token & user in redux) ---
-  // const token = useSelector(state => state.auth?.token); // <- adjust if your key different
-  // const token = useSelector(state => state.auth?.token);
-  const token = useSelector(state => state.auth?.token);
-
-  console.log('TOKEN ===>', token);
-
-  // const userId = useSelector(state => state.auth?.user?.id);
-  const userId = useSelector(state => state.auth?.user?.id);
-
+  const userId = useSelector(state => state.user?.user?.id);
   console.log('USER ID ===>', userId);
 
+  useEffect(() => {
+    dispatch({type: 'FETCH_USER_REQUEST'});
+  }, []);
+  console.log('USER ID IN ADDRESS SCREEN:', userId);
   // Address list comes from redux address reducer
   const addresses = useSelector(state => state.addresses?.list) || [];
   const loading = useSelector(state => state.addresses?.loading);
@@ -73,7 +67,7 @@ const AddressScreen = () => {
   const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    dispatch(getAddressRequest(userId, token));
+    dispatch(getAddressRequest(userId));
   }, []);
 
   // open add sheet with blank form
@@ -90,19 +84,8 @@ const AddressScreen = () => {
     bottomSheetRef.current.open();
   };
   const openEditSheet = item => {
-    // Map API fields to your form fields
-    // setEditId(item._id || item.id); // API likely returns _id
-    // setEditId(item._id);
     setEditId(item.id);
 
-    // setForm({
-    //   name: item.name || '',
-    //   mobile: String(item.mobileNumber || item.mobile || ''),
-    //   pincode: String(item.pincode || ''),
-    //   address: item.addressLineOne || item.address || '',
-    //   locality: item.addressLineTwo || item.locality || '',
-    //   isDefault: !!item.isDefaultAddress || !!item.isDefault,
-    // });
     setForm({
       name: item.name,
       mobile: String(item.mobileNumber),
@@ -115,7 +98,11 @@ const AddressScreen = () => {
     bottomSheetRef.current?.open();
   };
   const saveAddress = () => {
-    if (!userId || !token) return;
+    if (!userId) {
+      console.log('User ID is missing. Cannot save address.');
+      return;
+    }
+    console.log('USER ID IN SAVE ADDRESS:', userId);
 
     const payload = {
       userId,
@@ -134,7 +121,7 @@ const AddressScreen = () => {
         updateAddressRequest(
           editId, // correct address ID
           payload, // full body data
-          token, // correct token from redux
+          // token, // correct token from redux
           userId,
         ),
       );
@@ -142,7 +129,7 @@ const AddressScreen = () => {
       console.log('Updating address with ID:', editId);
     } else {
       // ADD
-      dispatch(addAddressRequest(payload, token));
+      dispatch(addAddressRequest(payload));
     }
 
     bottomSheetRef.current?.close();
@@ -155,18 +142,10 @@ const AddressScreen = () => {
     setShowConfirm(true);
   };
 
-  // const handleDelete = () => {
-  //   console.log('DELETE ID INSIDE HANDLE DELETE:', deleteId);
-  //   if (!deleteId || !token || !userId) return;
-  //   dispatch(deleteAddressRequest(deleteId, token, userId));
-  //   console.log('DELETE ID BEFORE DISPATCH:', deleteId);
-  //   setShowConfirm(false);
-  //   setDeleteId(null);
-  // };
   const handleDelete = id => {
     console.log('DELETE ID INSIDE HANDLE DELETE:', id);
-    if (!id || !token || !userId) return;
-    dispatch(deleteAddressRequest(id, token, userId));
+    if (!id || !userId) return;
+    dispatch(deleteAddressRequest(id, userId));
     setShowConfirm(false);
   };
 
@@ -177,7 +156,7 @@ const AddressScreen = () => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Image source={back_icon} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Addresses</Text>
+        <Text style={styles.headerTitle}>My Addresses</Text>
         <View style={{width: wp(25)}} />
       </View>
 
@@ -198,16 +177,33 @@ const AddressScreen = () => {
           showsVerticalScrollIndicator={false}
           scrollEnabled={false}
           ListEmptyComponent={
-            <Text
+            <View
               style={{
-                textAlign: 'center',
-                marginTop: 20,
-                color: '#000',
-                fontFamily: fontFamily.poppins400,
-                fontSize: fontSize(16),
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}>
-              No Address Found
-            </Text>
+              <MapIcon />
+
+              <View style={{marginTop: hp(26)}}>
+                <Text
+                  style={{
+                    color: '#000',
+                    fontFamily: fontFamily.poppins600,
+                    fontSize: fontSize(18),
+                  }}>
+                  No Address Found
+                </Text>
+              </View>
+              <Text
+                style={{
+                  color: '#909090',
+                  fontFamily: fontFamily.poppins400,
+                  fontSize: fontSize(12),
+                }}>
+                Please provide an address for delivery
+              </Text>
+            </View>
           }
           renderItem={({item}) => {
             if (!item) return null; // ✅ IMPORTANT
@@ -217,59 +213,29 @@ const AddressScreen = () => {
             }`;
             const isDefault = item.isDefaultAddress;
 
-            // const addressText = `${item.addressLineOne}, ${item.addressLineTwo}`;
-            // const isDefault = item.isDefaultAddress;
             console.log('ITEM:', item); // <-- ADD THIS HERE
             return (
               <View style={styles.card}>
                 <View
                   style={{
                     // width: '100%',
-                    height: hp(244),
+                    // height: hp(244),
+                    // height: isDefault ? hp(225) : hp(auto), // 🔥 dynamic height
                     borderWidth: 1,
                     borderColor: '#E8E8E8',
                     borderRadius: 14,
                     paddingHorizontal: wp(18),
-                    marginTop: hp(28),
+                    // marginTop: hp(28),
+                    marginTop: hp(7),
                     marginHorizontal: wp(24), // 👈 ADD THIS
                   }}>
                   <View style={styles.defaultRow}>
-                    {/* <View
-                        style={{
-                          marginTop: hp(25),
-
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                        }}>
-                        <LinearGradient
-                          colors={['#8B5CF6', '#A855F7']}
-                          start={{x: 0, y: 0}}
-                          end={{x: 1, y: 0}}
-                          style={{
-                            width: wp(81),
-                            height: hp(23),
-                            borderRadius: 20,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                          }}>
-                          <Text style={styles.defaultText}>Default</Text>
-                        </LinearGradient>
-
-                        <Text
-                          style={{
-                            color: '#9CA3AF',
-                            fontSize: fontSize(12),
-                            fontFamily: fontFamily.poppins500,
-                            marginLeft: wp(10),
-                          }}>
-                          Home
-                        </Text>
-                      </View> */}
-
                     <View
                       style={{
-                        marginTop: hp(25),
+                        // marginTop: hp(25),
+                        marginTop: isDefault ? hp(25) : 0,
+
+                        marginBottom: isDefault ? hp(16) : hp(22),
                         flexDirection: 'row',
                         alignItems: 'center',
                         justifyContent: 'space-between',
@@ -280,16 +246,20 @@ const AddressScreen = () => {
                           start={{x: 0, y: 0}}
                           end={{x: 1, y: 0}}
                           style={{
-                            width: wp(81),
+                            // width: wp(81),
+                            // height: hp(23),
+                            width: wp(71.78),
                             height: hp(23),
                             borderRadius: 20,
                             justifyContent: 'center',
                             alignItems: 'center',
                           }}>
-                          <Text style={styles.defaultText}>Default</Text>
+                          <Text style={styles.defaultText}>
+                            {'Default'.toLocaleUpperCase()}
+                          </Text>
                         </LinearGradient>
                       )}
-                      <Text
+                      {/* <Text
                         style={{
                           color: '#9CA3AF',
                           fontSize: fontSize(12),
@@ -298,7 +268,7 @@ const AddressScreen = () => {
                           left: wp(271),
                         }}>
                         {item.type || 'Office'}
-                      </Text>
+                      </Text> */}
                     </View>
                   </View>
 
@@ -318,9 +288,9 @@ const AddressScreen = () => {
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
-                      marginTop: hp(31),
-                      marginLeft: wp(177),
-                      right: wp(20),
+                      marginTop: isDefault ? hp(23) : hp(23),
+                      marginBottom: isDefault ? hp(16) : hp(23),
+                      justifyContent: 'flex-end', // 🔥 RIGHT ALIGN
                     }}>
                     {/* // {styles.actions} */}
 
@@ -330,8 +300,8 @@ const AddressScreen = () => {
                         flexDirection: 'row',
                         alignItems: 'center',
                         paddingRight: wp(16),
-                        borderRightWidth: 1,
-                        borderRightColor: '#E5E5E5',
+                        // borderRightWidth: 1,
+                        // borderRightColor: '#E5E5E5',
                       }}
                       onPress={() => openEditSheet(item)}>
                       {/* <Image source={edit_address_icon} style={styles.icon} /> */}
@@ -341,11 +311,19 @@ const AddressScreen = () => {
                           color: '#6366F1',
                           fontSize: fontSize(14),
                           fontFamily: fontFamily.poppins500,
+                          marginLeft: wp(4),
                         }}>
                         Edit
                       </Text>
                     </TouchableOpacity>
-
+                    <View
+                      style={{
+                        height: hp(16),
+                        justifyContent: 'center',
+                        borderRightWidth: 1,
+                        borderRightColor: '#E5E7EB',
+                      }}
+                    />
                     <TouchableOpacity
                       style={{
                         flexDirection: 'row',
@@ -424,6 +402,7 @@ const AddressScreen = () => {
               <TextInput
                 style={styles.input}
                 placeholder="Mobile Number"
+                maxLength={10}
                 keyboardType="phone-pad"
                 value={form.mobile}
                 onChangeText={val => setForm({...form, mobile: val})}
@@ -437,6 +416,7 @@ const AddressScreen = () => {
 
               <TextInput
                 style={styles.input}
+                maxLength={6}
                 placeholder="Pincode"
                 value={form.pincode}
                 onChangeText={val => setForm({...form, pincode: val})}
@@ -475,7 +455,12 @@ const AddressScreen = () => {
               </TouchableOpacity>
 
               <View style={{marginBottom: 10}}>
-                <GradientButton title="Save Address" onPress={saveAddress} />
+                <GradientButton
+                  // title="Save Address"
+                  title={loading ? 'Saving...' : 'Save Address'}
+                  onPress={saveAddress}
+                  disabled={loading}
+                />
               </View>
             </View>
           </ScrollView>
@@ -548,18 +533,20 @@ const styles = StyleSheet.create({
     marginLeft: 30,
   },
   scrollContainer: {
+    flexGrow: 1,
     // padding: wp(5)
   },
   card: {
     backgroundColor: '#fff',
-    marginBottom: wp(15),
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    // marginBottom: wp(15),
+    marginBottom: hp(10),
+    // borderBottomWidth: 1,
+    // borderBottomColor: '#7a3b3b',s
   },
   defaultRow: {
     // flexDirection: 'row',
     // alignItems: 'center',
-    marginBottom: wp(10),
+    // marginBottom: wp(10),
   },
   checkIcon: {
     width: wp(18),
@@ -574,7 +561,11 @@ const styles = StyleSheet.create({
     borderRadius: wp(13),
     marginTop: hp(5),
   },
-  defaultText: {color: '#fff', fontSize: 12},
+  defaultText: {
+    color: '#FFFFFF',
+    fontSize: fontSize(10),
+    fontFamily: fontFamily.poppins700,
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -585,7 +576,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.poppins700,
     color: '#000000',
 
-    marginTop: 2,
+    // marginTop: 2,
   },
   type: {
     fontSize: 12,
@@ -593,7 +584,7 @@ const styles = StyleSheet.create({
     color: '#B0B0B0',
   },
   address: {
-    fontSize: fontSize(16),
+    fontSize: fontSize(14),
     fontFamily: fontFamily.poppins400,
     color: '#000000',
     marginTop: 2,

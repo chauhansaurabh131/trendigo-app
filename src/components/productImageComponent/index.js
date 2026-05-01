@@ -15,55 +15,58 @@ import {useNavigation} from '@react-navigation/native';
 const {width} = Dimensions.get('window');
 
 // const ProductImageComponent = ({product}) => {
-const ProductImageComponent = ({product, setSelectedColor}) => {
+const ProductImageComponent = ({
+  product,
+  setSelectedColor,
+  setSelectedVariant,
+}) => {
   const navigation = useNavigation();
-
-  // const groupOneImages = [
-  //   images.productImageTwo,
-  //   images.productImageOne,
-  //   images.productImageThree,
-  //   images.productImageFour,
-  // ];
-
-  // const groupTwoImages = [
-  //   images.productImageFive,
-  //   images.productImageSix,
-  //   images.productImageSeven,
-  //   images.productImageFive,
-  // ];
 
   const variants = product?.variants || [];
 
+  // console.log(variants, 'variants');
+
   // main screen images (default group)
-  const variantImages = variants.map(v =>
+  // const variantImages = variants.map(v =>
+  //   (v.images || [])
+  //     .filter(img => img.imageUrl)
+  //     .map(img => ({uri: img.imageUrl})),
+  // );
+  // console.log(variantImages, 'variatns images');
+
+  const fullVariantImages = variants.map(v =>
     (v.images || [])
       .filter(img => img.imageUrl)
       .map(img => ({uri: img.imageUrl})),
   );
 
+  console.log(fullVariantImages, 'FULLVAIRANTS======>');
+  const thumbnailImages = variants.map(v => {
+    const images = v.images || [];
+
+    const mainImage = images.find(img => img.isSelectedForMainScreen);
+    const finalImage = mainImage || images[0];
+
+    return finalImage ? {uri: finalImage.imageUrl} : null;
+  });
+  console.log(thumbnailImages, 'thumbnailImages====>');
   const [selectedGroupKey, setSelectedGroupKey] = useState('groupOne');
   // const [selectedGroup, setSelectedGroup] = useState(groupOneImages);
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef(null);
   // const [selectedGroup, setSelectedGroup] = useState(mainImages);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
-  const [selectedGroup, setSelectedGroup] = useState(variantImages[0] || []);
-  // const [selectedColor, setSelectedColor] = useState(null);
-  // const handleGroupChange = index => {
-  //   console.log('THUMBNAIL CLICKED INDEX:', index);
-  //   console.log('SELECTED VARIANT IMAGES:', variantImages[index]);
+  // const [selectedGroup, setSelectedGroup] = useState(variantImages[0] || []);
+  const [selectedGroup, setSelectedGroup] = useState(
+    fullVariantImages[0] || [],
+  );
 
-  //   setSelectedVariantIndex(index);
-  //   setSelectedGroup(variantImages[index]);
-  //   setActiveIndex(0);
-  //   flatListRef.current?.scrollToIndex({index: 0, animated: false});
-  // };
   const handleGroupChange = index => {
     console.log('THUMBNAIL CLICKED INDEX:', index);
-    console.log('SELECTED VARIANT IMAGES:', variantImages[index]);
+    console.log('SELECTED VARIANT IMAGES:', thumbnailImages[index]);
 
     const variant = product?.variants[index];
-
+    setSelectedVariant && setSelectedVariant(variant);
     const colorObj = variant?.variants?.find(v => v.key === 'color');
 
     if (colorObj && setSelectedColor) {
@@ -72,7 +75,8 @@ const ProductImageComponent = ({product, setSelectedColor}) => {
     }
 
     setSelectedVariantIndex(index);
-    setSelectedGroup(variantImages[index]);
+    // setSelectedGroup(variantImages[index]);
+    setSelectedGroup(fullVariantImages[index]);
     setActiveIndex(0);
 
     flatListRef.current?.scrollToIndex({index: 0, animated: false});
@@ -131,47 +135,9 @@ const ProductImageComponent = ({product, setSelectedColor}) => {
       </View>
 
       {/* Thumbnails */}
-      {/* <View style={styles.thumbnailsRow}>
-        <TouchableOpacity
-          // onPress={() => handleGroupChange(groupOneImages, 'groupOne')}
-          style={{marginRight: hp(20)}}>
-          <Image
-            // source={groupOneImages[0]}
-            source={{uri: selectedGroup[0]?.uri}}
-            style={[
-              styles.thumbnail,
-              {
-                borderWidth: selectedGroupKey === 'groupOne' ? 2 : 0,
-                borderColor:
-                  selectedGroupKey === 'groupOne' ? '#8225AF' : 'transparent',
-              },
-            ]}
-          />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-        // onPress={() => handleGroupChange(groupTwoImages, 'groupTwo')}
-        >
-          <Image
-            // source={groupTwoImages[0]}
-            style={[
-              styles.thumbnail,
-              {
-                borderWidth: selectedGroupKey === 'groupTwo' ? 2 : 0,
-                borderColor:
-                  selectedGroupKey === 'groupTwo' ? '#8225AF' : 'transparent',
-              },
-            ]}
-          />
-        </TouchableOpacity>
-      </View> */}
-
-      {/* Thumbnails */}
       <View style={styles.thumbnailsRow}>
-        {variantImages.map((imgs, index) => {
-          const thumbUri = imgs?.[0]?.uri;
-
-          if (!thumbUri) return null;
+        {thumbnailImages.map((img, index) => {
+          if (!img?.uri) return null;
 
           return (
             <TouchableOpacity
@@ -179,7 +145,7 @@ const ProductImageComponent = ({product, setSelectedColor}) => {
               onPress={() => handleGroupChange(index)}
               style={{marginRight: hp(20)}}>
               <Image
-                source={{uri: thumbUri}}
+                source={{uri: img.uri}}
                 style={[
                   styles.thumbnail,
                   {

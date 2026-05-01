@@ -1,4 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
+
 import {
   SafeAreaView,
   Text,
@@ -38,12 +39,20 @@ import ReviewRatingComponent from '../../components/reviewRatingComponent';
 import Svg, {Path} from 'react-native-svg';
 import star_icon from '../../assets/images/star_image_icon.png';
 import {useDispatch} from 'react-redux';
-import {wishlistRequest} from '../../redux/actions/wishlistActions';
+import {
+  getWishlistRequest,
+  removeWishlistRequest,
+  wishlistRequest,
+} from '../../redux/actions/wishlistActions';
 import {productDetailsRequest} from '../../redux/actions/productDetailsAction';
 import {getUserReviewsRequest} from '../../redux/actions/reviewActions';
 import {getStoreRequest} from '../../redux/actions/storeActions';
 import {ToastAndroid} from 'react-native';
 import {addRecentlyViewedRequest} from '../../redux/actions/recentlyViewedActions';
+import {
+  GET_CART_FAILURE,
+  GET_CART_REQUEST,
+} from '../../redux/actions/cartActions';
 export const CustomStarIcon = ({
   width = 24,
   height = 24,
@@ -65,23 +74,37 @@ export const CustomStarIcon = ({
 
 const ProductDetailsScreen = () => {
   const {width} = useWindowDimensions();
-
   const route = useRoute();
+
+  const dispatch = useDispatch();
+  const token = useSelector(state => state.auth.token);
+  console.log('Auth Token in ProductDetailsScreen:', token);
   // const ratingsRef = useRef(null);
+
   const scrollRef = useRef(null); // Ref for ScrollView
   const reviewsRef = useRef(null); // Ref for Reviews section
   // ✅ FIRST define product
-  const {loading, cartData, error} = useSelector(state => state.addToCard);
+
+  const [showAdded, setShowAdded] = useState(false);
+  const {loading, cartData, error, success} = useSelector(
+    state => state.addToCard,
+  );
   const cartCount = cartData?.productDetailList?.length || 0;
   console.log('CART COUNT =>', cartCount);
+  useEffect(() => {
+    if (token) {
+      console.log('🔥 CALLING CART API FROM PRODUCT DETAILS');
+
+      dispatch({
+        type: GET_CART_REQUEST,
+        token: token,
+      });
+    }
+  }, [token]);
+  // REVIEW
   const userReviews = useSelector(state => state.review.userReviews);
   console.log('USER REVIEWS FROM REDUX 👉', userReviews);
-  // const reviews = useSelector(
-  //   state => state.product.productDetails?.reviews || [],
-  // );
-
   const reviewData = useSelector(state => state.review.userReviews);
-
   const reviews = reviewData?.reviews || [];
   const averageRating = reviewData?.averageRating || 0;
   const totalReviews = reviewData?.totalReviews || 0;
@@ -92,75 +115,60 @@ const ProductDetailsScreen = () => {
     console.log(' REVIEWS COUNT:', reviews.length);
   }, [reviewData]);
 
+  // USERID
   const user = useSelector(state => state.auth.user);
   const userId = user?.id || user?._id;
+
+  // PRODUCT
   const product = route.params?.product;
-
-  console.log('FULL PRODUCT 👉', product);
-  console.log('PRODUCT ID 👉', product?.id);
-  console.log('PRODUCT _ID 👉', product?._id);
-
+  // console.log('FULL PRODUCT ', product);
+  // console.log('PRODUCT ID ', product?.id);
+  // console.log('PRODUCT _ID ', product?._id);
   const productId = product?.id || product?._id;
-  console.log('FINAL PRODUCT ID 👉', productId);
+  console.log('FINAL PRODUCT ID ', productId);
   // ✅ safety check
   if (!product) {
     console.log('❌ Product not received from navigation');
     return null;
   }
+  // useEffect(() => {
+  //   console.log(' FULL PRODUCT:', product);
+  //   console.log(' RESULTS:', product?.results);
+  //   console.log(' REVIEWS:', product?.results?.reviews);
+  //   console.log(' REVIEWS COUNT:', product?.results?.reviews?.length);
+  // }, [product]);
 
+  // GET USER REVIEWS
   useEffect(() => {
     if (productId) {
       console.log('FETCHING REVIEWS FOR PRODUCT ---------', productId);
       dispatch(getUserReviewsRequest(productId));
     }
   }, [productId]);
-  useEffect(() => {
-    console.log(' FULL PRODUCT:', product);
-    console.log(' RESULTS:', product?.results);
-    console.log(' REVIEWS:', product?.results?.reviews);
-    console.log(' REVIEWS COUNT:', product?.results?.reviews?.length);
-  }, [product]);
 
+  // GET STORE DATA OF PRODUCT
   const {storeData} = useSelector(state => state.sellerStore);
   const seller = storeData;
   const storeId = product?.storeId;
+  console.log('STORE ID =>', storeId);
   useEffect(() => {
     console.log('UPDATED STORE DATA =>', storeData);
   }, [storeData]);
+
   useEffect(() => {
     console.log(storeId, 'storeid......');
     console.log('Fetching store for ID:', storeId);
     dispatch(getStoreRequest(storeId));
   }, [storeId]);
-  useEffect(() => {
-    console.log('PRODUCT NAME ', product?.title);
-    console.log('STORE ID ', product?.storeId);
-    console.log('CURRENT PRODUCT STORE ID ', storeId);
-    console.log('Store seller name ', storeData?.name);
-    console.log('Product Store Object:', product?.storeId);
-    console.log('Store ID Used For API:', storeId);
-    console.log('StoreData From Redux:', storeData);
-    console.log(product?.productDetails ?? 'Product Details Descriptionsssss');
-    {
-      /* {product?.productDetails ?? ''} */
-    }
-  }, [product]);
+
   //shop image
-  // const shopImage = storeData?.shopImage;
   const shopImage = storeData?.profileImage;
-  useEffect(() => {
-    if (productId) {
-      dispatch(addRecentlyViewedRequest(productId));
-      console.log('ADD REVENTLY VIEW PRODUCT ID====>', productId);
-    }
-  }, [productId]);
+
   const scrollToReviews = () => {
     reviewsRef.current?.measureLayout(scrollRef.current, (x, y) => {
       scrollRef.current.scrollTo({y: y, animated: true});
     });
   };
-  // const {product} = route.params;
-
   // const [selectedSize, setSelectedSize] = useState('S'); // Default selection
   const [pincode, setPincode] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
@@ -168,25 +176,34 @@ const ProductDetailsScreen = () => {
   const navigation = useNavigation();
   const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
-  // const [selectedSize, setSelectedSize] = useState(sizes[0]); // default first size
-  // const [selectedVariant, setSelectedVariant] = useState(
-  //   product?.variants?.[0],
-  // );
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [justAdded, setJustAdded] = useState([]);
   const sellerId = product?.storeId?.id;
   const [ratingValue, setRatingValue] = useState(0);
   const [reviewText, setReviewText] = useState('');
-  const wishlistState = useSelector(state => state.wishlist);
+  // wishlist state
 
-  // 🔹 Safety check – wishlistData always array
-  // beacuse filter/map always work on array
-  const wishlistData = Array.isArray(wishlistState?.wishlistData)
-    ? wishlistState.wishlistData
-    : [];
-  const [justAdded, setJustAdded] = useState([]);
+  const [localWishlist, setLocalWishlist] = useState([]);
+  const {wishlistData} = useSelector(state => state.wishlist);
+  useEffect(() => {
+    if (Array.isArray(wishlistData)) {
+      setLocalWishlist(wishlistData);
+    }
+  }, [wishlistData]);
 
+  const isInWishlist = productId => {
+    return localWishlist.some(
+      w => (w.productId?.id || w.productId?._id) === productId,
+    );
+  };
+
+  const getWishlistItem = productId =>
+    localWishlist.find(
+      w => (w.productId?.id || w.productId?._id) === productId,
+    );
+  // PINCODE
   const handlePincodeChange = text => {
     // Allow only digits and limit input to 6 characters
     if (/^\d{0,6}$/.test(text)) {
@@ -194,37 +211,13 @@ const ProductDetailsScreen = () => {
     }
   };
 
-  console.log('PRODUCT..........:', product);
-  const dispatch = useDispatch();
-  const token = useSelector(state => state.auth.token);
-  console.log('TOKEN:', token);
-  console.log(token, 'token product details');
-  // const product = route.params?.product;
+  // Address List ID add in the Add to card
 
-  if (!product) {
-    console.log('product not available yet');
-    return null;
-  }
+  const addressList = useSelector(state => state.addresses?.list || []);
+  const deliveryAddressId = addressList[0]?.id;
 
-  console.log('product available.....:', product);
-  console.log('Product Code:', product.productCode);
-  console.log('product Storeid name', product.storeId.name);
-  // console.log('SPECIFICATIONS FROM API:', product?.specifications);
-  // console.log('product Title', product.title),
-  //   console.log('product description', product.description);
-  // console.log('product Details...', product.productDetails);
-
-  // const handleAddToCart = () => {
-  //   if (token) {
-  //     navigation.navigate('MainTabs', {
-  //       screen: 'BagStack',
-  //     });
-  //   } else {
-  //     navigation.navigate('StartingScreen', {
-  //       redirectTo: 'BagStack',
-  //     });
-  //   }
-  // };
+  console.log('ADDRESS LIST ', addressList);
+  console.log('DELIVERY ID ', deliveryAddressId);
   // Add to Card Function
   const handleAddToCart = () => {
     if (!token) {
@@ -234,10 +227,10 @@ const ProductDetailsScreen = () => {
       return;
     }
 
-    if (!selectedVariant) {
-      alert('Please select size and color');
-      return;
-    }
+    // if (!selectedVariant) {
+    //   alert('Please select size and color');
+    //   return;
+    // }
 
     const payload = {
       productDetailList: [
@@ -251,76 +244,24 @@ const ProductDetailsScreen = () => {
     };
 
     console.log('ADD TO CART PAYLOAD ', payload);
+    console.log('Selected Variants ID', selectedVariant);
 
     dispatch({
       type: 'ADD_TO_CART_REQUEST',
       payload: payload,
       token: token,
     });
-    ToastAndroid.show('Product added to cart', ToastAndroid.SHORT);
+
+    // ✅ UI CONTROL HERE (BEST)
+    setShowAdded(true);
+
+    setTimeout(() => {
+      setShowAdded(false);
+    }, 2000);
+    // ToastAndroid.show('Add to Bag', ToastAndroid.SHORT);
   };
-  // console.log('PRODUCT12345:', route.params.product);
-  //html covert to the stings
 
-  // const htmlString = '&lt;p>women t shirt&lt;/p&gt;';
-
-  // // Convert HTML entities
-  // const normalString = htmlString
-  //   .replace(/&lt;/g, '<')
-  //   .replace(/&gt;/g, '>')
-  //   .replace(/&amp;/g, '&');
-
-  // // Remove HTML tags
-  // const plainText = normalString.replace(/<[^>]+>/g, '');
-
-  // // console.log(plainText); // "women t shirt"
-  // // decode html code convert to the strings
-  // const decodeHtml = html =>
-  //   html?.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-  // const getBulletPoints = html => {
-  //   if (!html) return [];
-
-  //   const decoded = decodeHtml(html);
-
-  //   return (
-  //     decoded
-  //       .match(/<li>(.*?)<\/li>/g)
-  //       ?.map(item => item.replace(/<[^>]+>/g, '').trim()) || []
-  //   );
-  // };
-
-  //  find out the variants
-
-  // const findVariant = (product, color, size) => {
-  //   console.log('--- FIND VARIANT CALLED ---');
-  //   console.log('Selected Color:', color);
-  //   console.log('Selected Size:', size);
-
-  //   if (!product || !color || !size) {
-  //     console.log('❌ Missing product / color / size');
-  //     return null;
-  //   }
-
-  //   const result = product.variants.find((v, index) => {
-  //     console.log(`Checking variant ${index}:`, v.variants);
-
-  //     const hasColor = v.variants.some(
-  //       x => x.key === 'color' && x.value.toLowerCase() === color.toLowerCase(),
-  //     );
-
-  //     const hasSize = v.variants.some(
-  //       x => x.key === 'size' && x.value.toLowerCase() === size.toLowerCase(),
-  //     );
-
-  //     console.log('  color match:', hasColor);
-  //     console.log('  size match:', hasSize);
-
-  //     return hasColor && hasSize;
-  //   });
-
-  //   console.log('✅ MATCHED VARIANT:', result);
-  //   return result || null;
-  // };
+  // Product Varitans
   const findVariant = (product, color, size) => {
     if (!product?.variants) return null;
     console.log('ALL PRODUCT VARIANTS:', product.variants);
@@ -389,9 +330,48 @@ const ProductDetailsScreen = () => {
   }, [selectedVariant]);
 
   useEffect(() => {
+    console.log('PRODUCT 👉', product);
+    console.log('VARIANT 👉', selectedVariant);
+    console.log('IMAGES 👉', selectedVariant?.images);
+  }, [selectedVariant]);
+
+  // only variants size show
+  const getAvailableSizes = (product, selectedColor) => {
+    if (!product?.variants) return [];
+
+    const sizes = product.variants
+      .filter(v =>
+        v.variants.some(
+          x =>
+            x.key === 'color' &&
+            x.value?.toLowerCase() === selectedColor?.toLowerCase(),
+        ),
+      )
+      .map(v => v.variants.find(x => x.key === 'size')?.value);
+
+    return [...new Set(sizes)];
+  };
+
+  const availableSizes = getAvailableSizes(product, selectedColor);
+  useEffect(() => {
     if (productId) {
       console.log('DISPATCHING PRODUCT DETAILS 👉', productId);
       dispatch(productDetailsRequest(productId));
+    }
+  }, [productId]);
+
+  // Get Wishlist
+  useEffect(() => {
+    dispatch(getWishlistRequest()); //  ADD THIS
+    console.log('Fetching  Get wishlist data for user ...');
+  }, []);
+
+  // Add Recently View
+  useEffect(() => {
+    if (productId) {
+      // dispatch(addRecentlyViewedRequest(productId));
+      dispatch(addRecentlyViewedRequest({productId}));
+      console.log('ADD REVENTLY VIEW PRODUCT ID====>', productId);
     }
   }, [productId]);
   const onWishlistPress = product => {
@@ -402,25 +382,37 @@ const ProductDetailsScreen = () => {
 
     const productId = product.id || product._id;
 
-    // If product already in redux wishlist → do nothing (no alert)
-    if (
-      wishlistData.some(
-        w => (w.productId?.id || w.productId?._id) === productId,
-      )
-    ) {
-      return;
+    const alreadyExists = isInWishlist(productId);
+
+    if (alreadyExists) {
+      // 🔍 find item
+      const wishlistItem = getWishlistItem(productId);
+
+      if (!wishlistItem?.id) {
+        ToastAndroid.show('Remove failed', ToastAndroid.SHORT);
+        return;
+      }
+
+      // ✅ UI instant remove
+      setLocalWishlist(prev =>
+        prev.filter(w => (w.productId?.id || w.productId?._id) !== productId),
+      );
+
+      // 🚀 API
+      dispatch(removeWishlistRequest(wishlistItem.id));
+
+      ToastAndroid.show('Removed from Wishlist', ToastAndroid.SHORT);
+    } else {
+      // ✅ UI instant add
+      setLocalWishlist(prev => [...prev, {productId: {id: productId}}]);
+
+      // 🚀 API
+      dispatch(wishlistRequest(productId));
+
+      ToastAndroid.show('Saved to Wishlist', ToastAndroid.SHORT);
     }
-
-    // First time click → alert
-    // alert('Product saved in wishlist');
-    ToastAndroid.show('Product saved in your wishlist', ToastAndroid.SHORT);
-    // Mark product as just added (for gradient icon)
-    setJustAdded(prev => [...prev, productId]);
-
-    // Dispatch redux action to add wishlist
-    dispatch(wishlistRequest(productId));
-    console.log(' Product ID sending:', productId);
   };
+
   //Helper Function (Initials name show)
   const getInitials = name => {
     if (!name || typeof name !== 'string') return 'NN';
@@ -435,11 +427,15 @@ const ProductDetailsScreen = () => {
     // Multiple words (e.g., "Riya Shah")
     return words[0][0].toUpperCase() + words[words.length - 1][0].toUpperCase();
   };
+
+  // Get All Reviews of user
   const ReviewItem = ({item}) => {
-    console.log('REVIEW IMAGES 👉', item.productImages);
-    console.log('FULL ITEM 👉', item);
-    console.log('USER DATA 👉', item.user);
-    console.log('Review item:', item);
+    useEffect(() => {
+      console.log('REVIEW IMAGES ', item.productImages);
+      console.log('FULL ITEM ', item);
+      console.log('USER DATA ', item.user);
+      console.log('Review item:', item);
+    }, [item]);
     return (
       <View style={{marginTop: hp(24)}}>
         {/* Review Title */}
@@ -596,6 +592,7 @@ const ProductDetailsScreen = () => {
     );
   };
 
+  // Html code
   const htmlContent = product?.productDetails
     ?.replace(/&lt;/g, '<')
     ?.replace(/&gt;/g, '>')
@@ -604,19 +601,9 @@ const ProductDetailsScreen = () => {
     ?.replace(/<\/p>\s*<\/li>/g, '</li>')
     ?.replace(/<p><\/p>/g, '')
     ?.replace(/<\/ul>\s*<ul>/g, ''); // 🔥 gap fix// remove empty p
-  const addressList = useSelector(state => state.addresses?.list || []);
-  const deliveryAddressId = addressList[0]?.id;
 
-  console.log('ADDRESS LIST ', addressList);
-  console.log('DELIVERY ID ', deliveryAddressId);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      {/*<Text>{product.title}</Text>*/}
-      {/*<Image source={product.image} style={{width: 200, height: 200}} />*/}
-      {/*<Text>Price: Rs. {product.price}</Text>*/}
-      {/*<Text>MRP: Rs. {product.mrp}</Text>*/}
-      {/*<Text>Discount: {product.discount}</Text>*/}
-
       <View
         style={{
           marginHorizontal: 17,
@@ -650,16 +637,6 @@ const ProductDetailsScreen = () => {
             <SearchFilterIcon />
           </Touchable>
 
-          {/* <Touchable
-            style={{
-              marginLeft: 10,
-              width: 50,
-              height: 50,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <BagIcon width={20} height={20} />
-          </Touchable> */}
           <View>
             <Touchable
               style={{
@@ -734,7 +711,9 @@ const ProductDetailsScreen = () => {
             buttonStyle={{width: wp(285), height: hp(50)}}
           /> */}
           <GradientButton
-            title="Add to Cart"
+            // title="Add to Cart"
+            title={showAdded ? 'Added to Cart' : 'Add to Cart'}
+            // loading={loading}
             onPress={handleAddToCart}
             buttonStyle={{width: wp(285), height: hp(50)}}
           />
@@ -746,35 +725,6 @@ const ProductDetailsScreen = () => {
               style={{width: '100%', height: '100%'}}
             />
 
-            {/* Touchable Like Icon */}
-            {/* <TouchableOpacity
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: [
-                  {translateX: -wp(23) / 2},
-                  {translateY: -hp(20) / 2},
-                ],
-              }}
-              // onPress={() => dispatch(wishlistRequest(product._id))}>
-              // <Image
-              //   source={images.emptyLikeImage}
-              //   style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
-              // />
-              onPress={() => onPress(() => onWishlistPress(product))}>
-              {wishlistData.some(
-                w =>
-                  (w.productId?.id || w.productId?._id) ===
-                  (item.id || item._id),
-              ) || justAdded.includes(item.id || item._id) ? (
-                // Filled / gradient heart
-                <GradientFullFillLike />
-              ) : (
-                // Empty heart
-                <GradientLikeIcon />
-              )}
-            </TouchableOpacity> */}
             <TouchableOpacity
               style={{
                 position: 'absolute',
@@ -786,21 +736,10 @@ const ProductDetailsScreen = () => {
                 ],
               }}
               onPress={() => onWishlistPress(product)}>
-              {wishlistData.some(
-                w =>
-                  (w.productId?.id || w.productId?._id) ===
-                  (product.id || product._id),
-              ) || justAdded.includes(product.id || product._id) ? (
+              {isInWishlist(product.id || product._id) ? (
                 <GradientFullFillLike width={wp(23)} height={hp(20)} />
               ) : (
-                //   <Image
-                //   source={images.emptyLikeImage}
-                //   style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
-                // />
-                <Image
-                  source={images.emptyLikeImage}
-                  style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
-                />
+                <GradientLikeIcon width={wp(23)} height={hp(20)} />
               )}
             </TouchableOpacity>
           </View>
@@ -818,6 +757,7 @@ const ProductDetailsScreen = () => {
             product={route.params.product}
             // selectedVariant={handleColorChange}
             setSelectedColor={setSelectedColor}
+            setSelectedVariant={setSelectedVariant} // 🔥 ADD THIS
           />
         </View>
 
@@ -1005,38 +945,12 @@ const ProductDetailsScreen = () => {
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              // justifyContent: 'space-between'
+              flexWrap: 'wrap',
               marginTop: hp(23),
             }}>
-            {/* {sizes.map(size => (
-              <TouchableOpacity
-                key={size}
-                onPress={() => setSelectedSize(size)}
-                style={{
-                  width: hp(52),
-                  height: hp(52),
-                  borderRadius: 50,
-                  borderWidth: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginRight: 6,
-                  backgroundColor:
-                    selectedSize === size ? '#F7E7FF' : 'transparent',
-                  borderColor: selectedSize === size ? '#000000' : '#D1D1D1',
-                }}>
-                <Text
-                  style={{
-                    color: selectedSize === size ? '#000000' : '#000',
-                    fontSize: fontSize(18),
-                    lineHeight: hp(26),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  {size}
-                </Text>
-              </TouchableOpacity>
-            ))} */}
-
-            {sizes.map(size => (
+            {/* {sizes.map(size => ( */}
+            {availableSizes.map(size => (
               <TouchableOpacity
                 key={size}
                 onPress={() => handleSizeChange(size)}
@@ -1047,13 +961,14 @@ const ProductDetailsScreen = () => {
                   borderWidth: 1,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginRight: 6,
+                  marginRight: 7,
                   backgroundColor:
                     selectedSize === size ? '#F7E7FF' : 'transparent',
                   borderColor: selectedSize === size ? '#000' : '#D1D1D1',
                 }}>
                 <Text style={{color: selectedSize === size ? '#000' : '#000'}}>
-                  {size}
+                  {/* {size} */}
+                  {size?.toUpperCase()}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -1111,6 +1026,7 @@ const ProductDetailsScreen = () => {
                 borderRadius: 50,
                 paddingHorizontal: hp(30),
                 fontSize: fontSize(14),
+                color: '#969696',
                 lineHeight: hp(20),
                 fontFamily: fontFamily.poppins500,
               }}
@@ -1194,33 +1110,7 @@ const ProductDetailsScreen = () => {
               }}
             />
           </View>
-          {/* <View style={{marginTop: hp(16)}}>
-            {getBulletPoints(product?.productDetails).map((point, index) => (
-              <View
-                key={index}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginTop: hp(3),
-                  marginLeft: wp(7),
-                }}>
-                <Text
-                  style={{
-                    fontSize: fontSize(10),
-                    color: '#6B6B6B',
-                    marginRight: wp(10),
-                  }}>
-                  ●
-                </Text>
-                <Text style={{color: '#6B6B6B'}}>{point}</Text>
-              </View>
-            ))}
-          </View> */}
-          {/* {product?.productDetails
-              ?.replace(/&lt;/g, '<')
-              ?.replace(/&gt;/g, '>')
-              ?.replace(/&amp;/g, '&')
-              ?.replace(/<[^>]+>/g, '') ?? ''} */}
+
           <Text
             style={{
               color: colors.pureBlack,
@@ -1231,223 +1121,6 @@ const ProductDetailsScreen = () => {
             }}>
             Specification
           </Text>
-
-          {/* <View style={{marginTop: hp(23)}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}>
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Back
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Regular
-                </Text>
-              </View>
-
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Center front open
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  No
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                marginTop: hp(25),
-              }}>
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Closure
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Back Closure
-                </Text>
-              </View>
-
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Coverage
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Medium Coverage
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                marginTop: hp(25),
-              }}>
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Fabrics
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Cotton, Elastane
-                </Text>
-              </View>
-
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Features
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  All Day Comfort
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                marginTop: hp(25),
-              }}>
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Knit or Woven
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Knitted
-                </Text>
-              </View>
-
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Multipack Set
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Single
-                </Text>
-              </View>
-            </View>
-          </View> */}
 
           <View style={{marginTop: hp(23)}}>
             {product?.specifications?.map((item, index) => {
@@ -1595,11 +1268,12 @@ const ProductDetailsScreen = () => {
                   color: colors.pureBlack,
                   top: 18,
                 }}>
-                Seller:{' '}
+                Seller :{'  '}
                 <Text style={{fontFamily: fontFamily.poppins400}}>
-                  {/* Galaxy Fashion Hub */}
-                  {/* {product?.storeId?.name ?? ''} */}
-                  {storeData?.name ?? ''}
+                  {/* {storeData?.name ?? ''}
+                   */}
+                  {storeData?.name?.charAt(0)?.toUpperCase() +
+                    storeData?.name.slice(1) || 'No Name of store'}
                 </Text>
               </Text>
 
@@ -1617,7 +1291,20 @@ const ProductDetailsScreen = () => {
                     height: hp(32),
                   }}> */}
                 <TouchableOpacity
-                  onPress={() => setModalVisible(true)}
+                  // onPress={() => setModalVisible(true)}
+                  onPress={() =>
+                    // navigation.navigate('sellerProfile', {
+                    //   store: storeData,
+                    // })
+
+                    navigation.navigate('MainTabs', {
+                      screen: 'SearchStack',
+                      params: {
+                        screen: 'SellerProfile',
+                        params: {store: storeData},
+                      },
+                    })
+                  }
                   style={{
                     width: wp(95), // smaller than container
                     height: hp(40),
@@ -1841,7 +1528,7 @@ const ProductDetailsScreen = () => {
 
         <View style={{height: hp(30)}} />
 
-        <Modal
+        {/*     <Modal
           transparent={true}
           visible={modalVisible}
           animationType="none"
@@ -1900,9 +1587,7 @@ const ProductDetailsScreen = () => {
                   color: colors.pureBlack,
                   textAlign: 'center',
                 }}>
-                {/* Galaxy Fashion Hub */}
                 {storeData?.name ?? ''}
-                {/* {product?.storeId?.name ?? ''} */}
               </Text>
 
               <View
@@ -1920,9 +1605,6 @@ const ProductDetailsScreen = () => {
                     fontFamily: fontFamily.poppins500,
                     color: colors.pureBlack,
                   }}>
-                  {/* Assured Product quality at great value and Great{'\n'}shopping
-                  experience and best class services with Ruhi{'\n'}Dress
-                  Materials */}
                   {storeData?.description ?? ''}
                 </Text>
               </View>
@@ -2069,7 +1751,6 @@ const ProductDetailsScreen = () => {
                   </View>
                 </View>
               </View>
-              {/* Add your profile content here */}
 
               <Touchable
                 style={{
@@ -2093,6 +1774,7 @@ const ProductDetailsScreen = () => {
             </View>
           </View>
         </Modal>
+*/}
       </ScrollView>
     </SafeAreaView>
   );

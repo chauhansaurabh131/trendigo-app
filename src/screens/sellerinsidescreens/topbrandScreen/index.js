@@ -5,6 +5,7 @@ import {
   Image,
   SafeAreaView,
   Text,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -22,8 +23,14 @@ import {
   StarIcon,
 } from '../../../assets';
 import {useNavigation} from '@react-navigation/native';
+import {useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {getStoreProductsRequest} from '../../../redux/actions/storeProductActions';
+import {
+  getWishlistRequest,
+  REMOVE_WISHLIST_REQUEST,
+  WISHLIST_REQUEST,
+} from '../../../redux/actions/wishlistActions';
 // import HomeTrendingComponent from '../../components/homeTrendingComponent';
 
 const products = [
@@ -76,28 +83,36 @@ const cardWidth = (screenWidth - 40) / 2;
 const TopbrandScreen = ({storeId}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {data, error, loading} = useSelector(state => state.storeProduct);
-
+  const {data, error} = useSelector(state => state.storeProduct);
+  const [localWishlist, setLocalWishlist] = useState([]);
+  const {wishlistData} = useSelector(state => state.wishlist);
   useEffect(() => {
     dispatch(getStoreProductsRequest(storeId));
     console.log(storeId, 'StoreId===>');
     console.log('StoreId received in Topbrand:', storeId);
     console.log('API Response:', data);
   }, []);
-  if (loading) {
-    return <Text style={{color: '#000'}}>Loading...</Text>;
-  }
 
-  if (error) {
-    return <Text style={{color: '#000'}}>{error}</Text>;
-  }
-  if (!loading && data?.results?.length === 0) {
-    return (
-      <Text style={{textAlign: 'center', marginTop: 20, color: '#000'}}>
-        No Products Found
-      </Text>
-    );
-  }
+  useEffect(() => {
+    if (Array.isArray(wishlistData)) {
+      setLocalWishlist(wishlistData);
+    }
+  }, [wishlistData]);
+  useEffect(() => {
+    dispatch(getWishlistRequest()); // ✅ ADD THIS
+  }, []);
+  // console.log('Products in UI...:', products);
+
+  const token = useSelector(state => state.auth.token);
+  console.log('Auth Token in HomeTrendingComponent:', token);
+  //wishlist function
+
+  useEffect(() => {
+    if (!token) {
+      setLocalWishlist([]); // logout clear
+    }
+  }, [token]);
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <FlatList
@@ -112,11 +127,39 @@ const TopbrandScreen = ({storeId}) => {
         renderItem={({item}) => {
           console.log('FULL ITEM ===>', item);
           console.log('VARIANTS ===>', item.variants);
+
+          const getMainImage = product => {
+            for (let variant of product.variants || []) {
+              const mainImage = variant.images?.find(
+                img => img.isSelectedForMainScreen === true,
+              );
+              if (mainImage) return mainImage.imageUrl;
+            }
+            console.log(getMainImage, 'Main Image URL===>');
+            return null;
+          };
+
+          // Now check if product exist in wishlist
+          const safeWishlist = Array.isArray(wishlistData) ? wishlistData : [];
+
+          // const isWishlisted = localWishlist.some(w => {
+          //   const productId = w.productId?.id || w.productId?._id;
+          //   return String(productId) === String(item._id);
+          // });
+
+          /// when not token always emty heart show
+          const isWishlisted =
+            token &&
+            localWishlist.some(w => {
+              const productId = w.productId?.id || w.productId?._id;
+              return String(productId) === String(item._id);
+            });
+
           return (
             <TouchableOpacity
               style={{
                 width: cardWidth,
-                marginBottom: 15,
+                // marginBottom: 15,
                 marginHorizontal: 5,
                 borderRadius: 12,
                 borderWidth: 1,
@@ -135,7 +178,7 @@ const TopbrandScreen = ({storeId}) => {
               }}>
               <Image
                 // source={{uri: item.image}}
-                source={{uri: item.variants?.[0]?.images?.[0]?.imageUrl}}
+                source={{uri: getMainImage(item)}}
                 style={{
                   width: '100%',
                   height: hp(170),
@@ -233,12 +276,102 @@ const TopbrandScreen = ({storeId}) => {
                       fontFamily: fontFamily.poppins500,
                       marginLeft: hp(12),
                     }}>
-                    {item.totalReviews}
+                    ({item.totalReviews})
                   </Text>
 
-                  <TouchableOpacity style={{marginLeft: 'auto'}}>
-                    {/*<Text style={{fontSize: 18}}>♡</Text>*/}
-                    <GradientFullFillLike />
+                  <TouchableOpacity
+                    style={{marginLeft: 'auto'}}
+                    onPress={() => {
+                      if (!token) {
+                        console.log(
+                          'User not authenticated → Redirect to StartingScreen',
+                        );
+                        navigation.navigate('StartingScreen');
+                        return;
+                      }
+
+                      console.log(' CLICK:', item._id);
+
+                      const alreadyExists = isWishlisted;
+
+                      console.log(' BEFORE LOCAL WISHLIST:', localWishlist);
+                      console.log(' ALREADY EXISTS:', alreadyExists);
+
+                      if (alreadyExists) {
+                        // 🔍 find wishlist item
+                        const wishlistItem = localWishlist.find(w => {
+                          const pid = w.productId?.id || w.productId?._id;
+                          return String(pid) === String(item._id);
+                        });
+
+                        console.log(' FOUND ITEM FOR REMOVE:', wishlistItem);
+
+                        if (!wishlistItem?.id) {
+                          console.log(' REMOVE FAILED: Wishlist ID not found');
+                          ToastAndroid.show(
+                            'Remove failed',
+                            ToastAndroid.SHORT,
+                          );
+                          return;
+                        }
+
+                        //  UI instant update
+                        setLocalWishlist(prev =>
+                          prev.filter(
+                            w =>
+                              (w.productId?.id || w.productId?._id) !==
+                              item._id,
+                          ),
+                        );
+
+                        console.log('UI UPDATED (REMOVED)');
+
+                        // 🚀 API call
+                        dispatch({
+                          type: REMOVE_WISHLIST_REQUEST,
+                          payload: wishlistItem.id,
+                        });
+
+                        console.log(' REMOVE API CALLED:', wishlistItem.id);
+
+                        // Toast
+                        ToastAndroid.show(
+                          'Removed from Wishlist',
+                          ToastAndroid.SHORT,
+                        );
+                      } else {
+                        console.log(' ADD FLOW START');
+
+                        // ✅ UI instant update
+                        setLocalWishlist(prev => [
+                          ...prev,
+                          {productId: {id: item._id}},
+                        ]);
+
+                        console.log(' UI UPDATED (ADDED)');
+
+                        //  API call
+                        dispatch({
+                          type: WISHLIST_REQUEST,
+                          payload: {productId: item._id},
+                        });
+
+                        console.log(' ADD API CALLED');
+
+                        //  Toast
+                        ToastAndroid.show(
+                          'Added to Wishlist',
+                          ToastAndroid.SHORT,
+                        );
+                      }
+
+                      console.log(' AFTER LOCAL WISHLIST:', localWishlist);
+                    }}>
+                    {isWishlisted ? (
+                      <GradientFullFillLike />
+                    ) : (
+                      <GradientLikeIcon />
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>

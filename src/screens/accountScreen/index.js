@@ -9,6 +9,7 @@ import {
   TextInput,
   Modal,
   SafeAreaView,
+  ToastAndroid,
 } from 'react-native';
 import {fontFamily, hp, wp, fontSize} from '../../utils/helpers';
 import check_icon from '../../assets/images/check_green_icon.png';
@@ -18,6 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import GradientButton from '../../components/gradientButton';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useDispatch, useSelector} from 'react-redux';
+import RBSheet from 'react-native-raw-bottom-sheet';
 import {Alert} from 'react-native';
 import {LOGOUT} from '../../redux/actions/authActions';
 import {
@@ -30,6 +32,7 @@ import {
   resetEmailVerifyStatus,
   sendMobileOtpRequest,
   verifyMobileOtpRequest,
+  resetAccountError,
 } from '../../redux/actions/userAccountActions';
 import {resetMobileMessage} from '../../redux/actions/userAccountActions';
 
@@ -40,7 +43,19 @@ import {images, OtpVerifyIcon} from '../../assets';
 // import {VERIFY_EMAIL_OTP_REQUEST} from '../../redux/actions/authActions';
 const AccountScreen = () => {
   const navigation = useNavigation();
+  // EMAIL SHEET REF
+  const sheetRef = useRef(null);
+  const inputRefs = useRef([]);
+  const otpSheetRef = useRef();
+  const successSheetRef = useRef();
+  // MOBIL SHEET REF
+
+  const mobileSheetRef = useRef();
+  const mobileOtpSheetRef = useRef();
+  const mobileSuccessSheetRef = useRef();
+
   const dispatch = useDispatch();
+
   // const [email, setEmail] = useState('jit*****@gmail.com');
   const [editingField, setEditingField] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -55,51 +70,54 @@ const AccountScreen = () => {
   const [showMobileSuccessModal, setShowMobileSuccessModal] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   // const user = useSelector(state => state.userAccount.user);
+  // mobile number validation (10 digits)
+  // const isMobileValid = newMobileNumber?.trim().length === 10;
+  const isMobileValid = /^[0-9]{10}$/.test(newMobileNumber);
+
+  // email validation
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail?.trim());
+
+  //
+  const isOtpEmailValid = /^\d{4}$/.test(finalOtp);
   const user = useSelector(state => state.userAccount.user);
   const userData = useSelector(state => state.userAccount.user?.user);
   const updatedEmail = useSelector(state => state.userAccount.updatedEmail);
   const message = useSelector(state => state.userAccount.message);
   const [otp, setOtp] = useState(['', '', '', '']);
-  const inputRefs = [useRef(), useRef(), useRef(), useRef()];
+  const finalOtp = otp?.join('') || '';
+  const isOtpValid = finalOtp.length === 4;
   const [newMobileNumber, setNewMobileNumber] = useState('');
   const [timer, setTimer] = useState(48);
   console.log('EMAIL:', userData?.email);
-  const token = useSelector(state => state.auth.token);
-  console.log('TOKEN IN ACCOUNT SCREEN:', token);
-  useEffect(() => {
-    let interval = null;
+  // const token = useSelector(state => state.auth.token);
+  // console.log('TOKEN IN ACCOUNT SCREEN:', token);
 
-    if (showMobileOtpModal) {
-      setTimer(48); // modal open → reset timer
-
-      interval = setInterval(() => {
-        setTimer(prev => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => clearInterval(interval);
-  }, [showMobileOtpModal]);
-
+  // fouce otp type  auto focus
   const handleOtpChange = (value, index) => {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
     if (value && index < 3) {
-      inputRefs[index + 1].current.focus();
+      inputRefs.current[index + 1].focus();
     }
   };
+  //Backspace handle for otp input
+  const handleKeyPress = (e, index) => {
+    if (e.nativeEvent.key === 'Backspace') {
+      if (otp[index] === '' && index > 0) {
+        inputRefs.current[index - 1].focus();
+      }
+    }
+  };
+  //TIME FORMAT OTP
+  const isAnyOtpModalOpen = showOtpModal || showMobileOtpModal;
+
   useEffect(() => {
     let interval = null;
 
-    if (showOtpModal || showMobileOtpModal) {
-      setTimer(48);
+    if (isAnyOtpModalOpen) {
+      setTimer(119);
 
       interval = setInterval(() => {
         setTimer(prev => {
@@ -113,72 +131,44 @@ const AccountScreen = () => {
     }
 
     return () => clearInterval(interval);
-  }, [showOtpModal, showMobileOtpModal]);
+  }, [isAnyOtpModalOpen]);
 
-  // const user = useSelector(state => state.user?.data);
+  // Display format (1:59)
+  const formatTime = time => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
 
   // useEffect(() => {
-  //   if (user?.email) {
-  //     setEmail(user.email);
+  //   if (token && user?.user?.email) {
+  //     setEmail(user.user.email);
+  //   } else {
+  //     setEmail(''); // 🔥 CLEAR
   //   }
-  // }, [user]);
+  // }, [user, token]);
 
   useEffect(() => {
     if (user?.user?.email) {
       setEmail(user.user.email);
+    } else {
+      setEmail('');
     }
   }, [user]);
-  useEffect(() => {
-    if (user?.user?.mobileNumber) {
-      setMobile(String(user.user.mobileNumber)); // 🔥 IMPORTANT
-    }
-  }, [user]);
-  console.log('MOBILE NUMBER ===>', mobile);
-  console.log('USER ===>', user);
-  console.log('EMAIL in user ===>', userData?.email);
+  // WHEN USER CLICK ON VERIFY OTP BUTTON
 
-  const handleSendOtp = async () => {
-    const token = await AsyncStorage.getItem('authToken');
-    console.log(token, 'authToken');
+  const handleVerifyOtp = () => {
+    const finalOtp = otp?.join('') || '';
+    if (loading) return;
 
-    if (!email.trim() || !newEmail.trim()) {
-      alert('Please enter both emails');
-      return;
-    }
-
-    // Dispatch Saga
-    console.log('send OTP PAYLOAD:', {
-      token,
-      currentEmail: email,
-      newEmail,
-      // otp: finalOtp,
-    });
-
-    dispatch({
-      type: SEND_EMAIL_OTP_REQUEST,
-      payload: {
-        token,
-        currentEmail: email,
-        newEmail,
-      },
-    });
-
-    setShowEditModal(false);
-    setShowOtpModal(true);
-  };
-
-  const handleVerifyOtp = async () => {
-    const finalOtp = otp.join('');
-
-    if (finalOtp.length !== 4) {
+    if (!isOtpValid) {
       alert('Enter valid 4-digit OTP');
       return;
     }
 
-    const token = await AsyncStorage.getItem('authToken');
-    console.log(token, 'authToken');
     console.log('VERIFY OTP PAYLOAD:', {
-      token,
+      // token,
       currentEmail: email,
       newEmail,
       otp: finalOtp,
@@ -188,87 +178,130 @@ const AccountScreen = () => {
       // type: VERIFY_EMAIL_OTP_REQUEST,
       type: VERIFY_CHANGE_EMAIL_OTP_REQUEST,
       payload: {
-        token,
+        // token,
         currentEmail: email,
         newEmail,
         otp: finalOtp,
       },
     });
   };
+  // WHEN USER CLICK ON SEND OTP (CONTINUE) BUTTON
+  const handleSendOtp = async () => {
+    if (loading) return;
+
+    if (!isEmailValid) {
+      Alert.alert('Error', 'Please enter valid email');
+      return;
+    }
+
+    // Dispatch Saga
+    console.log('send OTP PAYLOAD:', {
+      // token,
+      currentEmail: email,
+      newEmail,
+      // otp: finalOtp,
+    });
+
+    dispatch({
+      type: SEND_EMAIL_OTP_REQUEST,
+
+      payload: {
+        // token,
+        currentEmail: email,
+        newEmail,
+      },
+    });
+
+    // setShowEditModal(false);
+    // setShowOtpModal(true);
+    // ✅ Close Email Sheet
+    // sheetRef.current?.close();
+
+    // 1. First sheet close
+    sheetRef.current?.close();
+    //  2. OTP modal state
+    setShowOtpModal(true);
+
+    //  Open OTP Sheet
+    setTimeout(() => {
+      otpSheetRef.current?.open();
+    }, 300);
+  };
+
+  useEffect(() => {
+    if (user?.user?.mobileNumber) {
+      setMobile(String(user.user.mobileNumber)); // 🔥 IMPORTANT
+    }
+  }, [user]);
+  // console.log('MOBILE NUMBER ===>', mobile);
+  // console.log('USER ===>', user);
+  // console.log('EMAIL in user ===>', userData?.email);
 
   const emailVerified = useSelector(state => state.userAccount.emailVerified);
 
-  // useEffect(() => {
-  //   if (emailVerified) {
-  //     setShowOtpModal(false); // close OTP popup
-  //     setShowSecondModal(true); // open success popup
-  //   }
-  // }, [emailVerified]);
-
   useEffect(() => {
     if (emailVerified) {
-      setShowOtpModal(false);
-      setShowSecondModal(true);
+      // ✅ Sheet close
+      otpSheetRef.current?.close();
 
-      // 🔥 RESET so next time works properly
+      // 🔥 ADD THIS (VERY IMPORTANT)
+      setShowOtpModal(false);
+      // 🔥 current email update only AFTER verify
+      setEmail(newEmail);
+
+      // ✅ Success open
+      setTimeout(() => {
+        successSheetRef.current?.open();
+      }, 300);
+
       dispatch(resetEmailVerifyStatus());
     }
   }, [emailVerified]);
-
   useEffect(() => {
-    const fetchUser = async () => {
-      const token = await AsyncStorage.getItem('authToken');
-      console.log(token, 'authToken');
-      if (token) {
-        dispatch(getMeRequest(token));
-      }
+    const fetchUser = () => {
+      // const token = await AsyncStorage.getItem('authToken');
+      // console.log(token, 'authToken');
+      // if (token) {
+      //   dispatch(getMeRequest(token));
+      // }
+      dispatch(getMeRequest());
     };
 
     fetchUser();
   }, []);
+  //when user click on delete
   const handleDelete = async () => {
-    const token = await AsyncStorage.getItem('authToken');
-    console.log('DELETE TOKEN:', token);
-
-    if (!token) {
-      alert('Token not found');
-      return;
-    }
-
-    dispatch(deleteAccountRequest(token));
+    dispatch(deleteAccountRequest());
   };
 
   const {loading, error, isDeleted} = useSelector(state => state.userAccount);
   console.log('isDeleted:', isDeleted);
-  //  import AsyncStorage from '@react-native-async-storage/async-storage';
 
   useEffect(() => {
     if (isDeleted) {
-      Alert.alert(
-        'Account Deleted',
-        'Your account has been deleted. Please login again.',
-        [
-          {
-            text: 'OK',
-            onPress: async () => {
-              // ✅ REMOVE TOKEN
-              await AsyncStorage.removeItem('authToken');
-
-              // ✅ RESET REDUX AUTH
-              dispatch({type: LOGOUT});
-
-              // ✅ RESET NAVIGATION
-              navigation.reset({
-                index: 0,
-                routes: [{name: 'StartingScreen'}],
-              });
-            },
-          },
-        ],
+      ToastAndroid.show(
+        'Account deleted. Please login again',
+        ToastAndroid.SHORT,
       );
+
+      AsyncStorage.removeItem('authToken');
+      dispatch({type: LOGOUT});
+
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'StartingScreen'}],
+      });
     }
   }, [isDeleted]);
+  // Error handle
 
+  useEffect(() => {
+    if (error) {
+      console.log('DELETE ERROR:', error);
+
+      ToastAndroid.show(error, ToastAndroid.SHORT);
+    }
+  }, [error]);
   useEffect(() => {
     if (error) {
       Alert.alert(
@@ -277,14 +310,24 @@ const AccountScreen = () => {
         [{text: 'OK'}],
       );
     }
+    dispatch(resetAccountError());
   }, [error]);
-  // const {message} = useSelector(state => state.userAccount);
+
   useEffect(() => {
     if (message === 'Mobile number updated successfully') {
-      setShowMobileSuccessModal(true);
+      console.log('✅ SUCCESS → OPEN SHEET');
+
+      // OTP sheet close
+      mobileOtpSheetRef.current?.close();
+
+      // Success sheet open
+      setTimeout(() => {
+        mobileSuccessSheetRef.current?.open();
+      }, 300);
+
+      dispatch(resetMobileMessage());
     }
   }, [message]);
-
   return (
     <ScrollView
       style={styles.container}
@@ -308,9 +351,11 @@ const AccountScreen = () => {
               <View style={styles.valueWrapper}>
                 {editingField === 'email' ? (
                   <TextInput
-                    value={newEmail}
-                    // editable={false}
-                    onChangeText={setNewEmail}
+                    // value={newEmail}
+                    value={email}
+                    editable={false}
+                    // onChangeText={setNewEmail}
+
                     style={styles.input}
                     placeholder="Enter email"
                     keyboardType="email-address"
@@ -329,23 +374,37 @@ const AccountScreen = () => {
               </View>
 
               <TouchableOpacity
+                activeOpacity={0.7}
                 onPress={() => {
                   setEditingField('email');
-                  setShowEditModal(true);
+                  // setShowEditModal(true);
+                  sheetRef.current?.open();
                 }}>
                 <Image source={edit_icon} style={styles.editIcon} />
               </TouchableOpacity>
             </View>
           </View>
-          <Modal
-            visible={showEditModal}
-            transparent
-            animationType="slide"
-            onRequestClose={() => setShowEditModal(false)}>
+
+          <RBSheet
+            ref={sheetRef}
+            height={hp(432)}
+            openDuration={250}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            customStyles={{
+              wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
+              draggableIcon: {backgroundColor: '#C4C4C4'},
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                backgroundColor: '#FFFFFF',
+              },
+            }}>
             <View style={styles.modalOverlay}>
               <View
                 style={{
-                  width: wp(375),
+                  // width: wp(375),
+                  width: '100%',
                   height: hp(432),
                   backgroundColor: '#FFFFFF',
                   borderWidth: 1,
@@ -459,6 +518,7 @@ const AccountScreen = () => {
                       padding: 2, // ⭐ THIS IS THE KEY
                     }}>
                     <TouchableOpacity
+                      activeOpacity={0.5}
                       style={{
                         flex: 1,
                         backgroundColor: '#FFFFFF',
@@ -467,7 +527,8 @@ const AccountScreen = () => {
                         justifyContent: 'center',
                       }}
                       onPress={() => {
-                        setShowEditModal(false);
+                        // setShowEditModal(false);
+                        sheetRef.current?.close(); // 👈 IMPORTANT
                         setEditingField(null);
                       }}>
                       <Text
@@ -481,42 +542,42 @@ const AccountScreen = () => {
                     </TouchableOpacity>
                   </LinearGradient>
 
-                  {/* <GradientButton
-                    title={'Continue'}
-                    buttonStyle={{width: wp(136), height: hp(50)}}
-                    onPress={() => {
-                      if (!newEmail.trim()) {
-                        alert('Please enter new email');
-                        return;
-                      }
-
-                      setShowEditModal(false);
-                      setShowOtpModal(true);
-                    }}
-                  /> */}
-
                   <GradientButton
-                    title={'Continue'}
-                    buttonStyle={{width: wp(136), height: hp(50)}}
+                    title={loading ? 'Loading...' : 'Continue'}
+                    buttonStyle={{
+                      width: wp(136),
+                      height: hp(50),
+                      opacity: loading || !isEmailValid ? 0.5 : 1,
+                    }}
                     onPress={handleSendOtp}
                   />
                 </View>
               </View>
             </View>
-          </Modal>
+          </RBSheet>
 
-          <Modal
-            visible={showOtpModal}
-            transparent
-            animationType="slide"
-            onRequestClose={() => setShowOtpModal(false)}>
+          <RBSheet
+            ref={otpSheetRef}
+            height={hp(432)}
+            openDuration={250}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            customStyles={{
+              wrapper: {backgroundColor: 'rgba(0,0,0,0.3)'},
+              draggableIcon: {backgroundColor: '#C4C4C4'},
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                backgroundColor: '#FFFFFF',
+              },
+            }}>
             <View style={styles.modalOverlay}>
               <View
                 style={{
                   width: wp(375),
                   height: hp(432),
                   backgroundColor: '#FFFFFF',
-                  borderWidth: 1,
+                  // borderWidth: 1,
                   borderTopLeftRadius: 20,
                   borderTopRightRadius: 20,
                 }}>
@@ -566,7 +627,7 @@ const AccountScreen = () => {
                   {[0, 1, 2, 3].map((_, index) => (
                     <TextInput
                       key={index}
-                      ref={inputRefs[index]}
+                      ref={ref => (inputRefs.current[index] = ref)}
                       style={{
                         width: wp(60),
                         height: hp(50),
@@ -576,11 +637,14 @@ const AccountScreen = () => {
                         color: '#000000',
                         fontSize: fontSize(24),
                         fontFamily: fontFamily.poppins600,
+                        lineHeight: hp(50),
+                        paddingVertical: 0,
                       }}
                       maxLength={1}
                       keyboardType="number-pad"
                       onChangeText={value => handleOtpChange(value, index)}
                       value={otp[index]}
+                      onKeyPress={e => handleKeyPress(e, index)}
                     />
                   ))}
                 </View>
@@ -591,7 +655,7 @@ const AccountScreen = () => {
                       fontFamily: fontFamily.poppins400,
                     }}>
                     <Text style={{color: '#A3A3A3'}}>Resend in </Text>
-                    <Text style={{color: '#000000'}}>{timer}Sec.</Text>
+                    <Text style={{color: '#000000'}}>{formatTime(timer)}</Text>
                   </Text>
                 </View>
                 <View
@@ -599,48 +663,38 @@ const AccountScreen = () => {
                     marginHorizontal: wp(37),
                     marginTop: hp(58),
                   }}>
-                  {/* <GradientButton
-                    title={'Verify Code'}
-                    // onPress={() => {
-                    //   // setShowSecondModal(true);
-                    //   const finalOtp = otp.join('');
-
-                    //   if (finalOtp.length !== 4) {
-                    //     alert('Please enter full 4-digit OTP');
-                    //     return;
-                    //   }
-                    //   console.log('OTP BEFORE DISPATCH:', otp);
-                    //   dispatch(
-                    //     verifyEmailOtpRequest(token, email, newEmail, otp),
-                    //   );
-                    // }}
-
-                    onPress={() => {
-                      // setShowSecondModal(true);
-                      const finalOtp = otp.join('');
-
-                      if (finalOtp.length !== 4) {
-                        alert('Please enter full 4-digit OTP');
-                        return;
-                      }
-                    }}
-                  /> */}
-
                   <GradientButton
-                    title={'Verify Code'}
+                    title={loading ? 'Verifying...' : 'Verify Code'}
                     onPress={handleVerifyOtp}
                     // buttonStyle={{width: wp(136), height: hp(50)}}
+                    buttonStyle={{opacity: loading || !isOtpValid ? 0.5 : 1}}
                   />
                 </View>
               </View>
             </View>
-          </Modal>
+            {/* </Modal> */}
+          </RBSheet>
 
-          <Modal
+          {/* <Modal
             transparent={true}
             visible={showSecondModal}
             animationType="slide"
-            onRequestClose={() => setShowSecondModal(false)}>
+            onRequestClose={() => setShowSecondModal(false)}> */}
+          <RBSheet
+            ref={successSheetRef}
+            height={hp(257)}
+            openDuration={250}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            customStyles={{
+              wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
+              draggableIcon: {backgroundColor: '#C4C4C4'},
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                backgroundColor: '#FFFFFF',
+              },
+            }}>
             <View
               style={{
                 flex: 1,
@@ -696,10 +750,11 @@ const AccountScreen = () => {
                     // }}
 
                     onPress={() => {
-                      setShowSecondModal(false);
+                      // setShowSecondModal(false);
                       setEditingField(null);
-                      setShowEditModal(false);
-                      navigation.goBack(); // or navigation.navigate('Account')
+                      // setShowEditModal(false);
+                      successSheetRef.current?.close();
+                      // navigation.goBack(); // or navigation.navigate('Account')
                     }}
                     title={'Ok'}
                     buttonStyle={{width: wp(120), height: hp(50)}}
@@ -707,7 +762,8 @@ const AccountScreen = () => {
                 </View>
               </View>
             </View>
-          </Modal>
+            {/* </Modal> */}
+          </RBSheet>
 
           {/* MOBILE ROW */}
           <View style={styles.row}>
@@ -742,7 +798,8 @@ const AccountScreen = () => {
                 onPress={
                   () => {
                     setEditingField('mobile');
-                    setShowMobileEditModal(true);
+                    // setShowMobileEditModal(true);
+                    mobileSheetRef.current?.open();
                   }
                   // setEditingField(editingField === 'mobile' ? null : 'mobile')
                 }>
@@ -750,18 +807,34 @@ const AccountScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          <Modal
+          {/* <Modal
             visible={showMobileEditModal}
             transparent
             animationType="slide"
-            onRequestClose={() => setShowMobileEditModal(false)}>
+            onRequestClose={() => setShowMobileEditModal(false)}> */}
+          <RBSheet
+            ref={mobileSheetRef}
+            height={hp(432)}
+            openDuration={250}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            customStyles={{
+              wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                backgroundColor: '#FFFFFF',
+                paddingBottom: hp(20),
+              },
+              draggableIcon: {backgroundColor: '#C4C4C4', width: 50},
+            }}>
             <View style={styles.modalOverlay}>
               <View
                 style={{
                   width: wp(375),
                   height: hp(432),
                   backgroundColor: '#FFFFFF',
-                  borderWidth: 1,
+                  // borderWidth: 1,
                   borderTopLeftRadius: 20,
                   borderTopRightRadius: 20,
                 }}>
@@ -848,6 +921,7 @@ const AccountScreen = () => {
                   <TextInput
                     value={newMobileNumber}
                     onChangeText={setNewMobileNumber}
+                    maxLength={10}
                     style={{
                       color: '#000',
                       fontSize: fontSize(14),
@@ -880,7 +954,8 @@ const AccountScreen = () => {
                         justifyContent: 'center',
                       }}
                       onPress={() => {
-                        setShowEditModal(false);
+                        // setShowEditModal(false);
+                        mobileSheetRef.current?.close(); // 👈 IMPORTANT
                         setShowMobileEditModal(null);
                       }}>
                       <Text
@@ -895,48 +970,75 @@ const AccountScreen = () => {
                   </LinearGradient>
 
                   <GradientButton
-                    title={'Continue'}
-                    buttonStyle={{width: wp(136), height: hp(50)}}
+                    title={loading ? 'Loading...' : 'Continue'}
+                    buttonStyle={{
+                      width: wp(136),
+                      height: hp(50),
+                      opacity: loading || !newMobileNumber ? 0.5 : 1, // 🔥 opacity add
+                    }}
+                    disabled={loading || !newMobileNumber} // 🔥 disable button when loading or no input
                     onPress={() => {
                       if (!newMobileNumber.trim()) {
+                        // if (!isMobileValid) {
                         Alert.alert('Error', 'Please enter new mobile number');
                         return;
                       }
                       // setShowEditModal(false);
                       // setShowMobileOtpModal(true);
                       dispatch(
-                        sendMobileOtpRequest(
-                          token,
-                          mobile, // current mobile
-                          newMobileNumber, // new mobile
-                        ),
+                        sendMobileOtpRequest({
+                          // token,
+                          // mobile, // current mobile
+                          // newMobileNumber, // new mobile
+                          currentMobileNumber: mobile,
+                          newMobileNumber: newMobileNumber,
+                        }),
                       );
-                      console.log(
-                        'token, mobile, newMobileNumber',
-                        token,
-                        mobile,
-                        newMobileNumber,
-                      );
+
+                      console.log('📤 DATA SENT:', {
+                        currentMobileNumber: mobile,
+                        newMobileNumber: newMobileNumber,
+                      });
+
                       setShowMobileOtpModal(true);
+                      mobileSheetRef.current?.close(); // 👈 IMPORTANT
+                      mobileOtpSheetRef.current?.open();
                     }}
                   />
                 </View>
               </View>
             </View>
-          </Modal>
+            {/* </Modal> */}
+          </RBSheet>
 
-          <Modal
+          {/* <Modal
             visible={showMobileOtpModal}
             transparent
             animationType="slide"
-            onRequestClose={() => setShowMobileOtpModal(false)}>
+            onRequestClose={() => setShowMobileOtpModal(false)}> */}
+
+          <RBSheet
+            ref={mobileOtpSheetRef}
+            height={hp(432)}
+            openDuration={250}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            customStyles={{
+              wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                backgroundColor: '#FFFFFF',
+              },
+              draggableIcon: {backgroundColor: '#C4C4C4'},
+            }}>
             <View style={styles.modalOverlay}>
               <View
                 style={{
                   width: wp(375),
                   height: hp(432),
                   backgroundColor: '#FFFFFF',
-                  borderWidth: 1,
+                  // borderWidth: 1,
                   borderTopLeftRadius: 20,
                   borderTopRightRadius: 20,
                 }}>
@@ -973,7 +1075,7 @@ const AccountScreen = () => {
                       fontFamily: fontFamily.poppins400,
                     }}>
                     <Text style={{color: '#A3A3A3'}}>OTP sent on</Text>
-                    <Text style={{color: '#000000'}}>{newMobileNumber}</Text>
+                    <Text style={{color: '#000000'}}> {newMobileNumber}</Text>
                   </Text>
                 </View>
                 <View
@@ -986,7 +1088,7 @@ const AccountScreen = () => {
                   {[0, 1, 2, 3].map((_, index) => (
                     <TextInput
                       key={index}
-                      ref={inputRefs[index]}
+                      ref={ref => (inputRefs.current[index] = ref)} // 🔥 FIX
                       style={{
                         width: wp(60),
                         height: hp(50),
@@ -996,11 +1098,14 @@ const AccountScreen = () => {
                         color: '#000000',
                         fontSize: fontSize(24),
                         fontFamily: fontFamily.poppins600,
+                        lineHeight: hp(50),
+                        paddingVertical: 0,
                       }}
                       maxLength={1}
                       keyboardType="number-pad"
-                      onChangeText={value => handleOtpChange(value, index)}
                       value={otp[index]}
+                      onChangeText={value => handleOtpChange(value, index)}
+                      onKeyPress={e => handleKeyPress(e, index)} // 🔥 ADD
                     />
                   ))}
                 </View>
@@ -1011,7 +1116,7 @@ const AccountScreen = () => {
                       fontFamily: fontFamily.poppins400,
                     }}>
                     <Text style={{color: '#A3A3A3'}}>Resend in </Text>
-                    <Text style={{color: '#000000'}}>{timer} Sec.</Text>
+                    <Text style={{color: '#000000'}}>{formatTime(timer)}</Text>
                   </Text>
                 </View>
 
@@ -1021,17 +1126,29 @@ const AccountScreen = () => {
                     marginTop: hp(58),
                   }}>
                   <GradientButton
-                    title={'Verify Code'}
-                    onPress={() => {
-                      const finalOtp = otp.join('');
+                    // title={loading ? 'Loading...' : 'Verify Code'}
+                    // onPress={() => {
+                    //   const finalOtp = otp.join('');
 
-                      if (finalOtp.length !== 4) {
+                    //   if (finalOtp.length !== 4) {
+                    //     alert('Please enter full 4-digit OTP');
+                    //     return;
+                    //   }
+
+                    title={loading ? 'Loading...' : 'Verify Code'}
+                    buttonStyle={{
+                      opacity: loading || !isOtpValid ? 0.5 : 1, // 🔥 opacity
+                    }}
+                    disabled={loading || !isOtpValid} // 🔥 disable
+                    onPress={() => {
+                      if (!isOtpValid) {
                         alert('Please enter full 4-digit OTP');
                         return;
                       }
+
                       dispatch(
                         verifyMobileOtpRequest(
-                          token,
+                          // token,
                           mobile,
                           newMobileNumber,
                           finalOtp,
@@ -1039,25 +1156,43 @@ const AccountScreen = () => {
                       );
                       console.log(
                         'token, mobile, newMobileNumber, finalOtp',
-                        token,
+                        // token,
                         mobile,
                         newMobileNumber,
                         finalOtp,
                       );
                       console.log('OTP ENTERED:', finalOtp);
 
-                      setShowMobileSuccessModal(true);
+                      // setShowMobileSuccessModal(true);
                     }}
                   />
                 </View>
               </View>
             </View>
-          </Modal>
-          <Modal
+            {/* </Modal> */}
+          </RBSheet>
+          {/* <Modal
             transparent={true}
             visible={showMobileSuccessModal}
             animationType="slide"
-            onRequestClose={() => setShowMobileSuccessModal(false)}>
+            onRequestClose={() => setShowMobileSuccessModal(false)}> */}
+
+          <RBSheet
+            ref={mobileSuccessSheetRef}
+            height={hp(257)}
+            openDuration={250}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            customStyles={{
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                backgroundColor: '#FFFFFF',
+              },
+              draggableIcon: {
+                backgroundColor: '#C4C4C4',
+              },
+            }}>
             <View
               style={{
                 flex: 1,
@@ -1120,16 +1255,22 @@ const AccountScreen = () => {
                     title={'Ok'}
                     buttonStyle={{width: wp(120), height: hp(50)}}
                     onPress={() => {
-                      // 1️⃣ Close success modal
-                      setShowMobileSuccessModal(false);
+                      // close sheet
+                      mobileSuccessSheetRef.current?.close();
 
-                      // 2️⃣ Close OTP modal
-                      setShowMobileOtpModal(false);
+                      // close other sheets
+                      mobileOtpSheetRef.current?.close();
+                      // mobileSheetRef.current?.close();
+                      //             // 1️⃣ Close success modal
+                      //             setShowMobileSuccessModal(false);
 
-                      // 3️⃣ Close edit modal
-                      setShowMobileEditModal(false);
+                      //             // 2️⃣ Close OTP modal
+                      //             setShowMobileOtpModal(false);
 
-                      // 4️⃣ Stop editing
+                      //             // 3️⃣ Close edit modal
+                      //             setShowMobileEditModal(false);
+
+                      //             // 4️⃣ Stop editing
                       setEditingField(null);
                       // 🔥 IMPORTANT: RESET redux message
                       dispatch(resetMobileMessage());
@@ -1141,7 +1282,8 @@ const AccountScreen = () => {
                 </View>
               </View>
             </View>
-          </Modal>
+            {/* </Modal> */}
+          </RBSheet>
 
           {/* Delete Account Section */}
           <View style={styles.deleteSection}>
@@ -1165,7 +1307,13 @@ const AccountScreen = () => {
           transparent
           animationType="fade"
           onRequestClose={() => setShowDeleteModal(false)}>
-          <View style={styles.modalOverlay}>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
             <View style={styles.modalBox}>
               {/* <Text style={styles.modalText}>Are you sure want proceed?</Text>
 
@@ -1231,9 +1379,14 @@ const AccountScreen = () => {
                   </TouchableOpacity>
                 </LinearGradient>
                 <GradientButton
-                  title={'Yes, Delete '}
+                  title={loading ? 'Deleting...' : 'Yes, Delete'}
                   onPress={handleDelete}
-                  buttonStyle={{width: wp(135), height: hp(44)}}
+                  buttonStyle={{
+                    width: wp(135),
+                    height: hp(44),
+                    opacity: loading ? 0.5 : 1,
+                  }}
+                  disabled={loading}
                 />
               </View>
             </View>
@@ -1352,7 +1505,7 @@ const styles = StyleSheet.create({
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
   },

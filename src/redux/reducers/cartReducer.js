@@ -18,6 +18,7 @@ const initialState = {
   cartData: [],
   error: null,
   cartItems: [],
+  success: false,
   // loading: false,
   // cartData: null,
 };
@@ -28,6 +29,7 @@ export default function cartReducer(state = initialState, action) {
       return {
         ...state,
         loading: true,
+        success: false,
       };
 
     case ADD_TO_CART_SUCCESS:
@@ -35,6 +37,7 @@ export default function cartReducer(state = initialState, action) {
         ...state,
         loading: false,
         cartData: action.payload.data,
+        success: true,
       };
 
     case ADD_TO_CART_FAILURE:
@@ -42,6 +45,7 @@ export default function cartReducer(state = initialState, action) {
         ...state,
         loading: false,
         error: action.payload,
+        success: false,
       };
 
     case GET_CART_REQUEST:
@@ -89,10 +93,23 @@ export default function cartReducer(state = initialState, action) {
         loading: true,
       };
 
+    // case REMOVE_CART_SUCCESS:
+    //   return {
+    //     ...state,
+    //     loading: false,
+    //     cartData: {
+    //       ...state.cartData,
+    //       productDetailList: state.cartData.productDetailList.filter(
+    //         item => item._id !== action.payload.itemId,
+    //       ),
+    //     },
+    //   };
     case REMOVE_CART_SUCCESS:
+      console.log('REMOVE_CART_SUCCESS action.payload:', action.payload);
       return {
         ...state,
         loading: false,
+        // cartData: action.payload.data, // 👈 FULL replace
         cartData: {
           ...state.cartData,
           productDetailList: state.cartData.productDetailList.filter(
@@ -107,7 +124,11 @@ export default function cartReducer(state = initialState, action) {
         loading: false,
         error: action.payload,
       };
-
+    case 'RESET_CART':
+      return {
+        ...state,
+        cartData: null, // or []
+      };
     default:
       return state;
   }

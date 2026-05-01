@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -13,24 +13,30 @@ import {
   SafeAreaView,
   Modal,
   ActivityIndicator,
+  ToastAndroid,
 } from 'react-native';
+import {Keyboard} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
 import {launchImageLibrary} from 'react-native-image-picker';
-
+import RBSheet from 'react-native-raw-bottom-sheet';
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import arrow_back from '../../assets/images/arrow_back.png';
 import GradientButton from '../../components/gradientButton';
 // import {updateUserRequest} from '../../redux/actions/userActions';
 import {uploadProfilePicRequest} from '../../redux/actions/profileImageActions';
-
 import {
   resetUpdateUser,
+  UPDATE_USER_OTP_REQUEST,
   updateUserRequest,
+  VERIFY_UPDATE_OTP_REQUEST,
 } from '../../redux/actions/updateUserActions';
 import {colors} from '../../utils/colors';
 import {images} from '../../assets';
 import {fetchUserRequest} from '../../redux/actions/userActions';
+import {SEND_OTP_REQUEST} from '../../redux/actions/otpActions';
+import {VERIFY_OTP_REQUEST} from '../../redux/actions/emailAndMobileActions';
+
 const GenderButton = ({label, isActive, onPress, style}) => (
   <TouchableOpacity
     style={[styles.genderBtn, style, isActive && styles.genderBtnActive]}
@@ -43,49 +49,57 @@ const GenderButton = ({label, isActive, onPress, style}) => (
 
 const BasicInfoScreen = () => {
   const navigation = useNavigation();
+  const refRBSheet = useRef();
+  const successSheetRef = useRef();
+  // const [otpSent, setOtpSent] = useState(false);
+  const isMobileValid = mobile?.length === 10;
+  // const isEmailValid = email ? /^\S+@\S+\.\S+$/.test(email) : false;
+
+  const isValid = isMobileValid || isEmailValid;
+  const [timer, setTimer] = useState(0);
+  const [finalOtpType, setFinalOtpType] = useState(null);
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  const [otpType, setOtpType] = useState('mobile'); // 'mobile' or 'email'
+  const prevImageUrl = useRef(null);
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const loginType = useSelector(state => state.auth.loginType);
+  console.log('LOGIN TYPE:', loginType);
+  // change to 'mobile' to test
   const dispatch = useDispatch();
-  const user = useSelector(state => state.user.user);
-  const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg'];
-  const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg'];
-  const token = useSelector(state => state.auth.token);
-  const [photoModalVisible, setPhotoModalVisible] = useState(false); // ✔ Move here
-  const [profileImage, setProfileImage] = useState(null);
-  const [showEditMobileModal, setShowEditMobileModal] = useState(false);
-  const [showEditOtpMobileModel, setShowEditOtpMobileModel] = useState(false);
-
-  const {imageUrl} = useSelector(state => state.profileImage || {});
-  // console.log('imageUrl1.............', imageUrl);
-
-  // useEffect(() => {
-  //   if (imageUrl) {
-  //     setProfileImage(imageUrl);
-  //   }
-  // }, [imageUrl]);
-  const profileImageState = useSelector(state => state.profileImage);
-
-  // console.log('REDUX STATE', profileImageState);
-
-  const {loading, userData, error} = useSelector(state => state.updateUser);
-
   const [name, setName] = useState('');
   const [gender, setGender] = useState('Male');
   const [dob, setDob] = useState('');
   const [mobile, setMobile] = useState('');
   const [email, setEmail] = useState('');
-
+  const user = useSelector(state => state.user.user);
+  const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg'];
+  const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg'];
+  // const token = useSelector(state => state.auth.token);
+  const [photoModalVisible, setPhotoModalVisible] = useState(false); // ✔ Move here
+  const [profileImage, setProfileImage] = useState(null);
+  const [showEditMobileModal, setShowEditMobileModal] = useState(false);
+  const [showEditOtpMobileModel, setShowEditOtpMobileModel] = useState(false);
+  // profile image upload
+  const {imageUrl} = useSelector(state => state.profileImage || {});
+  const profileImageState = useSelector(state => state.profileImage);
+  // when i update basic info
+  const {loading, userData} = useSelector(state => state.updateUser);
+  const {otpSent, otpVerified, error} = useSelector(state => state.optVerify);
+  const [otp, setOtp] = useState(['', '', '', '']);
+  const inputRefs = useRef([]);
   // Validation
   const validate = () => {
     if (!name.trim()) {
       Alert.alert('Validation Error', 'Please enter your name.');
       return false;
     }
-    if (!/^\d{10}$/.test(mobile)) {
-      Alert.alert(
-        'Validation Error',
-        'Please enter a valid 10-digit mobile number.',
-      );
-      return false;
-    }
+    // if (!/^\d{10}$/.test(mobile)) {
+    //   Alert.alert(
+    //     'Validation Error',
+    //     'Please enter a valid 10-digit mobile number.',
+    //   );
+    //   return false;
+    // }
     if (!/^\S+@\S+\.\S+$/.test(email)) {
       Alert.alert('Validation Error', 'Please enter a valid email.');
       return false;
@@ -93,28 +107,81 @@ const BasicInfoScreen = () => {
     return true;
   };
 
+  const handleOtpChange = (value, index) => {
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (value && index < 3) {
+      inputRefs.current[index + 1].focus();
+    }
+  };
+  //Backspace handle for otp input
+  const handleKeyPress = (e, index) => {
+    if (e.nativeEvent.key === 'Backspace') {
+      if (otp[index] === '' && index > 0) {
+        inputRefs.current[index - 1].focus();
+      }
+    }
+  };
+  useEffect(() => {
+    if (timer === 0) return;
+
+    const interval = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  // Display format (1:59)
+  const formatTime = time => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  useEffect(() => {
+    if (otpVerified) {
+      refRBSheet.current.close();
+
+      setTimeout(() => {
+        successSheetRef.current.open();
+      }, 300);
+    }
+  }, [otpVerified]);
+
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Error', error);
+    }
+  }, [error]);
+  //Validation
+  useEffect(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsEmailValid(emailRegex.test(email));
+  }, [email]);
+
+  //dob convert
   const convertToISO = dob => {
     if (!dob || dob.length !== 10) return null;
     const [day, month, year] = dob.split('/');
     return `${year}-${month}-${day}`;
   };
 
-  // const handleSave = () => {
-  //   if (!validate()) return;
+  // when i click to save changes   updated  after thatall basic info
 
-  //   const payload = {
-  //     name,
-  //     gender: gender.toLowerCase(),
-  //     dateOfBirth: convertToISO(dob), // ✅ UI dob only
-  //     phone: mobile,
-  //   };
-  //   console.log(payload, 'payload............');
-  //   dispatch(updateUserRequest(payload, token));
-  // };
   const handleSave = () => {
     if (!validate()) return;
 
-    console.log('SAVE CLICKED ✅');
+    console.log('SAVE CLICKED ');
 
     const payload = {
       name,
@@ -123,36 +190,45 @@ const BasicInfoScreen = () => {
       phone: mobile,
     };
 
-    console.log('PAYLOAD 👉', payload);
-    console.log('TOKEN 👉', token);
+    console.log('PAYLOAD ', payload);
+    // console.log('TOKEN ', token);
 
-    dispatch(updateUserRequest(payload, token));
+    // dispatch(updateUserRequest(payload, token));
+    dispatch(updateUserRequest(payload));
   };
 
   useEffect(() => {
     if (userData) {
-      Alert.alert('Success', 'User updated successfully!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            dispatch(resetUpdateUser()); // 👈 reset state
-            navigation.goBack();
-          },
-        },
-      ]);
+      // Alert.alert('Success', 'User updated successfully!', [
+      //   {
+      //     text: 'OK',
+      //     onPress: () => {
+      //       dispatch(resetUpdateUser()); // 👈 reset state
+      //       navigation.goBack();
+      //     },
+      //   },
+      // ]);
+
+      // ✅ Toast message
+      ToastAndroid.show('Profile updated successfully!', ToastAndroid.SHORT);
+
+      //  Reset state
+      dispatch(resetUpdateUser());
+
+      //ADD THIS to get updated user data after update
+      // dispatch(fetchUserRequest(token));
+      dispatch(fetchUserRequest());
+
+      // ✅ Navigate back
+      // navigation.goBack();
     }
   }, [userData]);
+
   useEffect(() => {
     if (user?.email) {
-      setEmail(user.email); // 🔥 autofill email
+      setEmail(user.email);
     }
   }, [user]);
-
-  // useEffect(() => {
-  //   if (userData) {
-  //     dispatch(fetchUserRequest(token)); // 👈 ONLY ON SUCCESS
-  //   }
-  // }, [userData]);
 
   //DOB FORMATTER LOGIC
 
@@ -189,13 +265,16 @@ const BasicInfoScreen = () => {
 
     setDob(formatted);
   };
+
+  // when get all the data server afte that run
   useEffect(() => {
     if (!user) return;
 
     setName(user.name || '');
     if (user.profilePic) {
-      setProfileImage(user.profilePic); // 🔥 ADD THIS
+      setProfileImage(user.profilePic); //  ADD THIS
     }
+
     setGender(
       user.gender
         ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1)
@@ -205,7 +284,7 @@ const BasicInfoScreen = () => {
     // setMobile(user.phone || '');
     setMobile(user.mobileNumber ? String(user.mobileNumber) : '');
 
-    // 🔥 DOB set ONLY first time
+    //  DOB set ONLY first time
     if (user.dateOfBirth) {
       const date = new Date(user.dateOfBirth);
       const day = String(date.getDate()).padStart(2, '0');
@@ -214,11 +293,21 @@ const BasicInfoScreen = () => {
 
       setDob(prev => (prev ? prev : `${day}/${month}/${year}`));
     }
-
-    // if (user.profilePic) {
-    //   setProfileImage(user.profilePic);
-    // }
   }, [user]);
+  //when i change or update image and get new url  after that run
+  useEffect(() => {
+    if (imageUrl && imageUrl !== prevImageUrl.current) {
+      console.log('NEW IMAGE URL 👉', imageUrl);
+
+      setProfileImage(imageUrl);
+
+      // ✅ Toast only when NEW image comes
+      // ToastAndroid.show('Profile image updated!', ToastAndroid.SHORT);
+
+      // 🔥 update previous value
+      prevImageUrl.current = imageUrl;
+    }
+  }, [imageUrl]);
   const openGallery = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
@@ -244,13 +333,23 @@ const BasicInfoScreen = () => {
       return;
     }
 
-    // ✅ Dispatch correct image
+    // Dispatch correct image
     dispatch(uploadProfilePicRequest(image));
   };
-  // const token = useSelector(state => state.auth.token);
+
+  // useEffect(() => {
+  //   if (!token) {
+  //     setName('');
+  //     setGender('Male');
+  //     setDob('');
+  //     setMobile('');
+  //     setEmail('');
+  //     setProfileImage(null);
+  //   }
+  // }, [token]);
 
   useEffect(() => {
-    if (!token) {
+    if (!user) {
       setName('');
       setGender('Male');
       setDob('');
@@ -258,11 +357,29 @@ const BasicInfoScreen = () => {
       setEmail('');
       setProfileImage(null);
     }
-  }, [token]);
-  useEffect(() => {
-    if (!token) setProfileImage(null);
-  }, [token]);
+  }, [user]);
+  // useEffect(() => {
+  //   if (!token) setProfileImage(null);
+  // }, [token]);
 
+  useEffect(() => {
+    if (!user) setProfileImage(null);
+  }, [user]);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -414,51 +531,415 @@ const BasicInfoScreen = () => {
           />
 
           <Text style={styles.label}>Mobile Number</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter mobile number"
-            keyboardType="number-pad"
-            value={mobile}
-            placeholderTextColor={'grey'}
-            onChangeText={setMobile}
-            maxLength={10}
-          />
-          {/* <Image source={images.edit_icon} /> */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: '#fff',
+              borderRadius: wp(10),
+              // paddingHorizontal: 12,
+              paddingLeft: 12,
+              paddingRight: 5,
+              overflow: 'hidden', // 👈 important (cut edges perfectly)
+              height: 50,
+              borderWidth: 1,
+              borderColor: '#ccc',
+              color: '#000000',
+            }}>
+            <TextInput
+              // style={styles.input}
+              style={{flex: 1, color: '#000000'}}
+              placeholder="Enter mobile number"
+              keyboardType="number-pad"
+              value={mobile}
+              placeholderTextColor={'grey'}
+              onChangeText={setMobile}
+              maxLength={10}
+            />
 
-          {/* 
+            {/* 👇 Hide when mobile login */}
+            {loginType === 'email' && (
+              <GradientButton
+                onPress={() => {
+                  console.log('🟡 CLICK: Send OTP (Mobile)');
+                  if (mobile.length !== 10) {
+                    Alert.alert('Error', 'Enter valid mobile number');
+                    return;
+                  }
+                  const payloadData = {
+                    mobileNumber: mobile, // ✅ FIXED KEY
+                    countryCodeId: '6957b791f4ef97291c4df2d0',
+                  };
+
+                  console.log('FINAL PAYLOAD:', payloadData);
+
+                  dispatch({
+                    type: SEND_OTP_REQUEST,
+                    payload: {
+                      data: payloadData,
+                    },
+                  });
+
+                  // console.log('TYPE:', 'mobile');
+                  // console.log('MOBILE:', mobile);
+                  // console.log('EMAIL:', email);
+
+                  // if (!isMobileValid) return;
+                  setOtpType('mobile');
+                  // setOtpType(true);
+                  setFinalOtpType('mobile'); // ✅ ADD THIS
+                  setOtp(['', '', '', '']); // reset OTP
+                  setTimer(119); // start timer
+                  refRBSheet.current.open();
+                }}
+                title={'Send OTP'}
+                buttonStyle={{
+                  width: wp(94),
+                  height: hp(39),
+                  borderRadius: 10,
+                  // opacity: isMobileValid ? 1 : 0.5,
+
+                  // borderRadius: 20,
+                }}
+                // disabled={!isMobileValid}
+                textStyle={{fontSize: fontSize(14)}}
+              />
+            )}
+          </View>
+
+          <RBSheet
+            ref={refRBSheet}
+            height={hp(432)}
+            openDuration={250}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            customStyles={{
+              wrapper: {backgroundColor: 'rgba(0,0,0,0.3)'},
+              draggableIcon: {backgroundColor: '#C4C4C4'},
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                backgroundColor: '#FFFFFF',
+              },
+            }}>
+            <View style={styles.modalOverlay}>
+              <View
+                style={{
+                  // width: wp(375),
+                  width: '100%',
+                  height: hp(432),
+                  backgroundColor: '#FFFFFF',
+                  // borderWidth: 1,
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                }}>
+                <View
+                  style={{
+                    marginTop: hp(24),
+                    marginLeft: wp(30),
+                  }}>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.poppins500,
+                      fontSize: fontSize(16),
+                      color: '#000',
+                    }}>
+                    Verify Mobile
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    borderWidth: 0.5,
+                    borderColor: '#E7E7E7',
+                    width: '100%',
+                    marginTop: hp(20),
+                  }}
+                />
+                <View
+                  style={{
+                    marginTop: wp(34),
+                    // marginLeft: hp(57),
+                    alignItems: 'center',
+                    // justifyContent: 'center',
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    <Text style={{color: '#A3A3A3'}}>OTP sent on</Text>
+                    {/* <Text style={{color: '#000000'}}> {mobile}</Text> */}
+                    {/* {console.log('RENDER TYPE:', otpType)} */}
+                    <Text style={{color: '#000000'}}>
+                      {otpType === 'mobile' ? mobile : email}
+                    </Text>
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginTop: hp(32),
+                    marginHorizontal: wp(20),
+                  }}>
+                  {[0, 1, 2, 3].map((_, index) => (
+                    <TextInput
+                      key={index}
+                      ref={ref => (inputRefs.current[index] = ref)}
+                      style={{
+                        width: wp(60),
+                        height: hp(50),
+                        borderBottomWidth: 1,
+                        borderColor: '#000',
+                        textAlign: 'center',
+                        color: '#000000',
+                        fontSize: fontSize(24),
+                        fontFamily: fontFamily.poppins600,
+                        lineHeight: hp(50),
+                        paddingVertical: 0,
+                      }}
+                      maxLength={1}
+                      keyboardType="number-pad"
+                      onChangeText={value => handleOtpChange(value, index)}
+                      value={otp[index]}
+                      onKeyPress={e => handleKeyPress(e, index)}
+                    />
+                  ))}
+                </View>
+                <View style={{marginTop: hp(59), marginLeft: wp(126)}}>
+                  <Text
+                    style={{
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    <Text style={{color: '#A3A3A3'}}>Resend in </Text>
+                    <Text style={{color: '#000000'}}>{formatTime(timer)}</Text>
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    marginHorizontal: wp(37),
+                    marginTop: hp(58),
+                  }}>
+                  <GradientButton
+                    // title="Verify Code"
+                    title={'Verify Code'}
+                    disabled={loading}
+                    onPress={() => {
+                      const finalOtp = otp.join('');
+                      console.log(' CLICK: Verify OTP');
+                      console.log(' ENTERED OTP:', finalOtp);
+                      console.log('TYPE:', otpType);
+                      if (finalOtp.length !== 4) {
+                        Alert.alert('Error', 'Enter 4-digit OTP');
+                        return;
+                      }
+
+                      // // ✅ Close OTP sheet
+                      // refRBSheet.current.close();
+
+                      // // ✅ Open Success sheet (after small delay)
+                      // setTimeout(() => {
+                      //   successSheetRef.current.open();
+                      // }, 300);
+                      console.log('📤 VERIFY REQUEST SEND');
+                      console.log(' VERIFY OTP', {
+                        otp: finalOtp,
+                        type: otpType,
+                      });
+                      dispatch({
+                        type: VERIFY_OTP_REQUEST,
+
+                        payload: {
+                          data: {
+                            otp: finalOtp,
+                            type: otpType, // 👈 'mobile' or 'email'
+                          },
+                          // token: token,
+                        },
+                      });
+                    }}
+                  />
+                </View>
+              </View>
+            </View>
+          </RBSheet>
+
+          <RBSheet
+            ref={successSheetRef}
+            height={hp(257)}
+            openDuration={250}
+            closeOnDragDown={true}
+            closeOnPressMask={true}
+            customStyles={{
+              container: {
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 20,
+              },
+            }}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <View
+                style={{
+                  width: wp(375),
+                  height: hp(257),
+                  backgroundColor: '#FFFFFF',
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
+                }}>
+                <View
+                  style={{
+                    marginTop: hp(44),
+                    marginLeft: wp(170),
+                  }}>
+                  <Image
+                    source={images.otp_verify}
+                    style={{
+                      width: wp(34),
+                      height: hp(34),
+                      resizeMode: 'contain',
+                    }}
+                  />
+                </View>
+                <View
+                  style={{
+                    marginTop: hp(33),
+                    marginLeft: wp(77),
+                  }}>
+                  <Text
+                    style={{
+                      color: '#000000',
+                      fontSize: fontSize(18),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    {/* Mobile has been updated */}
+                    {finalOtpType === 'mobile'
+                      ? 'Mobile has been updated'
+                      : 'Email has been updated'}
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    marginTop: hp(33),
+                    marginLeft: wp(127),
+                  }}>
+                  <GradientButton
+                    // onPress={() => {
+                    //   setShowSecondModal(false);
+                    //   // navigation.navigate('Account');
+                    // }}
+
+                    onPress={() => {
+                      successSheetRef.current?.close();
+
+                      dispatch({type: 'RESET_OTP_STATE'});
+                    }}
+                    title={'Ok'}
+                    buttonStyle={{width: wp(120), height: hp(50)}}
+                  />
+                </View>
+              </View>
+            </View>
+          </RBSheet>
+
           <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={[styles.input, {marginBottom: 30}]}
-            placeholder="Enter email"
-            keyboardType="email-address"
-            placeholderTextColor={'grey'}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-          /> */}
 
-          <Text style={styles.label}>Email</Text>
+          <View
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: wp(10),
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingLeft: 12,
+              paddingRight: 5,
+              // paddingHorizontal: 12,
+              height: 50,
+              borderWidth: 1,
+              borderColor: '#ccc',
+              color: '#000000',
+              marginBottom: 30,
+            }}>
+            <TextInput
+              // style={[styles.input, {marginBottom: 30}]}
+              style={{flex: 1, color: '#000000'}}
+              placeholder="Enter email"
+              keyboardType="email-address"
+              placeholderTextColor={'grey'}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+            />
+            {/* 👇 Hide when email login */}
+            {loginType === 'mobile' && (
+              <GradientButton
+                title={'Send OTP'}
+                buttonStyle={{
+                  width: wp(94),
+                  height: hp(39),
+                  borderRadius: 10,
+                }}
+                textStyle={{fontSize: fontSize(14)}}
+                // onPress={() => {
+                //   console.log('TYPE:', 'email');
+                //   console.log('MOBILE:', mobile);
+                //   console.log('EMAIL:', email);
 
-          <TextInput
-            style={[styles.input, {marginBottom: 30}]}
-            placeholder="Enter email"
-            keyboardType="email-address"
-            placeholderTextColor={'grey'}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-          />
+                //   if (!isEmailValid) return;
+                //   setOtpType('email'); // ✅ correct (small letters)
+                //   setOtpType(true);
+                //   setOtp(['', '', '', '']);
+                //   setTimer(119);
 
-          <GradientButton
-            title={loading ? 'Saving...' : 'Save Changes'}
-            onPress={handleSave}
-            disabled={loading}
-            // loading={loading}
-            buttonStyle={{height: hp(45)}}
-          />
-          {/* {loading && (
-            <ActivityIndicator style={{marginTop: 10}} color="#8225AF" />
-          )} */}
+                //   refRBSheet.current.open(); // same sheet use કરી શકે
+                // }}
+
+                onPress={() => {
+                  console.log('CLICK: Send OTP (Email)');
+
+                  if (!email || !email.includes('@')) {
+                    Alert.alert('Error', 'Enter valid email');
+                    return;
+                  }
+                  console.log(' SEND OTP PAYLOAD:', {
+                    email,
+                    loginType,
+                  });
+
+                  dispatch({
+                    type: SEND_OTP_REQUEST,
+                    payload: {
+                      data: {email: email},
+                      // token: token,
+                    },
+                  });
+                  console.log('OTP TYPE SET: email');
+                  setOtpType('email'); // ✅ only this
+                  setFinalOtpType('email'); // ✅ ADD THIS
+                  setOtp(['', '', '', '']);
+                  setTimer(119);
+
+                  refRBSheet.current.open();
+                }}
+              />
+            )}
+          </View>
+          {!isKeyboardVisible && (
+            <GradientButton
+              title={loading ? 'Saving...' : 'Save Changes'}
+              onPress={handleSave}
+              // disabled={loading}
+              loading={loading}
+              buttonStyle={{height: hp(45)}}
+            />
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -518,7 +999,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: wp(10),
     paddingHorizontal: 12,
-    height: 48,
+    height: 50,
     borderWidth: 1,
     borderColor: '#ccc',
     color: '#000000',
@@ -547,14 +1028,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  genderBtnActive: {backgroundColor: '#8225AF'},
+  genderBtnActive: {backgroundColor: '#8225AF', borderRadius: wp(10)},
   genderText: {
     fontSize: 15,
     fontFamily: fontFamily.poppins500,
     color: '#000000',
   },
   genderTextActive: {color: '#fff'},
-  divider: {width: 1, backgroundColor: '#E2E2E2'},
+  // divider: {width: 1, backgroundColor: '#E2E2E2'},
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',

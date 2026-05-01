@@ -21,13 +21,27 @@ export default function wishlistReducer(state = initialState, action) {
     case WISHLIST_REQUEST:
       return {...state, loading: true};
 
+    // case WISHLIST_SUCCESS:
+    //   return {
+    //     ...state,
+    //     loading: false,
+    //     wishlistData: action.payload,
+    //   };
+
+    // case WISHLIST_SUCCESS:
+    //   return {
+    //     ...state,
+    //     loading: false,
+    //     wishlistData: Array.isArray(action.payload)
+    //       ? action.payload
+    //       : action.payload?.data || [],
+    //   };
+
     case WISHLIST_SUCCESS:
       return {
         ...state,
         loading: false,
-        wishlistData: action.payload,
       };
-
     case WISHLIST_FAILURE:
       return {
         ...state,
@@ -86,6 +100,12 @@ export default function wishlistReducer(state = initialState, action) {
 
     case CLEAR_WISHLIST: // ✅ add this
       return {...state, wishlistData: []};
+
+    case 'RESET_WISHLIST':
+      return {
+        ...state,
+        wishlistData: [],
+      };
     default:
       return state;
   }

@@ -5,14 +5,14 @@ import {
   GET_STORE_PRODUCTS_SUCCESS,
   GET_STORE_PRODUCTS_FAILURE,
 } from '../actions/storeProductActions';
-
+import api from '../../api/apiClient';
 function* getStoreProductsSaga(action) {
   console.log('Saga Triggered');
   console.log('Store ID ', action.payload);
   try {
     const response = yield call(
-      axios.get,
-      `https://mntrendigo.mntech.website/api/v1/user/product/by-store/${action.payload}`,
+      api.get,
+      `/user/product/by-store/${action.payload}`,
     );
 
     yield put({

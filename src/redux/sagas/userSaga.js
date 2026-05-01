@@ -5,16 +5,23 @@ import {
   FETCH_USER_SUCCESS,
   FETCH_USER_FAILURE,
 } from '../actions/userActions';
-
+import api from '../../api/apiClient';
 function* fetchUserSaga(action) {
   try {
-    const token = action.payload;
+    // const token = action.payload;
 
+    console.log('FETCH USER SAGA STARTED');
     const response = yield call(() =>
-      axios.get('https://mntrendigo.mntech.website/api/v1/user/auth/me', {
-        headers: {Authorization: `Bearer ${token}`},
-      }),
+      // axios.get('https://mntrendigo.mntech.website/api/v1/user/auth/me', {
+      //   headers: {Authorization: `Bearer ${token}`},
+      // }),
+
+      api.get('/user/auth/me'),
     );
+    console.log(' API CALLED SUCCESSFULLY');
+    console.log(' FULL RESPONSE:', response);
+    console.log(' RESPONSE.DATA:', response.data);
+    console.log(' USER DATA:', response.data?.data?.user);
 
     console.log('USER DATA........:', response.data);
 
@@ -22,7 +29,12 @@ function* fetchUserSaga(action) {
       type: FETCH_USER_SUCCESS,
       payload: response.data.data.user, // ✔ FIXED
     });
+
+    console.log(' USER STORED IN REDUX');
   } catch (error) {
+    console.log(' FETCH USER ERROR:', error);
+    console.log(' ERROR RESPONSE:', error?.response);
+    console.log(' ERROR DATA:', error?.response?.data);
     yield put({
       type: FETCH_USER_FAILURE,
       payload: error.response?.data || 'Failed to fetch user',

@@ -4,9 +4,6 @@ import {
   SEND_EMAIL_OTP_REQUEST,
   SEND_EMAIL_OTP_SUCCESS,
   SEND_EMAIL_OTP_FAILURE,
-  // VERIFY_EMAIL_OTP_REQUEST,
-  // VERIFY_EMAIL_OTP_SUCCESS,
-  // VERIFY_EMAIL_OTP_FAILURE,
   VERIFY_CHANGE_EMAIL_OTP_REQUEST,
   VERIFY_CHANGE_EMAIL_OTP_SUCCESS,
   VERIFY_CHANGE_EMAIL_OTP_FAILURE,
@@ -23,122 +20,33 @@ import {
   VERIFY_CHANGE_MOBILE_OTP_SUCCESS,
   VERIFY_CHANGE_MOBILE_OTP_FAILURE,
 } from '../actions/userAccountActions';
+import api from '../../api/apiClient';
 
-function sendOtpApi(token, currentEmail, newEmail) {
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/user/auth/send-otp-change-email',
-    {
-      email: {currentEmail, newEmail},
-    },
-    {
-      headers: {Authorization: `Bearer ${token}`},
-    },
-  );
-}
-
-function verifyOtpApi(token, currentEmail, newEmail, otp) {
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/user/auth/verify-otp-change-email',
-    {
-      email: {currentEmail, newEmail, otp},
-    },
-    {
-      headers: {Authorization: `Bearer ${token}`},
-    },
-  );
-}
-
-// SEND OTP Saga
-function* sendOtpSaga(action) {
-  try {
-    const {token, currentEmail, newEmail} = action.payload;
-    console.log(action, 'action');
-    const response = yield call(sendOtpApi, token, currentEmail, newEmail);
-    console.log(response, 'response');
-    yield put({type: SEND_EMAIL_OTP_SUCCESS, payload: response.data});
-  } catch (error) {
-    yield put({type: SEND_EMAIL_OTP_FAILURE, error});
-  }
-}
-
-// // VERIFY OTP Saga
-// function* verifyOtpSaga(action) {
-//   try {
-//     const {token, currentEmail, newEmail, otp} = action.payload;
-//     const response = yield call(
-//       verifyOtpApi,
-//       token,
-//       currentEmail,
-//       newEmail,
-//       otp,
-//     );
-//     console.log(response, 'response123');
-//     yield put({type: VERIFY_CHANGE_EMAIL_OTP_SUCCESS, payload: response.data});
-//     console.log(VERIFY_CHANGE_EMAIL_OTP_SUCCESS, 'responseData');
-//   } catch (error) {
-//     yield put({type: VERIFY_CHANGE_EMAIL_OTP_FAILURE, error});
-//   }
-// }
-
-function* verifyOtpSaga(action) {
-  try {
-    const {token, currentEmail, newEmail, otp} = action.payload;
-
-    // API CALL
-    const response = yield call(
-      verifyOtpApi,
-      token,
-      currentEmail,
-      newEmail,
-      otp,
-    );
-
-    console.log('VERIFY OTP RESPONSE:', response.data);
-
-    // If backend gives updated email or message:
-    const successPayload = {
-      message: response.data?.message,
-      updatedEmail: response.data?.data?.email,
-      user: response.data?.data?.user,
-      token: response.data?.data?.token,
-    };
-
-    // SUCCESS DISPATCH
-    yield put({
-      type: VERIFY_CHANGE_EMAIL_OTP_SUCCESS,
-      payload: successPayload,
-    });
-  } catch (error) {
-    // console.log('VERIFY OTP ERROR:', error.response?.data);
-    const errorMessage = error.response?.data?.message || 'Email already taken';
-
-    yield put({
-      type: VERIFY_CHANGE_EMAIL_OTP_FAILURE,
-      // error: error,
-      payload: errorMessage, // 🔥 only message
-    });
-  }
-}
-
-function getMeApi(token) {
-  return axios.get('https://mntrendigo.mntech.website/api/v1/user/auth/me', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+function getMeApi() {
+  return api.get('/user/auth/me');
 }
 
 function* getMeSaga(action) {
   try {
-    const {token} = action.payload;
-    const response = yield call(getMeApi, token);
+    console.log(' GET_ME_SAGA CALLED');
+    console.log(' ACTION:', action);
+
+    console.log(' CALLING API...');
+
+    const response = yield call(getMeApi);
+
+    console.log(' API RESPONSE:', response.data);
 
     yield put({
       type: GET_ME_SUCCESS,
-      payload: response.data, // { user: {...} }
+      payload: response.data,
     });
+
+    console.log('DISPATCHED GET_ME_SUCCESS');
   } catch (error) {
-    console.log('GET ME ERROR', error);
+    console.log(' GET ME ERROR:', error);
+    console.log(' ERROR RESPONSE:', error.response?.data);
+
     yield put({
       type: GET_ME_FAILURE,
       payload: error.response?.data || error.message,
@@ -146,76 +54,180 @@ function* getMeSaga(action) {
   }
 }
 
-// function deleteAccountApi(token) {
-//   return axios.delete('https://mntrendigo.mntech.website/api/v1/user/user/', {
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//     },
-//   });
-// }
+//send email otp Saga
 
-function deleteAccountApi(token) {
-  return axios.delete('https://mntrendigo.mntech.website/api/v1/user/user/', {
-    headers: {
-      Authorization: `Bearer ${token}`,
+function sendOtpApi(currentEmail, newEmail) {
+  return api.post('/user/auth/send-otp-change-email', {
+    email: {currentEmail, newEmail},
+  });
+}
+// SEND OTP Saga
+function* sendOtpSaga(action) {
+  try {
+    console.log('🔥 SEND OTP SAGA CALLED');
+    console.log(' FULL ACTION:', action);
+
+    // const {token, currentEmail, newEmail} = action.payload;
+    const {currentEmail, newEmail} = action.payload;
+    // console.log('TOKEN:', token);
+    console.log('CURRENT EMAIL:', currentEmail);
+    console.log('NEW EMAIL:', newEmail);
+
+    // //  safety check
+    // if (!token) {
+    //   console.log(' NO TOKEN → STOP API');
+    //   return;
+    // }
+
+    console.log(' CALLING SEND OTP API...');
+
+    // const response = yield call(sendOtpApi, token, currentEmail, newEmail);
+
+    const response = yield call(sendOtpApi, currentEmail, newEmail);
+    console.log('SEND OTP API RESPONSE:', response);
+    console.log('API RESPONSE:', response.data);
+
+    yield put({
+      type: SEND_EMAIL_OTP_SUCCESS,
+      payload: response.data,
+    });
+
+    console.log(' DISPATCHED SEND_EMAIL_OTP_SUCCESS');
+  } catch (error) {
+    console.log(' SEND OTP ERROR:', error);
+    console.log(' ERROR RESPONSE:', error.response?.data);
+
+    yield put({
+      type: SEND_EMAIL_OTP_FAILURE,
+      error: error.response?.data || error.message,
+    });
+  }
+}
+// VERIFY OTP Saga
+
+function verifyOtpApi(currentEmail, newEmail, otp) {
+  return api.post('/user/auth/verify-otp-change-email', {
+    email: {currentEmail, newEmail, otp},
+  });
+}
+function* verifyOtpSaga(action) {
+  try {
+    // 🔥 Log incoming action
+    console.log('🔥 VERIFY OTP ACTION PAYLOAD:', action.payload);
+
+    const {
+      // token,
+      currentEmail,
+      newEmail,
+      otp,
+    } = action.payload;
+
+    // Log before API call
+    console.log(' Calling verifyOtpApi with:', {
+      // token,
+      currentEmail,
+      newEmail,
+      otp,
+    });
+
+    // API CALL
+    const response = yield call(
+      verifyOtpApi,
+      // token,
+      currentEmail,
+      newEmail,
+      otp,
+    );
+
+    //  Log API response
+    console.log('VERIFY OTP RESPONSE:', response.data);
+
+    // If backend gives updated email or message
+    const successPayload = {
+      message: response.data?.message,
+      updatedEmail: response.data?.data?.email,
+      user: response.data?.data?.user,
+      token: response.data?.data?.token,
+    };
+
+    // 🔥 Log success payload
+    console.log(' VERIFY OTP SUCCESS PAYLOAD:', successPayload);
+
+    // SUCCESS DISPATCH
+    yield put({
+      type: VERIFY_CHANGE_EMAIL_OTP_SUCCESS,
+      payload: successPayload,
+    });
+  } catch (error) {
+    // 🔥 Log error
+    console.error(' VERIFY OTP ERROR:', error.response?.data || error.message);
+
+    // const errorMessage = error.response?.data?.message || 'Email already taken';
+
+    yield put({
+      type: VERIFY_CHANGE_EMAIL_OTP_FAILURE,
+      // payload: errorMessage,
+      error: error, // ✅ FULL ERROR OBJECT
+    });
+  }
+}
+
+// SEND MOBILE OTP SAGA
+
+function sendMobileOtpApi(currentMobileNumber, newMobileNumber) {
+  return api.post('/user/auth/send-otp-change-email', {
+    mobileNumber: {
+      currentMobileNumber,
+      newMobileNumber,
     },
   });
 }
 
-function* deleteAccountSaga(action) {
-  try {
-    const token = action.payload;
-    console.log('TOKEN IN SAGA:', token);
-
-    const res = yield call(deleteAccountApi, token);
-    console.log('DELETE API RESPONSE:', res.data);
-
-    yield put(deleteAccountSuccess());
-  } catch (error) {
-    console.log('DELETE API ERROR:', error.response?.data);
-    yield put(deleteAccountFailure(error.response?.data || 'Error'));
-  }
-}
-function sendMobileOtpApi(token, currentMobileNumber, newMobileNumber) {
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/user/auth/send-otp-change-email',
-    {
-      mobileNumber: {currentMobileNumber, newMobileNumber},
-    },
-    {
-      headers: {Authorization: `Bearer ${token}`},
-    },
-  );
-}
-
-function verifyMobileOtpApi(token, currentMobileNumber, newMobileNumber, otp) {
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/user/auth/verify-otp-change-email',
-    {
-      mobileNumber: {currentMobileNumber, newMobileNumber, otp},
-    },
-    {
-      headers: {Authorization: `Bearer ${token}`},
-    },
-  );
-}
 function* sendMobileOtpSaga(action) {
   try {
-    const {token, currentMobileNumber, newMobileNumber} = action.payload;
+    console.log(' SEND MOBILE OTP SAGA CALLED');
+
+    // 👉 Full action log
+    console.log(' ACTION:', action);
+
+    // const {token, currentMobileNumber, newMobileNumber} = action.payload;
+    const {currentMobileNumber, newMobileNumber} = action.payload;
+
+    // 👉 Input logs
+    // console.log(' TOKEN:', token);
+    console.log(' CURRENT MOBILE:', currentMobileNumber);
+    console.log(' NEW MOBILE:', newMobileNumber);
+
+    // 🔥 Safety check
+    // if (!token) {
+    //   console.log(' NO TOKEN → STOP API');
+    //   return;
+    // }
+
+    console.log('CALLING SEND MOBILE OTP API...');
 
     const response = yield call(
       sendMobileOtpApi,
-      token,
+      // token,
       currentMobileNumber,
       newMobileNumber,
     );
+
+    // 👉 API success log
+    console.log(' API RESPONSE:', response.data);
 
     yield put({
       type: SEND_MOBILE_OTP_SUCCESS,
       payload: response.data,
     });
-    console.log('response.data', response.data);
+
+    console.log(' DISPATCHED SEND_MOBILE_OTP_SUCCESS');
   } catch (error) {
+    console.log(' SEND MOBILE OTP ERROR:', error);
+
+    // 👉 backend error
+    console.log('ERROR RESPONSE:', error.response?.data);
+
     yield put({
       type: SEND_MOBILE_OTP_FAILURE,
       payload: error.response?.data?.message || 'Failed to send OTP',
@@ -223,35 +235,126 @@ function* sendMobileOtpSaga(action) {
   }
 }
 
+function verifyMobileOtpApi(currentMobileNumber, newMobileNumber, otp) {
+  return api.post('/user/auth/verify-otp-change-email', {
+    mobileNumber: {
+      currentMobileNumber,
+      newMobileNumber,
+      otp,
+    },
+  });
+}
+
 function* verifyMobileOtpSaga(action) {
   try {
-    const {token, currentMobileNumber, newMobileNumber, otp} = action.payload;
+    console.log('🔥 VERIFY MOBILE OTP SAGA CALLED');
+
+    // 👉 Full action
+    console.log('👉 ACTION:', action);
+
+    const {currentMobileNumber, newMobileNumber, otp} = action.payload;
+
+    // 👉 Input logs
+    // console.log('📌 TOKEN:', token);
+    console.log(' CURRENT MOBILE:', currentMobileNumber);
+    console.log('NEW MOBILE:', newMobileNumber);
+    console.log('OTP:', otp);
+
+    // 🔥 Safety check
+    // if (!token) {
+    //   console.log('❌ NO TOKEN → STOP API');
+    //   return;
+    // }
+
+    console.log('CALLING VERIFY MOBILE OTP API...');
 
     const response = yield call(
       verifyMobileOtpApi,
-      token,
+      // token,
       currentMobileNumber,
       newMobileNumber,
       otp,
     );
 
+    // 👉 Success response
+    console.log('✅ VERIFY MOBILE OTP RESPONSE:', response.data);
+
     yield put({
       type: VERIFY_CHANGE_MOBILE_OTP_SUCCESS,
       payload: response.data,
     });
-    console.log('response.data', response.data);
 
-    // 🔥 Refresh user data after success
-    yield put({type: GET_ME_REQUEST, payload: {token}});
+    console.log(' DISPATCHED VERIFY_CHANGE_MOBILE_OTP_SUCCESS');
+
+    // 🔥 Refresh user data
+    console.log(' CALLING GET_ME AFTER SUCCESS');
+
+    // yield put({type: GET_ME_REQUEST, payload: {token}});
+
+    yield put({type: GET_ME_REQUEST});
   } catch (error) {
+    console.log('VERIFY MOBILE OTP ERROR:', error);
+
+    // 👉 backend error detail
+    console.log(' ERROR RESPONSE:', error.response?.data);
+
     yield put({
       type: VERIFY_CHANGE_MOBILE_OTP_FAILURE,
       payload: error.response?.data?.message || 'Invalid OTP',
     });
-    console.log('VERIFY MOBILE OTP ERROR:', error.response?.data);
+
+    console.log(' DISPATCHED VERIFY_CHANGE_MOBILE_OTP_FAILURE');
   }
 }
 
+// DELETE ACCOUNT SAGA
+function deleteAccountApi() {
+  console.log('DELETE API FUNCTION CALLED');
+
+  // return axios.delete('https://mntrendigo.mntech.website/api/v1/user/user/', {
+  //   headers: {
+  //     Authorization: `Bearer ${token}`,
+  //   },
+  // });
+
+  console.log('DELETE API FUNCTION CALLED');
+
+  return api.delete('/user/user/');
+}
+
+function* deleteAccountSaga(action) {
+  console.log(' [DELETE ACCOUNT] Saga Started');
+
+  try {
+    console.log(' CALLING DELETE ACCOUNT API...');
+
+    // res variable માં API response capture કરો
+    const res = yield call(deleteAccountApi);
+
+    console.log(' DELETE API SUCCESS RESPONSE:', res);
+    console.log('RESPONSE DATA:', res.data); // res.data હવે defined હશે
+
+    // dispatch success
+    yield put(deleteAccountSuccess());
+    console.log(' DISPATCHED deleteAccountSuccess');
+  } catch (error) {
+    console.log(' DELETE ACCOUNT ERROR OCCURRED');
+
+    console.log(' FULL ERROR:', error);
+    console.log(' ERROR RESPONSE:', error.response);
+    console.log(' ERROR DATA:', error.response?.data);
+    console.log(' ERROR MESSAGE:', error.message);
+
+    yield put(
+      deleteAccountFailure(
+        error.response?.data?.message || 'Delete account failed',
+      ),
+    );
+    console.log(' DISPATCHED deleteAccountFailure');
+  }
+
+  console.log(' [DELETE ACCOUNT] Saga Finished');
+}
 export default function* userAccountSaga() {
   yield takeLatest(SEND_EMAIL_OTP_REQUEST, sendOtpSaga);
   yield takeLatest(VERIFY_CHANGE_EMAIL_OTP_REQUEST, verifyOtpSaga);

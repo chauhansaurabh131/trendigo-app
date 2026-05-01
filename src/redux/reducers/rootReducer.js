@@ -19,6 +19,9 @@ import {productDetailsReducer} from './productDetailsReducer';
 import recentlyViewedReducer from './recentlyViewedReducer';
 import cartReducer from './cartReducer';
 import productVariantReducer from './productVariantReducer';
+import searchReducer from './searchReducer';
+import emailAndMobile from './emailAndMobileReducer';
+import otpReducer from './otpReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -40,6 +43,9 @@ const appReducer = combineReducers({
   recentlyView: recentlyViewedReducer,
   addToCard: cartReducer,
   productVariant: productVariantReducer,
+  search: searchReducer, // ✅ unique key
+  emailAndMobile: emailAndMobile,
+  optVerify: otpReducer,
 });
 
 const rootReducer = (state, action) => {

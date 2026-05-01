@@ -11,7 +11,8 @@ import {
   getUserReviewsFailure,
   GET_PRESIGNED_URL_REQUEST,
 } from '../actions/reviewActions';
-console.log('🟣 REVIEW SAGA FILE LOADED');
+import api from '../../api/apiClient';
+console.log('REVIEW SAGA FILE LOADED');
 
 const uploadImageToS3 = async (uploadUrl, file) => {
   const response = await fetch(file.uri);
@@ -29,79 +30,65 @@ const uploadImageToS3 = async (uploadUrl, file) => {
 };
 
 function addReviewApi(data, token) {
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/user/review/',
-    data,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+  // return axios.post(
+  //   'https://mntrendigo.mntech.website/api/v1/user/review/',
+  //   data,
+  //   {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   },
+  // );
+  return api.post('/user/review/', data);
 }
 function* addReviewSaga(action) {
   try {
-    console.log('🟢 ADD REVIEW SAGA CALLED');
-    console.log('📦 Payload:', action.payload);
+    console.log(' ADD REVIEW SAGA CALLED');
+    console.log(' Payload:', action.payload);
 
-    // const token = yield select(state => state.auth.token);
+    // const token = yield call(AsyncStorage.getItem, 'authToken');
+    // console.log(' TOKEN FROM ASYNC STORAGE IN REVIEW SAGA:', token);
+    // if (!token) {
+    //   throw new Error('Token missing');
+    // }
 
-    // console.log('🟢 TOKEN FROM REDUX:', token);
-    const token = yield call(AsyncStorage.getItem, 'authToken');
-    console.log('🟢 TOKEN FROM ASYNC STORAGE IN REVIEW SAGA:', token);
-    if (!token) {
-      throw new Error('Token missing');
-    }
-
-    const response = yield call(addReviewApi, action.payload, token);
-    console.log('✅ API RESPONSE:', response.data);
-
+    const response = yield call(addReviewApi, action.payload);
+    console.log(' API RESPONSE:', response.data);
+    console.log(' Review added successfully');
     yield put(addReviewSuccess(response.data));
   } catch (error) {
-    console.log('❌ ADD REVIEW ERROR:', error);
-    console.log('❌ STATUS:', error.response?.status);
-    console.log('❌ BACKEND ERROR:', error.response?.data);
+    console.log(' ADD REVIEW ERROR:', error);
+    console.log(' STATUS:', error.response?.status);
+    console.log(' BACKEND ERROR:', error.response?.data);
     yield put(addReviewFailure(error.response?.data || error.message));
   }
 }
 
-//get reviews by user id
-
-// function getUserReviewsApi(userId, token) {
-//   return axios.get(
-//     `https://mntrendigo.mntech.website/api/v1/user/review/by-user/${userId}`,
-//     {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     },
-//   );
-// }
-
 function getPresignedUrlApi(data, token) {
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/s3/presignedurlv2',
-    data,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
+  // return axios.post(
+  //   'https://mntrendigo.mntech.website/api/v1/s3/presignedurlv2',
+  //   data,
+  //   {
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       Authorization: `Bearer ${token}`,
+  //     },
+  //   },
+  // );
+  return api.post('/api/v1/s3/presignedurlv2', data);
 }
 function* getPresignedUrlSaga(action) {
   try {
     console.log(' GET_PRESIGNED_URL_SAGA CALLED');
     console.log('Incoming Payload:', action.payload);
 
-    const token = yield call(AsyncStorage.getItem, 'authToken');
-    console.log(' Token from AsyncStorage:', token);
+    // const token = yield call(AsyncStorage.getItem, 'authToken');
+    // console.log(' Token from AsyncStorage:', token);
 
-    if (!token) {
-      throw new Error('Token missing in presigned saga');
-    }
+    // if (!token) {
+    //   throw new Error('Token missing in presigned saga');
+    // }
 
     //  ONLY send required fields to backend
     const presignedPayload = {
@@ -111,7 +98,7 @@ function* getPresignedUrlSaga(action) {
     };
 
     console.log('Calling Presigned URL API...');
-    const response = yield call(getPresignedUrlApi, presignedPayload, token);
+    const response = yield call(getPresignedUrlApi, presignedPayload);
 
     console.log(' Presigned API Full Response:', response.data);
     const imageUrl = response.data.data.imageUrl;
@@ -159,9 +146,10 @@ function* getPresignedUrlSaga(action) {
   }
 }
 function getUserReviewsApi(productId) {
-  return axios.get(
-    `https://mntrendigo.mntech.website/api/v1/user/review/by-product/${productId}`,
-  );
+  // return axios.get(
+  //   `https://mntrendigo.mntech.website/api/v1/user/review/by-product/${productId}`,
+  // );
+  return api.get(`user/review/by-product/${productId}`);
 }
 function* getUserReviewsSaga(action) {
   try {
@@ -183,6 +171,9 @@ function* getUserReviewsSaga(action) {
 export function* watchAddReview() {
   console.log(' watchAddReview running');
   yield takeLatest(ADD_REVIEW_REQUEST, addReviewSaga);
+  console.log(' watchAddReview listening for ADD_REVIEW_REQUEST');
   yield takeLatest(GET_USER_REVIEWS_REQUEST, getUserReviewsSaga);
+  console.log(' watchAddReview listening for GET_USER_REVIEWS_REQUEST');
   yield takeLatest(GET_PRESIGNED_URL_REQUEST, getPresignedUrlSaga);
+  console.log(' watchAddReview listening for GET_PRESIGNED_URL_REQUEST');
 }

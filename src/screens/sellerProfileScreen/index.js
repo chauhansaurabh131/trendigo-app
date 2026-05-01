@@ -83,18 +83,53 @@ const SellerProfileScreen = ({route}) => {
           style={{
             marginTop: hp(16),
           }}>
-          <Image
+          {/* <Image
             // source={images.seller_image}
             source={bannerImage ? {uri: bannerImage} : images.seller_image}
             style={{width: '100%', height: hp(121)}}
-          />
+          /> */}
+
+          {bannerImage ? (
+            <Image
+              source={{uri: bannerImage}}
+              style={{width: '100%', height: hp(121)}}
+            />
+          ) : null}
         </View>
         <View style={{marginTop: 17, alignItems: 'center'}}>
-          <Image
+          {/* <Image
             // source={images.seller_shop}
             source={shopImage ? {uri: shopImage} : images.shopClothImage}
             style={{width: hp(84), height: hp(84), resizeMode: 'contain'}}
-          />
+          /> */}
+
+          <View
+            style={{
+              width: hp(90),
+              height: hp(90),
+              borderRadius: 50,
+              backgroundColor: '#fff',
+              borderColor: '#ccc',
+              borderWidth: 0.5,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {shopImage && shopImage.trim() !== '' ? (
+              <Image
+                source={{uri: shopImage}}
+                style={{width: hp(84), height: hp(84), borderRadius: 50}}
+              />
+            ) : (
+              <Text
+                style={{
+                  fontSize: fontSize(28),
+
+                  color: '#000',
+                }}>
+                {store?.name?.charAt(0)?.toUpperCase() || '?'}
+              </Text>
+            )}
+          </View>
         </View>
         <View style={{marginTop: hp(17), alignItems: 'center'}}>
           <Text
@@ -104,7 +139,8 @@ const SellerProfileScreen = ({route}) => {
               color: '#000',
             }}>
             {/* Galaxy Fashion Hub */}
-            {store?.name}
+            {store?.name?.charAt(0)?.toUpperCase() + store.name.slice(1) ||
+              'No Name of store'}
           </Text>
         </View>
         <View
@@ -126,7 +162,7 @@ const SellerProfileScreen = ({route}) => {
                   color: '#000',
                 }}>
                 {/* 4.2{'  '} */}
-                {data?.storeAverageRating ?? ''}
+                {data?.storeAverageRating ?? '0.0'}
                 {'  '}
               </Text>
               <Text
@@ -148,7 +184,7 @@ const SellerProfileScreen = ({route}) => {
                   color: '#000',
                 }}>
                 {/* 190 */}
-                {data?.totalResults ?? 0}
+                {data?.totalResults ?? '0'}
                 {'  '}
               </Text>
               <Text

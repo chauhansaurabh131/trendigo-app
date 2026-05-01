@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {useSelector} from 'react-redux';
-
+import {useDispatch, useSelector} from 'react-redux';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {setAuthToken, setLoginType} from '../redux/actions/authActions';
 import StartingScreen from '../screens/startingScreen';
 import MainTabNavigator from './MainTabNavigator';
 import DemoCodeScreen from '../screens/demoCodeScreen';
@@ -19,14 +20,44 @@ import ReviewRatingComponent from '../components/reviewRatingComponent';
 import ReviewandRatingsScreen from '../screens/ReviewandRatingsScreen';
 import revewsScreen from '../screens/revewsScreen';
 import RevewsScreen from '../screens/revewsScreen';
-import sellerProfileScreen from '../screens/sellerProfileScreen';
-import SellerProfileScreen from '../screens/sellerProfileScreen';
+// import sellerProfileScreen from '../screens/sellerProfileScreen';
+// import SellerProfileScreen from '../screens/sellerProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
+  const dispatch = useDispatch();
   const token = useSelector(state => state.auth.token);
+  const [loading, setLoading] = React.useState(true);
+  useEffect(() => {
+    const initAuth = async () => {
+      const storedToken = await AsyncStorage.getItem('authToken');
 
+      if (storedToken) {
+        dispatch(setAuthToken(storedToken));
+      }
+
+      setLoading(false);
+    };
+
+    initAuth();
+  }, []);
+
+  useEffect(() => {
+    const loadLoginType = async () => {
+      const savedType = await AsyncStorage.getItem('loginType');
+
+      console.log('LOADED LOGIN TYPE:', savedType);
+
+      if (savedType) {
+        dispatch(setLoginType(savedType));
+      }
+    };
+
+    loadLoginType();
+  }, []);
+
+  if (loading) return null;
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       {/* 🔥 ALWAYS HOME FIRST */}
@@ -50,7 +81,7 @@ const RootNavigator = () => {
       />
       <Stack.Screen name="ReviewRating" component={ReviewandRatingsScreen} />
       <Stack.Screen name="ReviewsScreen" component={RevewsScreen} />
-      <Stack.Screen name="sellerProfile" component={SellerProfileScreen} />
+      {/* <Stack.Screen name="SellerProfile" component={SellerProfileScreen} /> */}
     </Stack.Navigator>
   );
 };

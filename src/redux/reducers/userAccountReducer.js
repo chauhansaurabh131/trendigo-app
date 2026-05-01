@@ -2,9 +2,6 @@ import {
   SEND_EMAIL_OTP_REQUEST,
   SEND_EMAIL_OTP_SUCCESS,
   SEND_EMAIL_OTP_FAILURE,
-  // VERIFY_EMAIL_OTP_REQUEST,
-  // VERIFY_EMAIL_OTP_SUCCESS,
-  // VERIFY_EMAIL_OTP_FAILURE,
   VERIFY_CHANGE_EMAIL_OTP_REQUEST,
   VERIFY_CHANGE_EMAIL_OTP_FAILURE,
   VERIFY_CHANGE_EMAIL_OTP_SUCCESS,
@@ -16,6 +13,9 @@ import {
   SEND_MOBILE_OTP_REQUEST,
   SEND_MOBILE_OTP_SUCCESS,
   VERIFY_CHANGE_MOBILE_OTP_SUCCESS,
+  VERIFY_CHANGE_MOBILE_OTP_FAILURE,
+  SEND_MOBILE_OTP_FAILURE,
+  RESET_ACCOUNT_ERROR,
 } from '../actions/userAccountActions';
 import {LOGOUT} from '../actions/authActions';
 const initialState = {
@@ -83,7 +83,11 @@ export default function userAccountReducer(state = initialState, action) {
         ...state,
         loading: false,
         emailVerified: false,
-        error: action.error?.response?.data?.message || 'Email already taken',
+        // error: action.error?.response?.data?.message || 'Email already taken',
+        error:
+          action.error?.response?.data?.message ||
+          action.error?.message ||
+          'Something went wrong',
       };
 
     // case GET_ME_SUCCESS:
@@ -127,12 +131,39 @@ export default function userAccountReducer(state = initialState, action) {
       };
     case LOGOUT:
       return initialState; // 🔥 FULL RESET
+    // case SEND_MOBILE_OTP_REQUEST:
+    //   return {...state, loading: true, otpSent: false};
+
+    // case SEND_MOBILE_OTP_SUCCESS:
+    //   return {...state, loading: false, otpSent: true};
     case SEND_MOBILE_OTP_REQUEST:
-      return {...state, loading: true, otpSent: false};
+      return {
+        ...state,
+        loading: true,
+        otpSent: false,
+        error: null,
+      };
 
     case SEND_MOBILE_OTP_SUCCESS:
-      return {...state, loading: false, otpSent: true};
+      return {
+        ...state,
+        loading: false,
+        otpSent: true,
+      };
 
+    case SEND_MOBILE_OTP_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        otpSent: false,
+        error: action.payload,
+      };
+    case VERIFY_CHANGE_MOBILE_OTP_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload, // 🔥 error store
+      };
     case VERIFY_CHANGE_MOBILE_OTP_SUCCESS:
       return {
         ...state,
@@ -144,6 +175,11 @@ export default function userAccountReducer(state = initialState, action) {
       return {
         ...state,
         message: null,
+      };
+    case RESET_ACCOUNT_ERROR:
+      return {
+        ...state,
+        error: null,
       };
     default:
       return state;

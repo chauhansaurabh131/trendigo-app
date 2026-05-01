@@ -1,5 +1,5 @@
-import React from 'react';
-import {FlatList, SafeAreaView, Text, View} from 'react-native';
+import React, {useEffect} from 'react';
+import {FlatList, Image, SafeAreaView, Text, View} from 'react-native';
 import {colors} from '../../utils/colors';
 import {
   ColorTrendiGo,
@@ -15,10 +15,18 @@ import LatestTrendyComponet from '../../components/latestTrendyComponent';
 import ViralTrendyComponet from '../../components/viralTrendComponent';
 import ShopByBrandsComponent from '../../components/shopByBrandComponenent';
 import RecentlyViewComponent from '../../components/recentlyViewComponent';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchUserRequest} from '../../redux/actions/userActions';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-
+  const dispatch = useDispatch();
+  const {user, loading} = useSelector(state => state.user);
+  useEffect(() => {
+    dispatch(fetchUserRequest());
+  }, []);
+  console.log('PROFILE PIC 👉', user?.profilePic);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       {/* 🔒 Non-scrollable header */}
@@ -36,12 +44,20 @@ const HomeScreen = () => {
           }}>
           <ColorTrendiGo />
 
-          <Touchable
+          <TouchableOpacity
+            activeOpacity={0.6}
             onPress={() => {
               navigation.navigate('ProfileScreen');
             }}>
-            <ProfileIcon />
-          </Touchable>
+            {user?.profilePic ? (
+              <Image
+                source={{uri: user.profilePic}}
+                style={{width: wp(24), height: hp(24), borderRadius: 20}}
+              />
+            ) : (
+              <ProfileIcon />
+            )}
+          </TouchableOpacity>
         </View>
 
         <View
