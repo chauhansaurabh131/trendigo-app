@@ -60,9 +60,14 @@ const cardWidth = (screenWidth - 40) / 2;
 const RecentlyViewComponent = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
   const {data, loading} = useSelector(state => state.recentlyView);
+
+  console.log('RECENTLY PRODUCT ', data);
+
   const [localWishlist, setLocalWishlist] = useState([]);
   const {wishlistData} = useSelector(state => state.wishlist);
+
   useEffect(() => {
     if (Array.isArray(wishlistData)) {
       setLocalWishlist(wishlistData);
@@ -108,26 +113,18 @@ const RecentlyViewComponent = () => {
                 justifyContent: 'space-between',
               }}
               renderItem={({item, index}) => {
+                console.log('RECENTY OF PRODUCT ITEM ', item);
+                // console.log('RECENT PRODUCT =>', JSON.stringify(item, null, 2));
                 // Now check if product exist in wishlist
                 const safeWishlist = Array.isArray(wishlistData)
                   ? wishlistData
                   : [];
-
-                // const isWishlisted = safeWishlist.some(w => {
-                //   const productId = w.productId?.id || w.productId?._id;
-                //   return String(productId) === String(item._id);
-                // });
 
                 const isWishlisted = localWishlist.some(w => {
                   const productId = w.productId?.id || w.productId?._id;
                   return String(productId) === String(item._id);
                 });
 
-                // console.log('ITEM:', item._id);
-                // console.log(' WISHLIST CHECK:', isWishlisted);
-
-                // console.log('wishlistData:', wishlistData);
-                // console.log('current item:', item._id);
                 console.log('Images:', item.images);
                 console.log('Variants:', item.variants);
 
@@ -157,8 +154,15 @@ const RecentlyViewComponent = () => {
                       marginTop: hp(22),
                     }}
                     activeOpacity={0.6}
+                    // onPress={() => {
+                    //   navigation.navigate('ProductDetails', {product: item});
+                    // }}
+
                     onPress={() => {
-                      navigation.navigate('ProductDetails', {product: item});
+                      console.log('RECENT PRODUCT ID =>', item?._id);
+                      navigation.navigate('ProductDetails', {
+                        productId: item?._id,
+                      });
                     }}>
                     <Image
                       // source={item.image}
@@ -201,7 +205,7 @@ const RecentlyViewComponent = () => {
                             color: colors.black,
                           }}>
                           {/* Rs. {item.price} */}
-                          Rs. {variant?.price ?? ''}
+                          Rs. {variant?.sellingPrice ?? ''}
                         </Text>
                         <Text
                           style={{
@@ -212,7 +216,7 @@ const RecentlyViewComponent = () => {
                             fontFamily: fontFamily.poppins500,
                             lineHeight: hp(14),
                           }}>
-                          MRP {item.mrp}
+                          MRP {variant?.price ?? ''}
                         </Text>
                         <Text
                           style={{

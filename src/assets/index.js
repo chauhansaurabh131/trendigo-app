@@ -36,9 +36,27 @@ import RemoveIcon from './svgIcons/remove_icon.svg';
 import EditIcon from './svgIcons/edit_icon.svg';
 import SendEquiry1 from './svgIcons/send_equiry1.svg';
 import MapIcon from './svgIcons/map-icon.svg';
+import CrossIcon from './svgIcons/cross_icon.svg';
+import ThreeDotsIcon from './svgIcons/three_dot_icon.svg';
+import RightArrow from './svgIcons/right_arrow.svg';
+import EmojiIcon from './svgIcons/emoji_icon.svg';
+import CameraIcon from './svgIcons/camera_icon.svg';
+import ShareIcon from './svgIcons/share_icon.svg';
+import Icon from './svgIcons/icon.svg';
+import TrulyBag from './svgIcons/truly_bag.svg';
+import FullImage from './svgIcons/fullimage.svg';
+import SmallTrulyBag from './svgIcons/small_trulybag.svg';
 export {
+  Icon,
+  ShareIcon,
+  FullImage,
+  SmallTrulyBag,
+  TrulyBag,
   WhiteTrendiGo,
   RightSideArrow,
+  CameraIcon,
+  RightArrow,
+  EmojiIcon,
   GoogleIcon,
   ColorHomeIcon,
   HomeIcon,
@@ -75,6 +93,8 @@ export {
   EditIcon,
   SendEquiry1,
   MapIcon,
+  CrossIcon,
+  ThreeDotsIcon,
 };
 
 export const images = {
@@ -158,4 +178,7 @@ export const images = {
   latest_trendy: require('./images/latest_trendy_image.png'),
   viral_trendy: require('./images/viral_trendy_image.png'),
   video_play: require('./images/video_play_icon.png'),
+  full_image: require('./images/full_image1.png'),
+  truly_bag_image: require('./images/truly_bag_image1.png'),
+  blue_gradient: require('./images/blue_gradient1.png'),
 };

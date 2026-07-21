@@ -28,7 +28,7 @@ export default function recentlyViewedReducer(state = initialState, action) {
       return {...state, loading: false, error: action.payload};
 
     case GET_RECENTLY_VIEWED_SUCCESS:
-      return {...state, loading: false, data: action.payload}; // api data here
+      return {...state, loading: false, data: action.payload};
 
     case GET_RECENTLY_VIEWED_FAILURE:
       return {...state, loading: false, error: action.payload, data: []};

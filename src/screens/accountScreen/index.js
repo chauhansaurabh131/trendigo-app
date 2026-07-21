@@ -141,13 +141,15 @@ const AccountScreen = () => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  // useEffect(() => {
-  //   if (token && user?.user?.email) {
-  //     setEmail(user.user.email);
-  //   } else {
-  //     setEmail(''); // 🔥 CLEAR
-  //   }
-  // }, [user, token]);
+  useEffect(() => {
+    if (timer <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimer(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer]);
 
   useEffect(() => {
     if (user?.user?.email) {
@@ -212,11 +214,6 @@ const AccountScreen = () => {
       },
     });
 
-    // setShowEditModal(false);
-    // setShowOtpModal(true);
-    // ✅ Close Email Sheet
-    // sheetRef.current?.close();
-
     // 1. First sheet close
     sheetRef.current?.close();
     //  2. OTP modal state
@@ -241,15 +238,15 @@ const AccountScreen = () => {
 
   useEffect(() => {
     if (emailVerified) {
-      // ✅ Sheet close
+      // Sheet close
       otpSheetRef.current?.close();
 
-      // 🔥 ADD THIS (VERY IMPORTANT)
+      //  ADD THIS (VERY IMPORTANT)
       setShowOtpModal(false);
-      // 🔥 current email update only AFTER verify
+      //  current email update only AFTER verify
       setEmail(newEmail);
 
-      // ✅ Success open
+      //  Success open
       setTimeout(() => {
         successSheetRef.current?.open();
       }, 300);
@@ -306,7 +303,7 @@ const AccountScreen = () => {
     if (error) {
       Alert.alert(
         'Error',
-        error, // 👉 "Email already taken"
+        error, //  "Email already taken"
         [{text: 'OK'}],
       );
     }
@@ -315,7 +312,7 @@ const AccountScreen = () => {
 
   useEffect(() => {
     if (message === 'Mobile number updated successfully') {
-      console.log('✅ SUCCESS → OPEN SHEET');
+      console.log('SUCCESS → OPEN SHEET');
 
       // OTP sheet close
       mobileOtpSheetRef.current?.close();
@@ -453,7 +450,7 @@ const AccountScreen = () => {
                     borderColor: '#CDCDCD',
                     borderRadius: 25,
                     marginHorizontal: wp(39),
-                    height: hp(50),
+                    height: hp(45),
                     marginTop: hp(9),
                   }}>
                   <TextInput
@@ -463,7 +460,8 @@ const AccountScreen = () => {
                       color: '#000',
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
-                      marginLeft: wp(26),
+                      // marginLeft: wp(26),
+                      marginLeft: wp(15),
                     }}
                   />
                 </View>
@@ -488,7 +486,8 @@ const AccountScreen = () => {
                     borderColor: '#CDCDCD',
                     borderRadius: 25,
                     marginHorizontal: wp(39),
-                    height: hp(50),
+                    // height: hp(50),
+                    height: hp(45),
                     marginTop: hp(9),
                   }}>
                   <TextInput
@@ -498,7 +497,8 @@ const AccountScreen = () => {
                       color: '#000',
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
-                      marginLeft: wp(26),
+                      // marginLeft: wp(26),
+                      marginLeft: wp(15),
                     }}
                   />
                 </View>
@@ -514,15 +514,15 @@ const AccountScreen = () => {
                     style={{
                       width: wp(136),
                       height: hp(50),
-                      borderRadius: 25,
-                      padding: 2, // ⭐ THIS IS THE KEY
+                      borderRadius: 30,
+                      padding: 1, // ⭐ THIS IS THE KEY
                     }}>
                     <TouchableOpacity
                       activeOpacity={0.5}
                       style={{
                         flex: 1,
                         backgroundColor: '#FFFFFF',
-                        borderRadius: 23, // 👈 25 - padding
+                        borderRadius: 30, // 👈 25 - padding
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
@@ -543,7 +543,7 @@ const AccountScreen = () => {
                   </LinearGradient>
 
                   <GradientButton
-                    title={loading ? 'Loading...' : 'Continue'}
+                    title={loading ? 'Loading...' : 'Submit'}
                     buttonStyle={{
                       width: wp(136),
                       height: hp(50),
@@ -613,7 +613,7 @@ const AccountScreen = () => {
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
                     }}>
-                    <Text style={{color: '#A3A3A3'}}>OTP sent on</Text>
+                    <Text style={{color: '#A3A3A3'}}> OTP sent on </Text>
                     <Text style={{color: '#000000'}}>{newEmail}</Text>
                   </Text>
                 </View>
@@ -649,14 +649,58 @@ const AccountScreen = () => {
                   ))}
                 </View>
                 <View style={{marginTop: hp(59), marginLeft: wp(126)}}>
-                  <Text
+                  {/* <Text
                     style={{
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
                     }}>
                     <Text style={{color: '#A3A3A3'}}>Resend in </Text>
                     <Text style={{color: '#000000'}}>{formatTime(timer)}</Text>
-                  </Text>
+                  </Text> */}
+
+                  {timer > 0 ? (
+                    <Text
+                      style={{
+                        fontSize: fontSize(14),
+                        fontFamily: fontFamily.poppins400,
+                      }}>
+                      <Text style={{color: '#A3A3A3'}}>Resend in </Text>
+                      <Text style={{color: '#000000'}}>
+                        {formatTime(timer)}
+                      </Text>
+                    </Text>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        console.log(' RESEND EMAIL OTP CLICKED');
+
+                        const payload = {
+                          currentEmail: email,
+                          newEmail,
+                        };
+
+                        console.log(
+                          ' SEND_EMAIL_OTP_REQUEST PAYLOAD:',
+                          payload,
+                        );
+
+                        dispatch({
+                          type: SEND_EMAIL_OTP_REQUEST,
+                          payload,
+                        });
+
+                        setTimer(119); // restart timer
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: fontSize(14),
+                          fontFamily: fontFamily.poppins400,
+                          color: '#A3A3A3',
+                        }}>
+                        Resend OTP
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
                 <View
                   style={{
@@ -675,11 +719,6 @@ const AccountScreen = () => {
             {/* </Modal> */}
           </RBSheet>
 
-          {/* <Modal
-            transparent={true}
-            visible={showSecondModal}
-            animationType="slide"
-            onRequestClose={() => setShowSecondModal(false)}> */}
           <RBSheet
             ref={successSheetRef}
             height={hp(257)}
@@ -762,7 +801,6 @@ const AccountScreen = () => {
                 </View>
               </View>
             </View>
-            {/* </Modal> */}
           </RBSheet>
 
           {/* MOBILE ROW */}
@@ -795,6 +833,7 @@ const AccountScreen = () => {
               </View>
 
               <TouchableOpacity
+                activeOpacity={0.7}
                 onPress={
                   () => {
                     setEditingField('mobile');
@@ -807,11 +846,7 @@ const AccountScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-          {/* <Modal
-            visible={showMobileEditModal}
-            transparent
-            animationType="slide"
-            onRequestClose={() => setShowMobileEditModal(false)}> */}
+
           <RBSheet
             ref={mobileSheetRef}
             height={hp(432)}
@@ -832,19 +867,35 @@ const AccountScreen = () => {
               <View
                 style={{
                   width: wp(375),
-                  height: hp(432),
+                  // height: hp(432),
                   backgroundColor: '#FFFFFF',
                   // borderWidth: 1,
                   borderTopLeftRadius: 20,
                   borderTopRightRadius: 20,
                 }}>
-                <View
+                {/* <View
                   style={{
                     marginTop: hp(24),
                     marginLeft: wp(30),
+                  }}> */}
+                <View
+                  style={{
+                    marginLeft: wp(30),
+                    // marginTop: hp(24),
+                    // alignItems: 'center',
+                    // justifyContent: 'center',
                   }}>
+                  {/* <Text
+                    style={{
+                      fontFamily: fontFamily.poppins500,
+                      fontSize: fontSize(16),
+                      color: '#000',
+                    }}>
+                    Update Mobile Number
+                  </Text> */}
                   <Text
                     style={{
+                      // textAlign: 'center',
                       fontFamily: fontFamily.poppins500,
                       fontSize: fontSize(16),
                       color: '#000',
@@ -860,6 +911,7 @@ const AccountScreen = () => {
                     marginTop: hp(20),
                   }}
                 />
+
                 <View
                   style={{
                     marginTop: hp(36),
@@ -876,11 +928,19 @@ const AccountScreen = () => {
                 </View>
                 <View
                   style={{
+                    // borderWidth: 1,
+                    // borderColor: '#CDCDCD',
+                    // borderRadius: 25,
+                    // marginHorizontal: wp(39),
+                    // height: hp(50),
+                    // // height: hp(45),
+                    // marginTop: hp(9),
+                    // height: hp(50),
                     borderWidth: 1,
                     borderColor: '#CDCDCD',
                     borderRadius: 25,
                     marginHorizontal: wp(39),
-                    height: hp(50),
+                    height: hp(45),
                     marginTop: hp(9),
                   }}>
                   <TextInput
@@ -890,7 +950,7 @@ const AccountScreen = () => {
                       color: '#000',
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
-                      marginLeft: wp(26),
+                      marginLeft: wp(15),
                     }}
                   />
                 </View>
@@ -911,22 +971,31 @@ const AccountScreen = () => {
                 </View>
                 <View
                   style={{
+                    // borderWidth: 1,
+                    // borderColor: '#CDCDCD',
+                    // borderRadius: 25,
+                    // marginHorizontal: wp(39),
+                    // // height: hp(50),
+                    // height: hp(45),
+                    // marginTop: hp(9),
                     borderWidth: 1,
                     borderColor: '#CDCDCD',
                     borderRadius: 25,
                     marginHorizontal: wp(39),
-                    height: hp(50),
+                    height: hp(45),
                     marginTop: hp(9),
                   }}>
                   <TextInput
                     value={newMobileNumber}
                     onChangeText={setNewMobileNumber}
                     maxLength={10}
+                    keyboardType="number-pad"
                     style={{
                       color: '#000',
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
-                      marginLeft: wp(26),
+                      // marginLeft: wp(26),
+                      marginLeft: wp(15),
                     }}
                   />
                 </View>
@@ -942,20 +1011,20 @@ const AccountScreen = () => {
                     style={{
                       width: wp(136),
                       height: hp(50),
-                      borderRadius: 25,
-                      padding: 2, // ⭐ THIS IS THE KEY
+                      borderRadius: 30,
+                      padding: 1,
                     }}>
                     <TouchableOpacity
                       style={{
                         flex: 1,
                         backgroundColor: '#FFFFFF',
-                        borderRadius: 23, // 👈 25 - padding
+                        borderRadius: 30, //
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                       onPress={() => {
                         // setShowEditModal(false);
-                        mobileSheetRef.current?.close(); // 👈 IMPORTANT
+                        mobileSheetRef.current?.close();
                         setShowMobileEditModal(null);
                       }}>
                       <Text
@@ -970,13 +1039,13 @@ const AccountScreen = () => {
                   </LinearGradient>
 
                   <GradientButton
-                    title={loading ? 'Loading...' : 'Continue'}
+                    title={loading ? 'Loading...' : 'Submit'}
                     buttonStyle={{
                       width: wp(136),
                       height: hp(50),
-                      opacity: loading || !newMobileNumber ? 0.5 : 1, // 🔥 opacity add
+                      opacity: loading || !newMobileNumber ? 0.5 : 1, //  opacity add
                     }}
-                    disabled={loading || !newMobileNumber} // 🔥 disable button when loading or no input
+                    disabled={loading || !newMobileNumber} //  disable button when loading or no input
                     onPress={() => {
                       if (!newMobileNumber.trim()) {
                         // if (!isMobileValid) {
@@ -1010,12 +1079,6 @@ const AccountScreen = () => {
             </View>
             {/* </Modal> */}
           </RBSheet>
-
-          {/* <Modal
-            visible={showMobileOtpModal}
-            transparent
-            animationType="slide"
-            onRequestClose={() => setShowMobileOtpModal(false)}> */}
 
           <RBSheet
             ref={mobileOtpSheetRef}
@@ -1074,7 +1137,7 @@ const AccountScreen = () => {
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
                     }}>
-                    <Text style={{color: '#A3A3A3'}}>OTP sent on</Text>
+                    <Text style={{color: '#A3A3A3'}}> OTP sent on </Text>
                     <Text style={{color: '#000000'}}> {newMobileNumber}</Text>
                   </Text>
                 </View>
@@ -1110,14 +1173,43 @@ const AccountScreen = () => {
                   ))}
                 </View>
                 <View style={{marginTop: hp(59), marginLeft: wp(126)}}>
-                  <Text
-                    style={{
-                      fontSize: fontSize(14),
-                      fontFamily: fontFamily.poppins400,
-                    }}>
-                    <Text style={{color: '#A3A3A3'}}>Resend in </Text>
-                    <Text style={{color: '#000000'}}>{formatTime(timer)}</Text>
-                  </Text>
+                  {timer > 0 ? (
+                    <Text
+                      style={{
+                        fontSize: fontSize(14),
+                        fontFamily: fontFamily.poppins400,
+                      }}>
+                      <Text style={{color: '#A3A3A3'}}>Resend in </Text>
+                      <Text style={{color: '#000000'}}>
+                        {formatTime(timer)}
+                      </Text>
+                    </Text>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        console.log('🔄 RESEND MOBILE OTP CLICKED');
+
+                        const payload = {
+                          currentMobileNumber: mobile,
+                          newMobileNumber: newMobileNumber,
+                        };
+
+                        console.log('📤 RESEND MOBILE OTP PAYLOAD:', payload);
+
+                        dispatch(sendMobileOtpRequest(payload));
+
+                        setTimer(119);
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: fontSize(14),
+                          fontFamily: fontFamily.poppins400,
+                          color: '#A3A3A3',
+                        }}>
+                        Resend OTP
+                      </Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
 
                 <View
@@ -1126,20 +1218,11 @@ const AccountScreen = () => {
                     marginTop: hp(58),
                   }}>
                   <GradientButton
-                    // title={loading ? 'Loading...' : 'Verify Code'}
-                    // onPress={() => {
-                    //   const finalOtp = otp.join('');
-
-                    //   if (finalOtp.length !== 4) {
-                    //     alert('Please enter full 4-digit OTP');
-                    //     return;
-                    //   }
-
                     title={loading ? 'Loading...' : 'Verify Code'}
                     buttonStyle={{
-                      opacity: loading || !isOtpValid ? 0.5 : 1, // 🔥 opacity
+                      opacity: loading || !isOtpValid ? 0.5 : 1, //  opacity
                     }}
-                    disabled={loading || !isOtpValid} // 🔥 disable
+                    disabled={loading || !isOtpValid} // disable
                     onPress={() => {
                       if (!isOtpValid) {
                         alert('Please enter full 4-digit OTP');
@@ -1171,11 +1254,6 @@ const AccountScreen = () => {
             </View>
             {/* </Modal> */}
           </RBSheet>
-          {/* <Modal
-            transparent={true}
-            visible={showMobileSuccessModal}
-            animationType="slide"
-            onRequestClose={() => setShowMobileSuccessModal(false)}> */}
 
           <RBSheet
             ref={mobileSuccessSheetRef}
@@ -1241,16 +1319,6 @@ const AccountScreen = () => {
                     marginTop: hp(33),
                     marginLeft: wp(127),
                   }}>
-                  {/* <GradientButton
-                    onPress={() => {
-                      setShowMobileOtpModal(false);
-                      setEditingField(null);
-                      setShowMobileSuccessModal(false);
-                      navigation.goBack();
-                    }}
-                    title={'Ok'}
-                    buttonStyle={{width: wp(120), height: hp(50)}}
-                  /> */}
                   <GradientButton
                     title={'Ok'}
                     buttonStyle={{width: wp(120), height: hp(50)}}
@@ -1260,22 +1328,12 @@ const AccountScreen = () => {
 
                       // close other sheets
                       mobileOtpSheetRef.current?.close();
-                      // mobileSheetRef.current?.close();
-                      //             // 1️⃣ Close success modal
-                      //             setShowMobileSuccessModal(false);
 
-                      //             // 2️⃣ Close OTP modal
-                      //             setShowMobileOtpModal(false);
-
-                      //             // 3️⃣ Close edit modal
-                      //             setShowMobileEditModal(false);
-
-                      //             // 4️⃣ Stop editing
                       setEditingField(null);
-                      // 🔥 IMPORTANT: RESET redux message
+
                       dispatch(resetMobileMessage());
 
-                      // 5️⃣ Go back to previous screen
+                      //  Go back to previous screen
                       navigation.goBack();
                     }}
                   />
@@ -1315,21 +1373,6 @@ const AccountScreen = () => {
               alignItems: 'center',
             }}>
             <View style={styles.modalBox}>
-              {/* <Text style={styles.modalText}>Are you sure want proceed?</Text>
-
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={styles.cancelBtn}
-                  onPress={() => setShowDeleteModal(false)}>
-                  <Text style={styles.cancelBtnText}>Not Now</Text>
-                </TouchableOpacity>
-
-                <GradientButton
-                  title="Yes, Delete"
-                  onPress={handleDelete}
-                  buttonStyle={{width: 135, height: 45}}
-                />
-              </View> */}
               <View
                 style={{
                   marginTop: hp(56),

@@ -6,6 +6,7 @@ import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import LinearGradient from 'react-native-linear-gradient';
 import {useDispatch, useSelector} from 'react-redux';
+import {Keyboard} from 'react-native';
 // Screens
 import HomeScreen from '../screens/homeScreen';
 import SearchScreen from '../screens/searchScreen';
@@ -16,7 +17,7 @@ import MyOrderScreen from '../screens/myOrderScreen';
 import ProfileScreen from '../screens/profileScreen';
 import BasicInfoScreen from '../screens/basicInfoScreen';
 import WishlistScreen from '../screens/WishlistScreen';
-
+import {useState} from 'react';
 // Icons
 import {
   ColorHomeIcon,
@@ -119,11 +120,26 @@ const BagStackScreen = () => (
    MAIN TAB NAVIGATOR
 --------------------------- */
 const MainTabNavigator = () => {
+  const [keyboardVisible, setKeyboardVisible] = React.useState(false);
   const dispatch = useDispatch();
   const token = useSelector(state => state.auth.token);
   const {loading, cartData, error} = useSelector(state => state.addToCard);
   const cartCount = cartData?.productDetailList?.length || 0;
 
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => {
+      setKeyboardVisible(true);
+    });
+
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
   console.log('TAB CART COUNT =>', cartCount);
 
   useEffect(() => {
@@ -136,6 +152,7 @@ const MainTabNavigator = () => {
       });
     }
   }, [token]);
+
   return (
     <Tab.Navigator
       screenOptions={({route}) => {
@@ -161,19 +178,44 @@ const MainTabNavigator = () => {
         return {
           headerShown: false,
           // tabBarStyle: {height: isIOS ? hp(75) : hp(70), paddingTop: 5},
+          // tabBarStyle: {
+          //   height:
+          //     route.name === 'BagStack' &&
+          //     (childRouteName === 'BagScreen' || childRouteName === '')
+          //       ? 0
+          //       : isIOS
+          //       ? hp(75)
+          //       : hp(70),
+          //   paddingTop: 5,
+          //   display:
+          //     route.name === 'BagStack' &&
+          //     (childRouteName === 'BagScreen' || childRouteName === '')
+          //       ? 'none'
+          //       : 'flex',
+          //   //if you want to close hori. line then use it
+          //   // borderTopWidth: 0, // Remove horizontal line
+          //   // elevation: 0, // Android shadow
+          //   // shadowOpacity: 0, // iOS shadow
+          // },
+
           tabBarStyle: {
             height:
-              route.name === 'BagStack' &&
-              (childRouteName === 'BagScreen' || childRouteName === '')
+              keyboardVisible ||
+              (route.name === 'BagStack' &&
+                (childRouteName === 'BagScreen' || childRouteName === ''))
                 ? 0
                 : isIOS
                 ? hp(75)
                 : hp(70),
+
             display:
-              route.name === 'BagStack' &&
-              (childRouteName === 'BagScreen' || childRouteName === '')
+              keyboardVisible ||
+              (route.name === 'BagStack' &&
+                (childRouteName === 'BagScreen' || childRouteName === ''))
                 ? 'none'
                 : 'flex',
+
+            paddingTop: 5,
           },
           tabBarIcon: ({focused}) => {
             const iconSizeStyles = {
@@ -235,12 +277,12 @@ const MainTabNavigator = () => {
                   <View
                     style={{
                       position: 'absolute',
-                      right: -11,
-                      top: -8,
+                      right: -13,
+                      top: -12,
                       backgroundColor: '#9333EA',
-                      borderRadius: 10,
-                      minWidth: 16,
-                      height: 16,
+                      borderRadius: 20,
+                      width: hp(18),
+                      height: hp(18),
                       justifyContent: 'center',
                       alignItems: 'center',
                       paddingHorizontal: 3,

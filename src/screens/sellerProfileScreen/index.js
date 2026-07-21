@@ -22,7 +22,11 @@ import {useNavigation} from '@react-navigation/native';
 const SellerProfileScreen = ({route}) => {
   // const route = useRoute();
   const {store} = route.params;
+  // const store = route?.params?.store;
   console.log(store, 'Received store');
+
+  console.log('ROUTE PARAMS =>', route?.params);
+  console.log('STORE =>', route?.params?.store);
   const [activeTab, setActiveTab] = useState('Top Brand');
   const navigation = useNavigation();
   //banner image
@@ -117,7 +121,12 @@ const SellerProfileScreen = ({route}) => {
             {shopImage && shopImage.trim() !== '' ? (
               <Image
                 source={{uri: shopImage}}
-                style={{width: hp(84), height: hp(84), borderRadius: 50}}
+                style={{
+                  width: hp(84),
+                  height: hp(84),
+                  borderRadius: 50,
+                  resizeMode: 'cover',
+                }}
               />
             ) : (
               <Text

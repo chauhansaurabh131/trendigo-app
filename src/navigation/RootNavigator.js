@@ -20,6 +20,8 @@ import ReviewRatingComponent from '../components/reviewRatingComponent';
 import ReviewandRatingsScreen from '../screens/ReviewandRatingsScreen';
 import revewsScreen from '../screens/revewsScreen';
 import RevewsScreen from '../screens/revewsScreen';
+import SearchResultScreen from '../screens/SearchResultsScreen';
+import SendEquiryScreen from '../screens/SendEquiryScreen';
 // import sellerProfileScreen from '../screens/sellerProfileScreen';
 // import SellerProfileScreen from '../screens/sellerProfileScreen';
 
@@ -82,6 +84,8 @@ const RootNavigator = () => {
       <Stack.Screen name="ReviewRating" component={ReviewandRatingsScreen} />
       <Stack.Screen name="ReviewsScreen" component={RevewsScreen} />
       {/* <Stack.Screen name="SellerProfile" component={SellerProfileScreen} /> */}
+      <Stack.Screen name="SearchResultScreen" component={SearchResultScreen} />
+      <Stack.Screen name="SendEquiryScreen" component={SendEquiryScreen} />
     </Stack.Navigator>
   );
 };

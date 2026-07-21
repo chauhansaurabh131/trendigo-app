@@ -69,9 +69,9 @@ export default function authReducer(state = initialState, action) {
         ...state,
         loading: false,
         otpSent: true,
-        token: action.payload.token || state.token,
-        message: action.payload.message,
-        // user: action.payload.user || state.user, // 👈 update user if sent
+        // token: action.payload.token || state.token,
+        // message: action.payload.message,
+        message: action.payload?.data?.message,
       };
 
     case RESEND_OTP_FAILURE:

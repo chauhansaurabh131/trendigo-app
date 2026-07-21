@@ -169,12 +169,19 @@ const TopbrandScreen = ({storeId}) => {
                 marginTop: hp(22),
               }}
               activeOpacity={0.6}
+              // onPress={() => {
+              //   navigation.navigate('ProductDetails', {product: item});
+              //   console.log(
+              //     'FIRST IMAGE ===>',
+              //     item.variants?.[0]?.images?.[0],
+              //   );
+              // }}
+
               onPress={() => {
-                navigation.navigate('ProductDetails', {product: item});
-                console.log(
-                  'FIRST IMAGE ===>',
-                  item.variants?.[0]?.images?.[0],
-                );
+                console.log('Tob PRODUCT ID =>', item?._id);
+                navigation.navigate('ProductDetails', {
+                  productId: item?._id,
+                });
               }}>
               <Image
                 // source={{uri: item.image}}
@@ -216,7 +223,7 @@ const TopbrandScreen = ({storeId}) => {
                       lineHeight: hp(16),
                       color: colors.black,
                     }}>
-                    Rs. {item.variants?.[0]?.price}
+                    Rs. {item.variants?.[0]?.sellingPrice}
                   </Text>
                   <Text
                     style={{
@@ -227,7 +234,7 @@ const TopbrandScreen = ({storeId}) => {
                       fontFamily: fontFamily.poppins500,
                       lineHeight: hp(14),
                     }}>
-                    MRP {item.mrp}
+                    MRP {item.variants?.[0]?.price}
                   </Text>
                   <Text
                     style={{

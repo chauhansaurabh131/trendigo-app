@@ -282,7 +282,8 @@ const RevewsScreen = () => {
           }}>
           <View
             style={{
-              width: '100%',
+              // width: '100%',
+              width: wp(340),
               height: hp(206),
               backgroundColor: '#fff',
               borderRadius: 14,
@@ -308,7 +309,8 @@ const RevewsScreen = () => {
             <View
               style={{
                 flexDirection: 'row',
-                justifyContent: 'space-evenly',
+                // justifyContent: 'space-evenly',
+                justifyContent: 'space-between',
                 marginTop: hp(26),
                 marginHorizontal: wp(28),
               }}>
@@ -320,7 +322,7 @@ const RevewsScreen = () => {
                   borderRadius: 50,
                   width: wp(112),
                   height: hp(50),
-                  padding: 2,
+                  padding: 1,
                 }}>
                 <TouchableOpacity
                   style={{

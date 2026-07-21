@@ -25,6 +25,7 @@ import productVariantReducer from './reducers/productVariantReducer';
 import searchReducer from './reducers/searchReducer';
 import emailAndMobile from './reducers/emailAndMobileReducer';
 import otpReducer from './reducers/otpReducer';
+import {chatReducer} from './reducers/chatReducer';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -33,12 +34,13 @@ const rootReducer = combineReducers({
   user: userReducer,
   updateUser: updateuserReducer,
   addresses: addressReducer,
+  productDetails: productDetailsReducer,
   userAccount: userAccountReducer,
   profileImage: profileImageReducer,
   authMobile: authMobileReducer,
   product: productReducer,
   banner: bannerReducer,
-  productD: productDetailsReducer,
+  // productD: productDetailsReducer,
   wishlist: wishlistReducer,
   productCategroy: productCategoryReucer,
   review: reviewReducer,
@@ -52,6 +54,7 @@ const rootReducer = combineReducers({
   search: searchReducer,
   emailAndMobile: emailAndMobile,
   optVerify: otpReducer,
+  chat: chatReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));

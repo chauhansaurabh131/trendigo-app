@@ -8,20 +8,10 @@ import {
 } from '../actions/productCategoryActions';
 import api from '../../api/apiClient';
 
-/* ===============================
-   🔹 API FUNCTION (same file)
-================================ */
 const getProductByCategoryApi = (category, page, ProductType) => {
-  return api.get(
-    // `https://mntrendigo.mntech.website/api/v1/user/product/by-product-category/${category}?page=${page}`,
-    // `https://mntrendigo.mntech.website/api/v1/user/product/by-product-category/Topwear?page=1`,
-    `user/product/by-product-category/Topwear?page=1`,
-  );
+  return api.get(`user/product/by-product-category/Topwear?page=1`);
 };
 
-/* ===============================
-   🔹 SAGA FUNCTION
-================================ */
 function* productCategorySaga(action) {
   try {
     const {category, page, productType} = action.payload;
@@ -39,8 +29,10 @@ function* productCategorySaga(action) {
     );
     // console.log(' FULL RESPONSE:', response);
     console.log(' STATUS:', response.status);
-    console.log('full response', response);
-    console.log(' API DATA:', response.data.data);
+
+    console.log('PRODUCT CATEGORY RESPONSE', response);
+
+    console.log(' PRODUCT CATEGORY  API DATA:', response.data.data);
 
     // Success
     yield put(productCategorySuccess(response.data));
@@ -51,9 +43,6 @@ function* productCategorySaga(action) {
   }
 }
 
-/* ===============================
-   🔹 WATCHER SAGA
-================================ */
 export function* watchProductCategory() {
   yield takeLatest(PRODUCT_CATEGORY_REQUEST, productCategorySaga);
 }

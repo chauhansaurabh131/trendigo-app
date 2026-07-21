@@ -90,7 +90,8 @@ const BagScreen = () => {
       dispatch(getAddressRequest(userId));
     }
   }, [userId]);
-
+  const cartItems = cartData?.productDetailList || [];
+  console.log('CART ITEMS COUNT =>', cartData?.productDetailList?.length);
   // const addressList = useSelector(state => state.addresses?.list || []);
   const addressList = useSelector(state => state?.addresses?.list ?? []);
   console.log(addressList, 'ADDRESS LIST IN BAG SCREEN=====>');
@@ -436,15 +437,16 @@ const BagScreen = () => {
   };
   // console.log('Default Address show', defaultAddress);
   const renderCartItem = ({item}) => {
+    // console.log('CART ITEM =>', JSON.stringify(item, null, 2));
     const productId = item?.productId?.id;
 
     console.log('PRODUCT ID FROM CART:', productId);
     // console.log('Rendering Cart Item:', item);
     // console.log('CART DATA', cartData);
     const size = item?.variants?.variants?.find(v => v.key === 'size')?.value;
-    console.log('Selected Size:', size);
+    // console.log('Selected Size:', size);
     const color = item?.variants?.variants?.find(v => v.key === 'color')?.value;
-    console.log('Selected Color:', color);
+    // console.log('Selected Color:', color);
     // const image = item?.variants?.images?.find(
     //   i => i.isSelectedForMainScreen,
     // )?.imageUrl;
@@ -453,17 +455,17 @@ const BagScreen = () => {
       item?.variants?.images?.find(i => i.isSelectedForMainScreen)?.imageUrl ||
       item?.variants?.images?.[0]?.imageUrl ||
       null;
-    console.log('Selected Image:', image);
+    // console.log('Selected Image:', image);
 
     const price = item?.variants?.price;
-    console.log('Price:', price);
+    // console.log('Price:', price);
 
-    console.log('FINAL IMAGE URL 👉', image);
-    console.log('FULL IMAGES ARRAY 👉', item?.variants?.images);
+    // console.log('FINAL IMAGE URL ', image);
+    // console.log('FULL IMAGES ARRAY ', item?.variants?.images);
     const discountedPrice = item?.variants?.discountedPrice;
-    console.log('Discounted Price:', discountedPrice);
+    // console.log('Discounted Price:', discountedPrice);
     const discount = item?.variants?.discount;
-    console.log('Discount:', discount);
+    // console.log('Discount:', discount);
 
     return (
       <View
@@ -499,7 +501,13 @@ const BagScreen = () => {
             // backgroundColor: '#165ca1',
             // backgroundColor: '#F8FAFC',
           }}>
-          <View
+          <TouchableOpacity
+            onPress={() => {
+              console.log('Bag PRODUCT ID =>', item?.productId?.id);
+              navigation.navigate('ProductDetails', {
+                productId: item?.productId?.id,
+              });
+            }}
             style={{
               width: '30%',
               // backgroundColor: 'pink'
@@ -516,7 +524,7 @@ const BagScreen = () => {
                 borderRadius: 16,
               }}
             />
-          </View>
+          </TouchableOpacity>
 
           <View
             style={{
@@ -922,76 +930,14 @@ const BagScreen = () => {
                   style={{
                     color: '#000',
                     fontFamily: fontFamily.poppins500,
-                    fontSize: fontSize(17),
+                    fontSize: fontSize(15),
                   }}>
                   No delivery address added
                 </Text>
               </View>
             )}
           </View>
-          {/* <FlatList
-            data={addressList}
-            scrollEnabled={true}
-            keyExtractor={item => item.id}
-            renderItem={({item}) => (
-              <TouchableOpacity
-                style={{marginHorizontal: wp(16), marginTop: hp(16)}}>
-                <Text
-                  style={{
-                    color: '#9333EA',
-                    fontSize: fontSize(10),
-                    fontFamily: fontFamily.poppins700,
-                  }}>
-                  Delivery Address
-                </Text>
 
-                <View style={{marginTop: hp(6), flexDirection: 'row'}}>
-                  <Text
-                    style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(16),
-                      fontFamily: fontFamily.poppins700,
-                    }}>
-                    {item.name}
-                  </Text>
-
-                  <View
-                    style={{
-                      width: 2,
-                      height: 24,
-                      backgroundColor: '#E6E6E6',
-                      marginLeft: wp(10),
-                      marginRight: hp(10),
-                    }}
-                  />
-
-                  <Text
-                    style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(14),
-                      fontFamily: fontFamily.poppins500,
-                    }}>
-                    +91 {item.mobileNumber}
-                  </Text>
-                </View>
-
-                <Text
-                  style={{
-                    color: '#64748B',
-                    fontSize: fontSize(14),
-                    fontFamily: fontFamily.poppins400,
-                    marginTop: 4,
-                    marginBottom: hp(20),
-                  }}>
-                  {item.addressLineOne}, {item.addressLineTwo}, {item.city}{' '}
-                  {item.pincode}
-                
-                </Text>
-              </TouchableOpacity>
-            )}
-          />
-         
-          // */}
           <View
             style={{
               position: 'absolute',
@@ -1825,7 +1771,7 @@ const BagScreen = () => {
         </RBSheet>
       </ScrollView>
       {/* ✅ FIXED BUTTON */}
-      <View
+      {/* <View
         style={{
           position: 'absolute',
           bottom: 0,
@@ -1837,7 +1783,22 @@ const BagScreen = () => {
           borderColor: '#eee',
         }}>
         <GradientButton title={'Pay Now'} />
-      </View>
+      </View> */}
+      {cartData?.productDetailList?.length > 0 && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: '#fff',
+            padding: 15,
+            borderTopWidth: 1,
+            borderColor: '#eee',
+          }}>
+          <GradientButton title="Pay Now" />
+        </View>
+      )}
     </SafeAreaView>
   );
 };

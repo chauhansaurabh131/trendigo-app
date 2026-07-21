@@ -23,39 +23,17 @@ const ProfileScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {user, loading} = useSelector(state => state.user);
+  console.log('USER ', user);
   const {token} = useSelector(state => state.auth);
 
-  // const token = useSelector(state => state.auth.token);
-  // useEffect(() => {
-  //   const loadToken = async () => {
-  //     const token = await AsyncStorage.getItem('authToken');
-  //     console.log('PROFILE SCREEN TOKEN:', token);
-
-  //     if (token) {
-  //       dispatch(fetchUserRequest(token));
-  //     } else {
-  //       console.log('No token found');
-  //     }
-  //   };
-
-  //   loadToken();
-  // }, []);
-
-  // useEffect(() => {
-  //   if (token) {
-  //     dispatch(fetchUserRequest(token));
-  //   } else {
-  //     console.log('NO TOKEN');
-  //   }
-  // }, [token]);
-  // simple useEffect without token dependency (since apiClient handles it)
   useEffect(() => {
     if (token) {
       dispatch(fetchUserRequest());
     }
   }, [token]);
+
   const getInitials = fullName => {
-    if (!fullName) return 'U';
+    if (!fullName) return 'NA';
 
     const parts = fullName.trim().split(' ');
 
@@ -68,8 +46,7 @@ const ProfileScreen = () => {
   };
 
   const onLogoutPress = async () => {
-    // await AsyncStorage.multiRemove(['authToken', 'refreshToken']); // 🔥 BOTH REMOVE
-    await AsyncStorage.clear(); // 🔥 BEST
+    await AsyncStorage.clear();
 
     dispatch(logout());
     dispatch({type: 'RESET_WISHLIST'});
@@ -80,7 +57,7 @@ const ProfileScreen = () => {
     });
   };
 
-  console.log('PROFILE PIC 👉', user?.profilePic);
+  console.log('PROFILE PIC ', user?.profilePic);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.profileContainer}>
@@ -97,16 +74,6 @@ const ProfileScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* User Info */}
         <View style={styles.userContainer}>
-          {/* <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {getInitials(user?.name || user?.email)}
-            </Text>
-          </View>
-
-          <Text style={styles.nameText}>
-            {user?.name || user?.email || user?.mobileNumber || 'No User'}
-          </Text> */}
-
           <View style={styles.avatar}>
             {user?.profilePic ? (
               <Image
@@ -122,7 +89,7 @@ const ProfileScreen = () => {
           </View>
 
           <Text style={styles.nameText}>
-            {user?.name || user?.email || user?.mobileNumber || 'No User'}
+            {user?.name || user?.email || user?.mobileNumber || 'NA'}
           </Text>
         </View>
 
@@ -303,7 +270,7 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontFamily: fontFamily.poppins500,
-    fontSize: fontSize(24),
+    fontSize: fontSize(21),
     color: '#000',
   },
   nameText: {

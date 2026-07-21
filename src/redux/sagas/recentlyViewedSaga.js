@@ -21,7 +21,9 @@ function addRecentlyViewedApi(data, token) {
 function* addRecentlyViewedSaga(action) {
   try {
     console.log('ADD_RECENTLY_VIEWED_REQUEST TRIGGERED');
+
     console.log('ADD_RECENTLY_VIEWED Action Payload:', action.payload);
+
     console.log('Sending Product ID:', action.payload?.productId);
 
     const response = yield call(addRecentlyViewedApi, {
@@ -29,6 +31,7 @@ function* addRecentlyViewedSaga(action) {
     });
 
     console.log('ADD_RECENTLY_VIEWED FULL RESPONSE:', response);
+
     console.log('ADD_RECENTLY_VIEWED RESPONSE.DATA:', response?.data);
 
     yield put({
@@ -40,9 +43,9 @@ function* addRecentlyViewedSaga(action) {
       type: GET_RECENTLY_VIEWED_REQUEST,
     });
   } catch (error) {
-    console.log('❌ API ERROR:', error);
-    console.log('❌ ERROR RESPONSE:', error?.response);
-    console.log('❌ ERROR DATA:', error?.response?.data);
+    console.log(' API ERROR:', error);
+    console.log(' ERROR RESPONSE:', error?.response);
+    console.log(' ERROR DATA:', error?.response?.data);
 
     yield put({
       type: ADD_RECENTLY_VIEWED_FAILURE,

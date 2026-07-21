@@ -11,17 +11,25 @@ const initialState = {
 
 export const productDetailsReducer = (state = initialState, action) => {
   switch (action.type) {
+    // case PRODUCT_DETAILS_REQUEST:
+    //   return {
+    //     ...state,
+    //     loading: true,
+    //   };
+
     case PRODUCT_DETAILS_REQUEST:
       return {
         ...state,
         loading: true,
+        product: null,
+        error: null,
       };
 
     case PRODUCT_DETAILS_SUCCESS:
-      console.log('working on Reducer');
       return {
         loading: false,
-        product: action.payload.results, // ✅ results object store કરો
+        // product: action.payload.results,
+        product: action.payload,
         error: null,
       };
 

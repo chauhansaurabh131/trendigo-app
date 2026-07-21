@@ -4,6 +4,9 @@ import {
   SEARCH_PRODUCT_REQUEST,
   searchProductSuccess,
   searchProductFailure,
+  SEARCH_SUGGESTION_REQUEST,
+  SEARCH_SUGGESTION_SUCCESS,
+  SEARCH_SUGGESTION_FAILURE,
 } from '../actions/searchActions';
 import api from '../../api/apiClient';
 
@@ -29,6 +32,50 @@ function* searchProductWorker(action) {
   }
 }
 
+function* searchSuggestionSaga(action) {
+  try {
+    const response = yield call(
+      api.get,
+      `/user/product/search-suggestions?keyword=${action.payload}`,
+    );
+
+    console.log('SUGGESTION API RESPONSE =>', response.data);
+
+    yield put({
+      type: SEARCH_SUGGESTION_SUCCESS,
+      payload: response.data,
+    });
+  } catch (error) {
+    console.log('SUGGESTION ERROR =>', error?.response?.data || error.message);
+
+    yield put({
+      type: SEARCH_SUGGESTION_FAILURE,
+      payload: error?.response?.data || error.message,
+    });
+  }
+}
+
+function* getRecentSearchSaga() {
+  try {
+    const response = yield call(api.get, '/user/product/recent-searches');
+
+    yield put({
+      type: 'RECENT_SEARCH_SUCCESS',
+      payload: response.data.results,
+    });
+    console.log('RECENT SEARCHES =>', response.data.results);
+    console.log('RECENT SEARCHES RESPONSE =>', response.data);
+  } catch (error) {
+    console.log(
+      'RECENT SEARCHES ERROR =>',
+      error?.response?.data || error.message,
+    );
+    console.log(error);
+  }
+}
+
 export function* watchSearchProduct() {
   yield takeLatest(SEARCH_PRODUCT_REQUEST, searchProductWorker);
+  yield takeLatest(SEARCH_SUGGESTION_REQUEST, searchSuggestionSaga);
+  yield takeLatest('RECENT_SEARCH_REQUEST', getRecentSearchSaga);
 }

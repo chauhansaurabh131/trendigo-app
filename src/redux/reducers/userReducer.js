@@ -28,7 +28,7 @@ export default function userReducer(state = initialState, action) {
         userData: action.payload,
       };
     case LOGOUT:
-      return initialState; // 🔥 THIS IS REQUIRED
+      return initialState;
     default:
       return state;
   }

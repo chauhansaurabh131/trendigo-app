@@ -7,11 +7,6 @@ import {
 } from '../actions/productActions';
 import api from '../../api/apiClient';
 
-const API_BASE = 'https://mntrendigo.mntech.website/api/v1/user';
-
-// const getProductApi = () =>
-//   axios.get(`${API_BASE}/product/listProductByReview`);
-
 const getProductApi = () => api.get('/user/product/listProductByReview');
 
 function* getProductSaga() {

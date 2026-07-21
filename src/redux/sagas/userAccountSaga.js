@@ -64,7 +64,7 @@ function sendOtpApi(currentEmail, newEmail) {
 // SEND OTP Saga
 function* sendOtpSaga(action) {
   try {
-    console.log('🔥 SEND OTP SAGA CALLED');
+    console.log(' SEND OTP SAGA CALLED');
     console.log(' FULL ACTION:', action);
 
     // const {token, currentEmail, newEmail} = action.payload;
@@ -72,12 +72,6 @@ function* sendOtpSaga(action) {
     // console.log('TOKEN:', token);
     console.log('CURRENT EMAIL:', currentEmail);
     console.log('NEW EMAIL:', newEmail);
-
-    // //  safety check
-    // if (!token) {
-    //   console.log(' NO TOKEN → STOP API');
-    //   return;
-    // }
 
     console.log(' CALLING SEND OTP API...');
 
@@ -112,8 +106,7 @@ function verifyOtpApi(currentEmail, newEmail, otp) {
 }
 function* verifyOtpSaga(action) {
   try {
-    // 🔥 Log incoming action
-    console.log('🔥 VERIFY OTP ACTION PAYLOAD:', action.payload);
+    console.log(' VERIFY OTP ACTION PAYLOAD:', action.payload);
 
     const {
       // token,
@@ -150,7 +143,6 @@ function* verifyOtpSaga(action) {
       token: response.data?.data?.token,
     };
 
-    // 🔥 Log success payload
     console.log(' VERIFY OTP SUCCESS PAYLOAD:', successPayload);
 
     // SUCCESS DISPATCH
@@ -158,16 +150,16 @@ function* verifyOtpSaga(action) {
       type: VERIFY_CHANGE_EMAIL_OTP_SUCCESS,
       payload: successPayload,
     });
+    yield put({
+      type: GET_ME_REQUEST,
+    });
   } catch (error) {
-    // 🔥 Log error
     console.error(' VERIFY OTP ERROR:', error.response?.data || error.message);
-
-    // const errorMessage = error.response?.data?.message || 'Email already taken';
 
     yield put({
       type: VERIFY_CHANGE_EMAIL_OTP_FAILURE,
       // payload: errorMessage,
-      error: error, // ✅ FULL ERROR OBJECT
+      error: error,
     });
   }
 }
@@ -187,22 +179,13 @@ function* sendMobileOtpSaga(action) {
   try {
     console.log(' SEND MOBILE OTP SAGA CALLED');
 
-    // 👉 Full action log
     console.log(' ACTION:', action);
 
     // const {token, currentMobileNumber, newMobileNumber} = action.payload;
     const {currentMobileNumber, newMobileNumber} = action.payload;
 
-    // 👉 Input logs
-    // console.log(' TOKEN:', token);
     console.log(' CURRENT MOBILE:', currentMobileNumber);
     console.log(' NEW MOBILE:', newMobileNumber);
-
-    // 🔥 Safety check
-    // if (!token) {
-    //   console.log(' NO TOKEN → STOP API');
-    //   return;
-    // }
 
     console.log('CALLING SEND MOBILE OTP API...');
 
@@ -213,7 +196,6 @@ function* sendMobileOtpSaga(action) {
       newMobileNumber,
     );
 
-    // 👉 API success log
     console.log(' API RESPONSE:', response.data);
 
     yield put({
@@ -225,7 +207,6 @@ function* sendMobileOtpSaga(action) {
   } catch (error) {
     console.log(' SEND MOBILE OTP ERROR:', error);
 
-    // 👉 backend error
     console.log('ERROR RESPONSE:', error.response?.data);
 
     yield put({
@@ -247,37 +228,26 @@ function verifyMobileOtpApi(currentMobileNumber, newMobileNumber, otp) {
 
 function* verifyMobileOtpSaga(action) {
   try {
-    console.log('🔥 VERIFY MOBILE OTP SAGA CALLED');
+    console.log(' VERIFY MOBILE OTP SAGA CALLED');
 
-    // 👉 Full action
-    console.log('👉 ACTION:', action);
+    console.log(' ACTION:', action);
 
     const {currentMobileNumber, newMobileNumber, otp} = action.payload;
 
-    // 👉 Input logs
-    // console.log('📌 TOKEN:', token);
     console.log(' CURRENT MOBILE:', currentMobileNumber);
     console.log('NEW MOBILE:', newMobileNumber);
     console.log('OTP:', otp);
-
-    // 🔥 Safety check
-    // if (!token) {
-    //   console.log('❌ NO TOKEN → STOP API');
-    //   return;
-    // }
 
     console.log('CALLING VERIFY MOBILE OTP API...');
 
     const response = yield call(
       verifyMobileOtpApi,
-      // token,
       currentMobileNumber,
       newMobileNumber,
       otp,
     );
 
-    // 👉 Success response
-    console.log('✅ VERIFY MOBILE OTP RESPONSE:', response.data);
+    console.log('VERIFY MOBILE OTP RESPONSE:', response.data);
 
     yield put({
       type: VERIFY_CHANGE_MOBILE_OTP_SUCCESS,
@@ -286,16 +256,12 @@ function* verifyMobileOtpSaga(action) {
 
     console.log(' DISPATCHED VERIFY_CHANGE_MOBILE_OTP_SUCCESS');
 
-    // 🔥 Refresh user data
     console.log(' CALLING GET_ME AFTER SUCCESS');
-
-    // yield put({type: GET_ME_REQUEST, payload: {token}});
 
     yield put({type: GET_ME_REQUEST});
   } catch (error) {
     console.log('VERIFY MOBILE OTP ERROR:', error);
 
-    // 👉 backend error detail
     console.log(' ERROR RESPONSE:', error.response?.data);
 
     yield put({
@@ -311,12 +277,6 @@ function* verifyMobileOtpSaga(action) {
 function deleteAccountApi() {
   console.log('DELETE API FUNCTION CALLED');
 
-  // return axios.delete('https://mntrendigo.mntech.website/api/v1/user/user/', {
-  //   headers: {
-  //     Authorization: `Bearer ${token}`,
-  //   },
-  // });
-
   console.log('DELETE API FUNCTION CALLED');
 
   return api.delete('/user/user/');
@@ -328,11 +288,10 @@ function* deleteAccountSaga(action) {
   try {
     console.log(' CALLING DELETE ACCOUNT API...');
 
-    // res variable માં API response capture કરો
     const res = yield call(deleteAccountApi);
 
     console.log(' DELETE API SUCCESS RESPONSE:', res);
-    console.log('RESPONSE DATA:', res.data); // res.data હવે defined હશે
+    console.log('RESPONSE DATA:', res.data);
 
     // dispatch success
     yield put(deleteAccountSuccess());
@@ -341,8 +300,11 @@ function* deleteAccountSaga(action) {
     console.log(' DELETE ACCOUNT ERROR OCCURRED');
 
     console.log(' FULL ERROR:', error);
+
     console.log(' ERROR RESPONSE:', error.response);
+
     console.log(' ERROR DATA:', error.response?.data);
+
     console.log(' ERROR MESSAGE:', error.message);
 
     yield put(

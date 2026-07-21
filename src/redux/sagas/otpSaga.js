@@ -8,26 +8,28 @@ import {
   VERIFY_OTP_SUCCESS,
   VERIFY_OTP_FAILURE,
 } from '../actions/otpActions';
+import {fetchUserRequest} from '../actions/userActions';
 
 // 🔹 SEND OTP
 function* sendOtpSaga(action) {
   try {
     const {data} = action.payload;
 
-    console.log('🟡 SEND OTP SAGA:', data);
+    console.log(' SEND OTP SAGA UPDTATE USER', data);
 
-    const response = yield call(
-      () => api.put('/user/auth/update-user', data), // ⚠️ backend પ્રમાણે change કરજો
-    );
+    const response = yield call(() => api.put('/user/auth/update-user', data));
 
-    console.log('✅ OTP SENT:', response.data);
+    console.log(' OTP SENT  UPDTATE USER:', response.data);
 
     yield put({
       type: SEND_OTP_SUCCESS,
       payload: response.data,
     });
   } catch (error) {
-    console.log('❌ OTP ERROR:', error?.response?.data || error.message);
+    console.log(
+      ' OTP ERROR  UPDTATE USER:',
+      error?.response?.data || error.message,
+    );
 
     yield put({
       type: SEND_OTP_FAILURE,
@@ -41,21 +43,24 @@ function* verifyOtpSaga(action) {
   try {
     const {data} = action.payload;
 
-    console.log('🔵 VERIFY OTP SAGA:', data);
+    console.log(' VERIFY OTP SAGA  UPDTATE USER:', data);
 
     const response = yield call(() =>
       api.post('/user/auth/verify-update-otp', data),
     );
 
-    console.log('✅ OTP VERIFIED:', response.data);
+    console.log('OTP VERIFIED  UPDTATE USER:', response.data);
 
     yield put({
       type: VERIFY_OTP_SUCCESS,
       payload: response.data,
     });
+    // Fetch latest user data
+    yield put(fetchUserRequest());
+    console.log(' FETCH USER CALLED');
   } catch (error) {
     console.log(
-      '❌ VERIFY ERROR1233455:',
+      ' VERIFY ERROR  UPDTATE USER:',
       error?.response?.data || error.message || 'Something went wrong',
     );
 
@@ -66,7 +71,6 @@ function* verifyOtpSaga(action) {
   }
 }
 
-// 🔥 watcher
 export default function* otpSaga() {
   console.log('Send Otp Saga new');
   yield takeLatest(SEND_OTP_REQUEST, sendOtpSaga);

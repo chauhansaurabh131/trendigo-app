@@ -30,20 +30,36 @@ function productDetailsApi(productId, token) {
     },
   );
 }
+// function* productDetailsSaga(action) {
+//   try {
+//     console.log('PRODUCT ID 👉👉👉👉👉👉👉👉👉', action.payload); // ✅ CHECK HERE
+//     const token = yield AsyncStorage.getItem('authToken');
+//     console.log('TOKEN product deetails saga...', token);
+//     const response = yield call(productDetailsApi, action.payload, token);
+
+//     yield put(productDetailsSuccess(response.data.results));
+
+//     console.log('res!!!!!!!!!!!!', response);
+//   } catch (error) {
+//     yield put(
+//       productDetailsFailure(error.response?.data || 'Something went wrong'),
+//     );
+//   }
+// }
+
 function* productDetailsSaga(action) {
   try {
-    console.log('PRODUCT ID 👉👉👉👉👉👉👉👉👉', action.payload); // ✅ CHECK HERE
+    console.log('PRODUCT ID', action.payload);
+
     const token = yield AsyncStorage.getItem('authToken');
-    console.log('TOKEN product deetails saga...', token);
+
     const response = yield call(productDetailsApi, action.payload, token);
 
-    yield put(productDetailsSuccess(response.data.results));
+    console.log('API RESPONSE PRODUCT ID =>', response.data?.results?._id);
 
-    console.log('res!!!!!!!!!!!!', response);
+    yield put(productDetailsSuccess(response.data.results));
   } catch (error) {
-    yield put(
-      productDetailsFailure(error.response?.data || 'Something went wrong'),
-    );
+    console.log(error);
   }
 }
 

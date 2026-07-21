@@ -16,9 +16,6 @@ import {
   getAddressRequest,
 } from '../actions/addressActions';
 import api from '../../api/apiClient';
-// const api = axios.create({
-//   baseURL: 'https://mntrendigo.mntech.website/api/v1',
-// });
 
 // ---------- GET ADDRESS by user ----------
 function* getAddressSaga(action) {
@@ -26,8 +23,7 @@ function* getAddressSaga(action) {
 
   console.log(' GET_ADDRESS_REQUEST SAGA CALLED');
   console.log('➡ UserId:', userId);
-  // console.log('➡ Token:', token);
-  //  HARD STOP (MOST IMPORTANT)
+
   if (!userId) {
     console.log(' GET_ADDRESS stopped (no token or userId)');
     return;
@@ -35,8 +31,6 @@ function* getAddressSaga(action) {
 
   try {
     const res = yield call(() =>
-      // api.get(`/user/userAddress/get-by-user/${userId}`, {
-      //   headers: {Authorization: `Bearer ${token}`},
       api.get(`/user/userAddress/get-by-user/${userId}`),
     );
 
@@ -91,16 +85,6 @@ function* updateAddressSaga(action) {
       return;
     }
     const response = yield call(() =>
-      // axios.put(
-      //   `https://mntrendigo.mntech.website/api/v1/user/userAddress/${addressId}`,
-      //   payload,
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${token}`,
-      //       'Content-Type': 'application/json',
-      //     },
-      //   },
-
       api.put(`/user/userAddress/${addressId}`, payload),
     );
 
@@ -111,6 +95,7 @@ function* updateAddressSaga(action) {
     yield put(getAddressRequest(userId));
   } catch (error) {
     console.log('UPDATE ERROR:', error?.response?.data || error.message);
+
     yield put({type: UPDATE_ADDRESS_FAILURE, error});
   }
 }

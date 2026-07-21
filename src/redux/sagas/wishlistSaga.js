@@ -49,39 +49,27 @@ const getWishlistApi = () => {
 
 function* getWishlistWorker() {
   try {
-    console.log('📥 GET WISHLIST SAGA CALLED');
-
-    // const token = yield call(AsyncStorage.getItem, 'authToken');
-
-    // if (!token) {
-    //   throw new Error('Token missing');
-    // }
+    console.log('GET WISHLIST SAGA CALLED');
 
     const response = yield call(getWishlistApi);
 
-    console.log('✅ Wishlist list...:', response.data.data);
+    console.log('Wishlist list...:', response.data.data);
     console.log('Wishlist fetched successfully in saga', response);
 
     yield put({
       type: GET_WISHLIST_SUCCESS,
-      payload: response.data.data, // ✅ ARRAY ONLY
+      payload: response.data.data,
     });
   } catch (error) {
     console.log(' Wishlist error:', error.message);
+
+    console.log('Wishlist full error', error);
+
     yield put(getWishlistFailure(error.message));
+
+    console.log(' GET WISHLIST ERROR:', error?.response?.data || error.message);
   }
 }
-// 🔹 API CALL (same file)
-// const removeWishlistApi = (token, wishlistId) => {
-//   return axios.delete(
-//     `https://mntrendigo.mntech.website/api/v1/user/userWishlist/${wishlistId}`,
-//     {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     },
-//   );
-// };
 
 const removeWishlistApi = wishlistId => {
   return api.delete(`/user/userWishlist/${wishlistId}`);
@@ -113,25 +101,6 @@ function* removeWishlistSaga(action) {
   }
 }
 
-// function* removeWishlistSaga(action) {
-//   try {
-//     console.log(' REMOVE_WISHLIST_SAGA STARTED');
-
-//     if (!action.payload) {
-//       console.log('❌ Wishlist ID missing, stopping saga');
-//       return;
-//     }
-
-//     console.log(' Wishlist ID ', action.payload);
-
-//     yield call(removeWishlistApi, action.payload);
-//     console.log(' Wishlist removed successfully in saga', action.payload);
-//     yield put(removeWishlistSuccess(action.payload));
-//     console.log(' REMOVE_WISHLIST_SUCCESS dispatched', action.payload);
-//   } catch (error) {
-//     console.log('Error in removeWishlistSaga ', error);
-//   }
-// }
 /* =========================
    WATCHER SAGA
 ========================= */

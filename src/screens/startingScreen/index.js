@@ -8,10 +8,16 @@ import {
   Text,
   View,
 } from 'react-native';
-import {images, RightSideArrow, WhiteTrendiGo} from '../../assets';
+import {
+  ImageBackGround,
+  images,
+  RightSideArrow,
+  TrulyBag,
+  WhiteTrendiGo,
+} from '../../assets';
 // import {fontFamily, fontSize, hp, isIOS} from '../../utils/helpers';
 // import {fontFamily, fontSize, hp, isIOS} from '../../../utils/helpers';
-import {fontFamily, fontSize, hp} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import StartingScreenBottomButtonContainer from '../../components/startingScreenBottomButtonContainer';
 import {useNavigation} from '@react-navigation/native';
@@ -64,7 +70,7 @@ const StartingScreen = () => {
     <GestureHandlerRootView style={{flex: 1}}>
       <SafeAreaView style={{flex: 1}}>
         <ImageBackground
-          source={images.portal_img}
+          source={images.truly_bag_image}
           style={styles.imageBackground}
         />
 
@@ -76,7 +82,29 @@ const StartingScreen = () => {
             height: '100%',
           }}>
           <View style={{marginTop: Platform.OS === 'ios' ? 100 : 30}}>
-            <WhiteTrendiGo />
+            <TrulyBag />
+          </View>
+          <View style={{marginHorizontal: wp(66), marginTop: hp(38)}}>
+            <Text
+              style={{
+                fontSize: fontSize(16),
+                // lineHeight: hp(24),
+                fontFamily: fontFamily.poppins400,
+                textAlign: 'center',
+              }}>
+              <Text
+                style={{
+                  color: '#000000',
+                }}>
+                Trendy fashion, beauty, kids & more.{' '}
+              </Text>
+              <Text
+                style={{
+                  color: '#5029F4',
+                }}>
+                All in one place
+              </Text>
+            </Text>
           </View>
         </View>
 
@@ -87,7 +115,8 @@ const StartingScreen = () => {
             bottom: 0, // Position at the bottom of the screen
             width: '100%',
             alignItems: 'center',
-            paddingBottom: 50, // Optional: Add some padding if needed
+            // paddingBottom: 50, // Optional: Add some padding if needed
+            paddingBottom: 75,
             zIndex: 99,
           }}>
           {/* First Button */}
@@ -97,30 +126,39 @@ const StartingScreen = () => {
           >
             {/*<Touchable activeOpacity={0.6}>*/}
             <ImageBackground
-              source={images.gradient_background_img}
+              // source={images.gradient_background_img}
+              source={images.blue_gradient}
               style={{
                 width: hp(300),
-                height: hp(53),
+                height: hp(50),
                 justifyContent: 'center',
               }}
-              resizeMode="cover">
+              resizeMode="contain">
               <View
                 style={{
                   flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  // justifyContent: 'space-between',
+                  justifyContent: 'center',
                   alignItems: 'center',
-                  paddingHorizontal: 20,
+                  flex: 1,
+                  // paddingHorizontal: 20,
                 }}>
                 <Text
                   style={{
-                    color: '#fff',
-                    fontSize: fontSize(16),
+                    color: '#F2EEFD',
+                    fontSize: fontSize(15),
                     lineHeight: hp(24),
-                    fontFamily: fontFamily.poppins400,
+                    fontFamily: fontFamily.poppins700,
                   }}>
                   Explore Collection
                 </Text>
-                <RightSideArrow />
+                <View
+                  style={{
+                    position: 'absolute',
+                    right: wp(19),
+                  }}>
+                  <RightSideArrow />
+                </View>
               </View>
             </ImageBackground>
           </Touchable>
@@ -134,20 +172,23 @@ const StartingScreen = () => {
             }}
             style={{
               width: hp(300),
-              height: hp(53),
-              backgroundColor: '#000000',
+              height: hp(50),
+              // backgroundColor: '#000000',
+              borderWidth: 1,
+              borderColor: '#5029F4',
               borderRadius: hp(25),
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              // justifyContent: 'space-between',
+              justifyContent: 'center',
               alignItems: 'center',
               paddingHorizontal: 20,
-              marginTop: hp(17),
+              marginTop: hp(13),
             }}>
             <Text
               style={{
-                color: 'white',
-                fontSize: fontSize(16),
-                fontFamily: fontFamily.poppins400,
+                color: '#5029F4',
+                fontSize: fontSize(15),
+                fontFamily: fontFamily.poppins700,
                 lineHeight: hp(24),
               }}>
               Login or Sign Up
@@ -158,6 +199,42 @@ const StartingScreen = () => {
         </View>
 
         <StartingScreenBottomButtonContainer ref={demoRef} />
+        <View
+          style={{marginHorizontal: wp(63), position: 'absolute', bottom: 15}}>
+          <Text
+            style={{
+              fontSize: fontSize(12),
+              // lineHeight: hp(19),
+              fontFamily: fontFamily.poppins400,
+              textAlign: 'center',
+            }}>
+            <Text
+              style={{
+                color: '#000000',
+              }}>
+              By continuing, you agree to our{' '}
+            </Text>
+            <Text
+              style={{
+                color: '#5029F4',
+                lineHeight: hp(20),
+              }}>
+              Terms of Use{' '}
+            </Text>
+            <Text
+              style={{
+                color: '#000000',
+              }}>
+              and{' '}
+            </Text>
+            <Text
+              style={{
+                color: '#5029F4',
+              }}>
+              Privacy Policy
+            </Text>
+          </Text>
+        </View>
       </SafeAreaView>
     </GestureHandlerRootView>
   );

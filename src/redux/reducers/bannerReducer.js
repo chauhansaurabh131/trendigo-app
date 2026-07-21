@@ -23,7 +23,7 @@ const bannerReducer = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        banners: action.payload.data, // 👈 depends on backend
+        banners: action.payload.data,
       };
 
     case FETCH_BANNER_FAILURE:

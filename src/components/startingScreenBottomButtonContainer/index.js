@@ -609,7 +609,9 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
       return () => clearTimeout(t);
     }
   }, [input]);
-
+  useEffect(() => {
+    console.log('AUTH LOADING =>', authLoading);
+  }, [authLoading]);
   return (
     <GestureHandlerRootView>
       {/* First Bottom Sheet */}
@@ -656,7 +658,7 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
                   // marginLeft: hp(22),/
                   flex: 1,
                   height: hp(50),
-                  fontSize: 16,
+                  fontSize: fontSize(16),
                   color: 'black',
                 }}
                 placeholder="Enter Email or Mobile "

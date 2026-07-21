@@ -36,6 +36,7 @@ import {images} from '../../assets';
 import {fetchUserRequest} from '../../redux/actions/userActions';
 import {SEND_OTP_REQUEST} from '../../redux/actions/otpActions';
 import {VERIFY_OTP_REQUEST} from '../../redux/actions/emailAndMobileActions';
+import {RESEND_OTP_REQUEST} from '../../redux/actions/authActions';
 
 const GenderButton = ({label, isActive, onPress, style}) => (
   <TouchableOpacity
@@ -190,7 +191,7 @@ const BasicInfoScreen = () => {
       phone: mobile,
     };
 
-    console.log('PAYLOAD ', payload);
+    console.log('USER UPDATE  PAYLOAD ', payload);
     // console.log('TOKEN ', token);
 
     // dispatch(updateUserRequest(payload, token));
@@ -199,17 +200,6 @@ const BasicInfoScreen = () => {
 
   useEffect(() => {
     if (userData) {
-      // Alert.alert('Success', 'User updated successfully!', [
-      //   {
-      //     text: 'OK',
-      //     onPress: () => {
-      //       dispatch(resetUpdateUser()); // 👈 reset state
-      //       navigation.goBack();
-      //     },
-      //   },
-      // ]);
-
-      // ✅ Toast message
       ToastAndroid.show('Profile updated successfully!', ToastAndroid.SHORT);
 
       //  Reset state
@@ -218,9 +208,6 @@ const BasicInfoScreen = () => {
       //ADD THIS to get updated user data after update
       // dispatch(fetchUserRequest(token));
       dispatch(fetchUserRequest());
-
-      // ✅ Navigate back
-      // navigation.goBack();
     }
   }, [userData]);
 
@@ -301,10 +288,6 @@ const BasicInfoScreen = () => {
 
       setProfileImage(imageUrl);
 
-      // ✅ Toast only when NEW image comes
-      // ToastAndroid.show('Profile image updated!', ToastAndroid.SHORT);
-
-      // 🔥 update previous value
       prevImageUrl.current = imageUrl;
     }
   }, [imageUrl]);
@@ -316,7 +299,7 @@ const BasicInfoScreen = () => {
 
     if (result.didCancel || !result.assets?.length) return;
 
-    const image = result.assets[0]; // 🔥 THIS WAS MISSING
+    const image = result.assets[0];
 
     if (!ALLOWED_MIME_TYPES.includes(image.type)) {
       Alert.alert('Invalid Image', 'Only PNG, JPG, JPEG images are allowed');
@@ -337,17 +320,6 @@ const BasicInfoScreen = () => {
     dispatch(uploadProfilePicRequest(image));
   };
 
-  // useEffect(() => {
-  //   if (!token) {
-  //     setName('');
-  //     setGender('Male');
-  //     setDob('');
-  //     setMobile('');
-  //     setEmail('');
-  //     setProfileImage(null);
-  //   }
-  // }, [token]);
-
   useEffect(() => {
     if (!user) {
       setName('');
@@ -358,9 +330,6 @@ const BasicInfoScreen = () => {
       setProfileImage(null);
     }
   }, [user]);
-  // useEffect(() => {
-  //   if (!token) setProfileImage(null);
-  // }, [token]);
 
   useEffect(() => {
     if (!user) setProfileImage(null);
@@ -380,6 +349,10 @@ const BasicInfoScreen = () => {
       hideSubscription.remove();
     };
   }, []);
+  useEffect(() => {
+    dispatch(fetchUserRequest());
+  }, []);
+  const isOtpComplete = otp.join('').length === 4;
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -414,7 +387,15 @@ const BasicInfoScreen = () => {
                 />
               ) : (
                 <Text style={styles.profileInitials}>
-                  {name ? name.charAt(0).toUpperCase() : 'U'}
+                  {/* {name ? name.charAt(0).toUpperCase() : 'NA'} */}
+                  {name
+                    ? name
+                        .trim()
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase())
+                        .slice(0, 2)
+                        .join('')
+                    : 'NA'}
                 </Text>
               )}
             </View>
@@ -541,7 +522,7 @@ const BasicInfoScreen = () => {
               paddingLeft: 12,
               paddingRight: 5,
               overflow: 'hidden', // 👈 important (cut edges perfectly)
-              height: 50,
+              height: hp(50),
               borderWidth: 1,
               borderColor: '#ccc',
               color: '#000000',
@@ -561,13 +542,13 @@ const BasicInfoScreen = () => {
             {loginType === 'email' && (
               <GradientButton
                 onPress={() => {
-                  console.log('🟡 CLICK: Send OTP (Mobile)');
+                  console.log(' CLICK: Send OTP (Mobile)');
                   if (mobile.length !== 10) {
                     Alert.alert('Error', 'Enter valid mobile number');
                     return;
                   }
                   const payloadData = {
-                    mobileNumber: mobile, // ✅ FIXED KEY
+                    mobileNumber: mobile, //  FIXED KEY
                     countryCodeId: '6957b791f4ef97291c4df2d0',
                   };
 
@@ -587,7 +568,7 @@ const BasicInfoScreen = () => {
                   // if (!isMobileValid) return;
                   setOtpType('mobile');
                   // setOtpType(true);
-                  setFinalOtpType('mobile'); // ✅ ADD THIS
+                  setFinalOtpType('mobile'); // ADD THIS
                   setOtp(['', '', '', '']); // reset OTP
                   setTimer(119); // start timer
                   refRBSheet.current.open();
@@ -667,7 +648,7 @@ const BasicInfoScreen = () => {
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
                     }}>
-                    <Text style={{color: '#A3A3A3'}}>OTP sent on</Text>
+                    <Text style={{color: '#A3A3A3'}}> OTP sent on </Text>
                     {/* <Text style={{color: '#000000'}}> {mobile}</Text> */}
                     {/* {console.log('RENDER TYPE:', otpType)} */}
                     <Text style={{color: '#000000'}}>
@@ -707,14 +688,107 @@ const BasicInfoScreen = () => {
                   ))}
                 </View>
                 <View style={{marginTop: hp(59), marginLeft: wp(126)}}>
-                  <Text
+                  {/* <Text
                     style={{
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
                     }}>
                     <Text style={{color: '#A3A3A3'}}>Resend in </Text>
                     <Text style={{color: '#000000'}}>{formatTime(timer)}</Text>
-                  </Text>
+                  </Text> */}
+                  {timer > 0 ? (
+                    <Text
+                      style={{
+                        fontSize: fontSize(14),
+                        fontFamily: fontFamily.poppins400,
+                      }}>
+                      <Text style={{color: '#A3A3A3'}}>Resend in </Text>
+                      <Text style={{color: '#000000'}}>
+                        {formatTime(timer)}
+                      </Text>
+                    </Text>
+                  ) : (
+                    <TouchableOpacity
+                      onPress={() => {
+                        // const payload =
+                        //   otpType === 'mobile'
+                        //     ? {
+                        //         mobileNumber: mobile,
+                        //       }
+                        //     : {
+                        //         email: email,
+                        //       };
+
+                        // console.log('====================');
+                        // console.log('🔄 RESEND OTP CLICKED');
+                        // console.log('OTP TYPE:', otpType);
+                        // console.log('MOBILE:', mobile);
+                        // console.log('EMAIL:', email);
+                        // console.log('📤 RESEND OTP PAYLOAD:', payload);
+                        // console.log('====================');
+
+                        // dispatch({
+                        //   type: SEND_OTP_REQUEST,
+                        //   payload: {
+                        //     data:
+                        //       otpType === 'mobile'
+                        //         ? {
+                        //             mobileNumber: mobile,
+                        //             countryCodeId: '6957b791f4ef97291c4df2d0',
+                        //           }
+                        //         : {
+                        //             email: email,
+                        //           },
+                        //   },
+                        // });
+                        const payload = {
+                          data:
+                            otpType === 'mobile'
+                              ? {
+                                  mobileNumber: mobile,
+                                  countryCodeId: '6957b791f4ef97291c4df2d0',
+                                }
+                              : {
+                                  email: email,
+                                },
+                        };
+
+                        console.log('====================');
+                        console.log(' RESEND OTP CLICKED');
+                        console.log('OTP TYPE:', otpType);
+                        console.log('MOBILE:', mobile);
+                        console.log('EMAIL:', email);
+                        console.log(' SEND_OTP_REQUEST PAYLOAD:', payload);
+                        console.log('====================');
+
+                        dispatch({
+                          type: SEND_OTP_REQUEST,
+                          payload,
+                        });
+                        setTimer(120);
+                      }}>
+                      {/* <Text
+                        style={{
+                          fontSize: fontSize(14),
+                          fontFamily: fontFamily.poppins400,
+                        }}>
+                        <Text style={{color: '#A3A3A3'}}>Resend in </Text>
+                        <Text style={{color: '#000000'}}>
+                          {formatTime(timer)}
+                        </Text>
+                      </Text> */}
+                      <View style={{alignItems: 'center'}}>
+                        <Text
+                          style={{
+                            fontSize: fontSize(14),
+                            fontFamily: fontFamily.poppins400,
+                            color: '#A3A3A3',
+                          }}>
+                          Resend OTP
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  )}
                 </View>
                 <View
                   style={{
@@ -724,7 +798,7 @@ const BasicInfoScreen = () => {
                   <GradientButton
                     // title="Verify Code"
                     title={'Verify Code'}
-                    disabled={loading}
+                    disabled={!isOtpComplete || loading}
                     onPress={() => {
                       const finalOtp = otp.join('');
                       console.log(' CLICK: Verify OTP');
@@ -735,14 +809,14 @@ const BasicInfoScreen = () => {
                         return;
                       }
 
-                      // // ✅ Close OTP sheet
+                      // //  Close OTP sheet
                       // refRBSheet.current.close();
 
-                      // // ✅ Open Success sheet (after small delay)
+                      // //  Open Success sheet (after small delay)
                       // setTimeout(() => {
                       //   successSheetRef.current.open();
                       // }, 300);
-                      console.log('📤 VERIFY REQUEST SEND');
+                      console.log(' VERIFY REQUEST SEND');
                       console.log(' VERIFY OTP', {
                         otp: finalOtp,
                         type: otpType,
@@ -753,7 +827,7 @@ const BasicInfoScreen = () => {
                         payload: {
                           data: {
                             otp: finalOtp,
-                            type: otpType, // 👈 'mobile' or 'email'
+                            type: otpType, // 'mobile' or 'email'
                           },
                           // token: token,
                         },

@@ -207,7 +207,7 @@ const ReviewandRatingsScreen = () => {
               fontSize: fontSize(15),
               fontFamily: fontFamily.poppins400,
               color: '#000',
-              marginLeft: wp(19),
+              marginLeft: wp(10),
             }}
           />
         </View>
@@ -244,8 +244,10 @@ const ReviewandRatingsScreen = () => {
               fontSize: fontSize(15),
               fontFamily: fontFamily.poppins400,
               color: '#000',
-              marginLeft: wp(19),
-              marginTop: hp(18),
+              // marginLeft: wp(19),
+              // marginTop: hp(18),
+              marginLeft: wp(10),
+              marginTop: hp(1),
             }}
           />
         </View>

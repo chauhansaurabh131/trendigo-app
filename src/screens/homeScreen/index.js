@@ -5,6 +5,8 @@ import {
   ColorTrendiGo,
   GradientColorSearchIcon,
   ProfileIcon,
+  SmallTrulyBag,
+  TrulyBag,
 } from '../../assets';
 import {fontFamily, fontSize, hp, Touchable, wp} from '../../utils/helpers';
 import {useNavigation} from '@react-navigation/native';
@@ -26,7 +28,7 @@ const HomeScreen = () => {
   useEffect(() => {
     dispatch(fetchUserRequest());
   }, []);
-  console.log('PROFILE PIC 👉', user?.profilePic);
+  console.log('PROFILE PIC ', user?.profilePic);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       {/* 🔒 Non-scrollable header */}
@@ -42,7 +44,7 @@ const HomeScreen = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <ColorTrendiGo />
+          <SmallTrulyBag />
 
           <TouchableOpacity
             activeOpacity={0.6}
@@ -50,11 +52,45 @@ const HomeScreen = () => {
               navigation.navigate('ProfileScreen');
             }}>
             {user?.profilePic ? (
+              // ✅ Profile image
               <Image
                 source={{uri: user.profilePic}}
-                style={{width: wp(24), height: hp(24), borderRadius: 20}}
+                style={{
+                  width: hp(24),
+                  height: hp(24),
+                  borderRadius: 20,
+                }}
               />
+            ) : user?.name || user?.email ? (
+              // ✅ First Letter
+              <View
+                style={{
+                  width: hp(24),
+                  height: hp(24),
+                  borderRadius: 25,
+                  backgroundColor: '#F7E7FF',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#000',
+                    fontSize: fontSize(12),
+                    fontFamily: fontFamily.poppins500,
+                  }}>
+                  {/* {(user?.name || user?.email)?.charAt(0)?.toUpperCase()} */}
+                  {user?.name
+                    ? user.name
+                        .trim()
+                        .split(' ')
+                        .map(word => word.charAt(0).toUpperCase())
+                        .slice(0, 2)
+                        .join('')
+                    : user?.email?.charAt(0)?.toUpperCase()}
+                </Text>
+              </View>
             ) : (
+              // ✅ Not Logged In
               <ProfileIcon />
             )}
           </TouchableOpacity>

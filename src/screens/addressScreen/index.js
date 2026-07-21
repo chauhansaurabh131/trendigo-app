@@ -129,7 +129,9 @@ const AddressScreen = () => {
       console.log('Updating address with ID:', editId);
     } else {
       // ADD
+
       dispatch(addAddressRequest(payload));
+      console.log('ADD ADDRESS PAYLOAD', payload);
     }
 
     bottomSheetRef.current?.close();

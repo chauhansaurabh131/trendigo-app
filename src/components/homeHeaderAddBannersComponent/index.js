@@ -14,43 +14,28 @@ import {fetchBannerRequest} from '../../redux/actions/bannerActions';
 import {useSelector, useDispatch} from 'react-redux';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
-// const originalImages = [
-//   images.sale_banner_img,
-//   images.men_collection_img,
-//   images.women_collection_img,
-//   images.kids_collection_img,
-// ];
-
-// const imageData = [...originalImages, originalImages[0]];
-
 const HomeHeaderAddBannersComponent = () => {
   const dispatch = useDispatch();
-  // const {banners, loading} = useSelector(state => state.banner);
-
-  // // ✅ ADD HERE
-  // const bannerImages =
-  //   banners?.[0]?.images?.map(img => img?.imageUrl)?.filter(Boolean) || [];
-
-  // const bannerData =
-  //   bannerImages.length > 0 ? [...bannerImages, bannerImages[0]] : [];
 
   const {banners, loading} = useSelector(state => state.banner);
-
-  // ✅ CONVERT API DATA TO IMAGE URL ARRAY
-  const bannerImages = banners?.[0]?.images?.map(img => img.imageUrl) || [];
-  // its now only checked
-
-  // ✅ ADD DUPLICATE IMAGE FOR INFINITE SCROLL
-  const bannerData =
-    bannerImages.length > 0 ? [...bannerImages, bannerImages[0]] : [];
-
   useEffect(() => {
     dispatch(fetchBannerRequest());
   }, []);
+  //found the Banner Images
+  const bannerImages =
+    banners?.map(banner => banner.images?.[0]?.imageUrl)?.filter(Boolean) || [];
+  // console.log('BANNER IMAGES', bannerImages);
+  // console.log('BANNERS', banners);
+
+  //  ADD DUPLICATE IMAGE FOR INFINITE SCROLL
+  const bannerData =
+    bannerImages.length > 0 ? [...bannerImages, bannerImages[0]] : [];
+
   const flatListRef = useRef(null);
   const currentIndexRef = useRef(0);
   const [visibleIndex, setVisibleIndex] = useState(0); // for rendering dots
 
+  // Auto Scroll
   useEffect(() => {
     if (bannerData.length <= 1) return;
 

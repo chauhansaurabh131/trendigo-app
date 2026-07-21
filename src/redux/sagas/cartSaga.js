@@ -86,7 +86,7 @@ function* getCartSaga(action) {
     });
   } catch (error) {
     console.log('GET CART ERROR ', error);
-
+    console.log(' GET CART ERROR:', error?.response?.data || error.message);
     yield put({
       type: GET_CART_FAILURE,
       payload: error.message,
