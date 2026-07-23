@@ -15,54 +15,41 @@ import {
 } from '../actions/authActions';
 
 const initialState = {
-  loginType: null, // 👈 ADD THIS
+  //All state of data
+  loginType: null,
   loading: false,
   otpSent: false,
   token: null,
   error: null,
-  user: null, // 👈 ADD user object
+  user: null,
 };
 
 export default function authReducer(state = initialState, action) {
   switch (action.type) {
     case REGISTER_REQUEST:
+
     case VERIFY_EMAIL_OTP_REQUEST:
       return {...state, loading: true, error: null};
 
     case REGISTER_SUCCESS:
       return {...state, loading: false, otpSent: true};
 
-    // case VERIFY_EMAIL_OTP_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     token: action.payload,
-    //     // user: action.payload.user, // 👈 save user object
-    //   };
-    // case VERIFY_EMAIL_OTP_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     token: action.payload.tokens.access.token,
-    //     user: action.payload.user,
-    //   };
-
     case REGISTER_FAILURE:
+
     case VERIFY_EMAIL_OTP_FAILURE:
       return {...state, loading: false, error: action.payload};
+
     case RESET_AUTH_FLOW:
       return {
         ...state,
         otpSent: false,
         token: null,
         error: null,
-        user: null, // 👈 reset user as well
+        user: null,
       };
+
     case RESEND_OTP_REQUEST:
       return {...state, loading: true, error: null};
-
-    // case RESEND_OTP_SUCCESS:
-    //   return {...state, loading: false, otpSent: true};
 
     case RESEND_OTP_SUCCESS:
       return {
@@ -80,16 +67,9 @@ export default function authReducer(state = initialState, action) {
     case LOAD_TOKEN_FROM_STORAGE:
       return {
         ...state,
-        token: action.payload, // 👈 restore token here
+        token: action.payload,
       };
 
-    // case VERIFY_EMAIL_OTP_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     token: action.payload.tokens.access.token,
-    //     user: action.payload.user,
-    //   };
     case VERIFY_EMAIL_OTP_SUCCESS:
       console.log('REDUCER PAYLOAD:', action.payload);
       return {
@@ -99,6 +79,7 @@ export default function authReducer(state = initialState, action) {
         user: action.payload.user,
         error: null,
       };
+
     case 'SET_AUTH_TOKEN':
       return {
         ...state,
@@ -110,9 +91,10 @@ export default function authReducer(state = initialState, action) {
         ...state,
         loginType: action.payload,
       };
+
     case LOGOUT:
       return {
-        ...initialState, // 🔥 everything reset
+        ...initialState,
       };
 
     default:

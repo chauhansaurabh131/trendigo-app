@@ -153,7 +153,7 @@ import {
   View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {fontFamily, fontSize, hp} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 
 const GradientButton = ({
   title,
@@ -174,14 +174,14 @@ const GradientButton = ({
         onPress={onPress}
         disabled={isDisabled}>
         <LinearGradient
-          colors={isDisabled ? ['#0F52BA', '#8225AF'] : ['#0F52BA', '#8225AF']}
+          colors={isDisabled ? ['#5029F3', '#7756FF'] : ['#5029F3', '#7756FF']}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1.2}}
           style={[
             {
               width: '100%',
               height: hp(50),
-              borderRadius: 25,
+              borderRadius: wp(25),
               alignItems: 'center',
               justifyContent: 'center',
               alignSelf: 'center',
@@ -193,7 +193,7 @@ const GradientButton = ({
             <ActivityIndicator color="#fff" />
           ) : (
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              {icon && <View style={{marginRight: 8}}>{icon}</View>}
+              {icon && <View style={{marginRight: wp(8)}}>{icon}</View>}
               <Text
                 style={[
                   {

@@ -55,7 +55,6 @@ const BasicInfoScreen = () => {
   // const [otpSent, setOtpSent] = useState(false);
   const isMobileValid = mobile?.length === 10;
   // const isEmailValid = email ? /^\S+@\S+\.\S+$/.test(email) : false;
-
   const isValid = isMobileValid || isEmailValid;
   const [timer, setTimer] = useState(0);
   const [finalOtpType, setFinalOtpType] = useState(null);
@@ -76,7 +75,7 @@ const BasicInfoScreen = () => {
   const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg'];
   const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg'];
   // const token = useSelector(state => state.auth.token);
-  const [photoModalVisible, setPhotoModalVisible] = useState(false); // ✔ Move here
+  const [photoModalVisible, setPhotoModalVisible] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [showEditMobileModal, setShowEditMobileModal] = useState(false);
   const [showEditOtpMobileModel, setShowEditOtpMobileModel] = useState(false);
@@ -88,21 +87,12 @@ const BasicInfoScreen = () => {
   const {otpSent, otpVerified, error} = useSelector(state => state.optVerify);
   const [otp, setOtp] = useState(['', '', '', '']);
   const inputRefs = useRef([]);
+  const isOtpComplete = otp.join('').length === 4;
+  const [selectedImage, setSelectedImage] = useState(null);
   // Validation
   const validate = () => {
     if (!name.trim()) {
       Alert.alert('Validation Error', 'Please enter your name.');
-      return false;
-    }
-    // if (!/^\d{10}$/.test(mobile)) {
-    //   Alert.alert(
-    //     'Validation Error',
-    //     'Please enter a valid 10-digit mobile number.',
-    //   );
-    //   return false;
-    // }
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      Alert.alert('Validation Error', 'Please enter a valid email.');
       return false;
     }
     return true;
@@ -177,12 +167,20 @@ const BasicInfoScreen = () => {
     return `${year}-${month}-${day}`;
   };
 
-  // when i click to save changes   updated  after thatall basic info
+  // Save Changes Button
 
   const handleSave = () => {
     if (!validate()) return;
 
     console.log('SAVE CLICKED ');
+    // DOB validation
+    if (dob && dob.length !== 10) {
+      Alert.alert(
+        'Invalid Date of Birth',
+        'Please enter DOB in DD/MM/YYYY format',
+      );
+      return;
+    }
 
     const payload = {
       name,
@@ -192,9 +190,14 @@ const BasicInfoScreen = () => {
     };
 
     console.log('USER UPDATE  PAYLOAD ', payload);
-    // console.log('TOKEN ', token);
 
-    // dispatch(updateUserRequest(payload, token));
+    dispatch(updateUserRequest(payload));
+
+    if (selectedImage) {
+      console.log('UPLOADING IMAGE =>', selectedImage);
+      dispatch(uploadProfilePicRequest(selectedImage));
+    }
+
     dispatch(updateUserRequest(payload));
   };
 
@@ -202,11 +205,8 @@ const BasicInfoScreen = () => {
     if (userData) {
       ToastAndroid.show('Profile updated successfully!', ToastAndroid.SHORT);
 
-      //  Reset state
       dispatch(resetUpdateUser());
 
-      //ADD THIS to get updated user data after update
-      // dispatch(fetchUserRequest(token));
       dispatch(fetchUserRequest());
     }
   }, [userData]);
@@ -253,13 +253,12 @@ const BasicInfoScreen = () => {
     setDob(formatted);
   };
 
-  // when get all the data server afte that run
   useEffect(() => {
     if (!user) return;
 
     setName(user.name || '');
     if (user.profilePic) {
-      setProfileImage(user.profilePic); //  ADD THIS
+      setProfileImage(user.profilePic);
     }
 
     setGender(
@@ -268,10 +267,9 @@ const BasicInfoScreen = () => {
         : 'Male',
     );
     setEmail(user.email || '');
-    // setMobile(user.phone || '');
     setMobile(user.mobileNumber ? String(user.mobileNumber) : '');
 
-    //  DOB set ONLY first time
+    //  DOB set ONLY
     if (user.dateOfBirth) {
       const date = new Date(user.dateOfBirth);
       const day = String(date.getDate()).padStart(2, '0');
@@ -281,16 +279,18 @@ const BasicInfoScreen = () => {
       setDob(prev => (prev ? prev : `${day}/${month}/${year}`));
     }
   }, [user]);
+
   //when i change or update image and get new url  after that run
   useEffect(() => {
     if (imageUrl && imageUrl !== prevImageUrl.current) {
-      console.log('NEW IMAGE URL 👉', imageUrl);
+      console.log('NEW IMAGE URL ', imageUrl);
 
       setProfileImage(imageUrl);
 
       prevImageUrl.current = imageUrl;
     }
   }, [imageUrl]);
+
   const openGallery = async () => {
     const result = await launchImageLibrary({
       mediaType: 'photo',
@@ -315,9 +315,10 @@ const BasicInfoScreen = () => {
       Alert.alert('Invalid File', 'Please select a PNG, JPG or JPEG image');
       return;
     }
+    setSelectedImage(image);
+    setProfileImage(image.uri);
 
-    // Dispatch correct image
-    dispatch(uploadProfilePicRequest(image));
+    console.log('Image saved locally. Upload will happen on Save Changes.');
   };
 
   useEffect(() => {
@@ -349,10 +350,11 @@ const BasicInfoScreen = () => {
       hideSubscription.remove();
     };
   }, []);
+  //fetch user data
   useEffect(() => {
     dispatch(fetchUserRequest());
   }, []);
-  const isOtpComplete = otp.join('').length === 4;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -387,7 +389,6 @@ const BasicInfoScreen = () => {
                 />
               ) : (
                 <Text style={styles.profileInitials}>
-                  {/* {name ? name.charAt(0).toUpperCase() : 'NA'} */}
                   {name
                     ? name
                         .trim()
@@ -410,18 +411,15 @@ const BasicInfoScreen = () => {
               style={styles.modalOverlay}
               activeOpacity={1}
               onPress={() => setPhotoModalVisible(false)}>
-              {/* <View style={styles.modalBox}> */}
               <View
                 style={{
                   backgroundColor: colors.white,
                   width: wp(340),
-                  height: hp(147),
-                  borderRadius: 20,
+                  paddingVertical: hp(24),
+                  borderRadius: wp(20),
                 }}>
                 <TouchableOpacity
-                  // style={styles.modalRow}
                   style={{
-                    marginTop: hp(26),
                     marginHorizontal: wp(31),
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -429,22 +427,20 @@ const BasicInfoScreen = () => {
                   }}
                   onPress={() => {
                     setPhotoModalVisible(false);
-                    openGallery(); // 👈 open gallery
+                    openGallery();
                   }}>
                   <Text style={styles.modalText}>Change Photo</Text>
-                  {/* <Text style={styles.arrow}>{'>'}</Text> */}
                   <Image
                     source={images.white_icon}
                     style={{width: wp(7.78), height: hp(13.96)}}
                   />
                 </TouchableOpacity>
 
-                {/* <View style={styles.modalLine} /> */}
                 <View
                   style={{
                     marginTop: hp(24),
-                    borderColor: '#D8D8D8',
-                    borderWidth: 1,
+                    backgroundColor: '#D8D8D8',
+                    height: hp(1),
                     marginHorizontal: wp(31),
                   }}
                 />
@@ -459,11 +455,10 @@ const BasicInfoScreen = () => {
                     justifyContent: 'space-between',
                   }}
                   onPress={() => {
-                    setProfileImage(null); // 👈 delete image
+                    setProfileImage(null);
                     setPhotoModalVisible(false);
                   }}>
                   <Text style={styles.modalText}>Delete Photo</Text>
-                  {/* <Text style={styles.arrow}>{'>'}</Text> */}
                   <Image
                     source={images.white_icon}
                     style={{width: wp(7.78), height: hp(13.96)}}
@@ -514,21 +509,21 @@ const BasicInfoScreen = () => {
           <Text style={styles.label}>Mobile Number</Text>
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
+              // overflow: 'hidden',
               backgroundColor: '#fff',
               borderRadius: wp(10),
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingLeft: wp(12),
+              paddingRight: wp(5),
               // paddingHorizontal: 12,
-              paddingLeft: 12,
-              paddingRight: 5,
-              overflow: 'hidden', // 👈 important (cut edges perfectly)
               height: hp(50),
               borderWidth: 1,
-              borderColor: '#ccc',
+              borderColor: '#E2E2E2',
               color: '#000000',
+              // marginBottom: hp(30),
             }}>
             <TextInput
-              // style={styles.input}
               style={{flex: 1, color: '#000000'}}
               placeholder="Enter mobile number"
               keyboardType="number-pad"
@@ -538,7 +533,7 @@ const BasicInfoScreen = () => {
               maxLength={10}
             />
 
-            {/* 👇 Hide when mobile login */}
+            {/*  Hide when mobile login */}
             {loginType === 'email' && (
               <GradientButton
                 onPress={() => {
@@ -548,7 +543,7 @@ const BasicInfoScreen = () => {
                     return;
                   }
                   const payloadData = {
-                    mobileNumber: mobile, //  FIXED KEY
+                    mobileNumber: mobile,
                     countryCodeId: '6957b791f4ef97291c4df2d0',
                   };
 
@@ -561,28 +556,18 @@ const BasicInfoScreen = () => {
                     },
                   });
 
-                  // console.log('TYPE:', 'mobile');
-                  // console.log('MOBILE:', mobile);
-                  // console.log('EMAIL:', email);
-
-                  // if (!isMobileValid) return;
                   setOtpType('mobile');
-                  // setOtpType(true);
-                  setFinalOtpType('mobile'); // ADD THIS
-                  setOtp(['', '', '', '']); // reset OTP
-                  setTimer(119); // start timer
+                  setFinalOtpType('mobile');
+                  setOtp(['', '', '', '']);
+                  setTimer(119);
                   refRBSheet.current.open();
                 }}
                 title={'Send OTP'}
                 buttonStyle={{
                   width: wp(94),
                   height: hp(39),
-                  borderRadius: 10,
-                  // opacity: isMobileValid ? 1 : 0.5,
-
-                  // borderRadius: 20,
+                  borderRadius: wp(10),
                 }}
-                // disabled={!isMobileValid}
                 textStyle={{fontSize: fontSize(14)}}
               />
             )}
@@ -598,8 +583,8 @@ const BasicInfoScreen = () => {
               wrapper: {backgroundColor: 'rgba(0,0,0,0.3)'},
               draggableIcon: {backgroundColor: '#C4C4C4'},
               container: {
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: wp(20),
+                borderTopRightRadius: wp(20),
                 backgroundColor: '#FFFFFF',
               },
             }}>
@@ -610,9 +595,8 @@ const BasicInfoScreen = () => {
                   width: '100%',
                   height: hp(432),
                   backgroundColor: '#FFFFFF',
-                  // borderWidth: 1,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderTopLeftRadius: wp(20),
+                  borderTopRightRadius: wp(20),
                 }}>
                 <View
                   style={{
@@ -639,9 +623,7 @@ const BasicInfoScreen = () => {
                 <View
                   style={{
                     marginTop: wp(34),
-                    // marginLeft: hp(57),
                     alignItems: 'center',
-                    // justifyContent: 'center',
                   }}>
                   <Text
                     style={{
@@ -649,8 +631,7 @@ const BasicInfoScreen = () => {
                       fontFamily: fontFamily.poppins400,
                     }}>
                     <Text style={{color: '#A3A3A3'}}> OTP sent on </Text>
-                    {/* <Text style={{color: '#000000'}}> {mobile}</Text> */}
-                    {/* {console.log('RENDER TYPE:', otpType)} */}
+
                     <Text style={{color: '#000000'}}>
                       {otpType === 'mobile' ? mobile : email}
                     </Text>
@@ -687,15 +668,12 @@ const BasicInfoScreen = () => {
                     />
                   ))}
                 </View>
-                <View style={{marginTop: hp(59), marginLeft: wp(126)}}>
-                  {/* <Text
-                    style={{
-                      fontSize: fontSize(14),
-                      fontFamily: fontFamily.poppins400,
-                    }}>
-                    <Text style={{color: '#A3A3A3'}}>Resend in </Text>
-                    <Text style={{color: '#000000'}}>{formatTime(timer)}</Text>
-                  </Text> */}
+                <View
+                  style={{
+                    marginTop: hp(59),
+                    //  marginLeft: wp(126)
+                    alignItems: 'center',
+                  }}>
                   {timer > 0 ? (
                     <Text
                       style={{
@@ -710,37 +688,6 @@ const BasicInfoScreen = () => {
                   ) : (
                     <TouchableOpacity
                       onPress={() => {
-                        // const payload =
-                        //   otpType === 'mobile'
-                        //     ? {
-                        //         mobileNumber: mobile,
-                        //       }
-                        //     : {
-                        //         email: email,
-                        //       };
-
-                        // console.log('====================');
-                        // console.log('🔄 RESEND OTP CLICKED');
-                        // console.log('OTP TYPE:', otpType);
-                        // console.log('MOBILE:', mobile);
-                        // console.log('EMAIL:', email);
-                        // console.log('📤 RESEND OTP PAYLOAD:', payload);
-                        // console.log('====================');
-
-                        // dispatch({
-                        //   type: SEND_OTP_REQUEST,
-                        //   payload: {
-                        //     data:
-                        //       otpType === 'mobile'
-                        //         ? {
-                        //             mobileNumber: mobile,
-                        //             countryCodeId: '6957b791f4ef97291c4df2d0',
-                        //           }
-                        //         : {
-                        //             email: email,
-                        //           },
-                        //   },
-                        // });
                         const payload = {
                           data:
                             otpType === 'mobile'
@@ -767,26 +714,14 @@ const BasicInfoScreen = () => {
                         });
                         setTimer(120);
                       }}>
-                      {/* <Text
+                      <Text
                         style={{
                           fontSize: fontSize(14),
                           fontFamily: fontFamily.poppins400,
+                          color: '#A3A3A3',
                         }}>
-                        <Text style={{color: '#A3A3A3'}}>Resend in </Text>
-                        <Text style={{color: '#000000'}}>
-                          {formatTime(timer)}
-                        </Text>
-                      </Text> */}
-                      <View style={{alignItems: 'center'}}>
-                        <Text
-                          style={{
-                            fontSize: fontSize(14),
-                            fontFamily: fontFamily.poppins400,
-                            color: '#A3A3A3',
-                          }}>
-                          Resend OTP
-                        </Text>
-                      </View>
+                        Resend OTP
+                      </Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -796,7 +731,6 @@ const BasicInfoScreen = () => {
                     marginTop: hp(58),
                   }}>
                   <GradientButton
-                    // title="Verify Code"
                     title={'Verify Code'}
                     disabled={!isOtpComplete || loading}
                     onPress={() => {
@@ -808,14 +742,6 @@ const BasicInfoScreen = () => {
                         Alert.alert('Error', 'Enter 4-digit OTP');
                         return;
                       }
-
-                      // //  Close OTP sheet
-                      // refRBSheet.current.close();
-
-                      // //  Open Success sheet (after small delay)
-                      // setTimeout(() => {
-                      //   successSheetRef.current.open();
-                      // }, 300);
                       console.log(' VERIFY REQUEST SEND');
                       console.log(' VERIFY OTP', {
                         otp: finalOtp,
@@ -827,9 +753,8 @@ const BasicInfoScreen = () => {
                         payload: {
                           data: {
                             otp: finalOtp,
-                            type: otpType, // 'mobile' or 'email'
+                            type: otpType,
                           },
-                          // token: token,
                         },
                       });
                     }}
@@ -847,8 +772,8 @@ const BasicInfoScreen = () => {
             closeOnPressMask={true}
             customStyles={{
               container: {
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: wp(20),
+                borderTopRightRadius: wp(20),
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: 20,
@@ -866,8 +791,8 @@ const BasicInfoScreen = () => {
                   width: wp(375),
                   height: hp(257),
                   backgroundColor: '#FFFFFF',
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderTopLeftRadius: wp(20),
+                  borderTopRightRadius: wp(20),
                 }}>
                 <View
                   style={{
@@ -906,11 +831,6 @@ const BasicInfoScreen = () => {
                     marginLeft: wp(127),
                   }}>
                   <GradientButton
-                    // onPress={() => {
-                    //   setShowSecondModal(false);
-                    //   // navigation.navigate('Account');
-                    // }}
-
                     onPress={() => {
                       successSheetRef.current?.close();
 
@@ -932,17 +852,15 @@ const BasicInfoScreen = () => {
               borderRadius: wp(10),
               flexDirection: 'row',
               alignItems: 'center',
-              paddingLeft: 12,
-              paddingRight: 5,
-              // paddingHorizontal: 12,
-              height: 50,
+              paddingLeft: wp(12),
+              paddingRight: wp(5),
+              height: hp(50),
               borderWidth: 1,
-              borderColor: '#ccc',
+              borderColor: '#E2E2E2',
               color: '#000000',
-              marginBottom: 30,
+              marginBottom: hp(40),
             }}>
             <TextInput
-              // style={[styles.input, {marginBottom: 30}]}
               style={{flex: 1, color: '#000000'}}
               placeholder="Enter email"
               keyboardType="email-address"
@@ -951,30 +869,16 @@ const BasicInfoScreen = () => {
               onChangeText={setEmail}
               autoCapitalize="none"
             />
-            {/* 👇 Hide when email login */}
+            {/* Hide when email login */}
             {loginType === 'mobile' && (
               <GradientButton
                 title={'Send OTP'}
                 buttonStyle={{
                   width: wp(94),
                   height: hp(39),
-                  borderRadius: 10,
+                  borderRadius: wp(10),
                 }}
                 textStyle={{fontSize: fontSize(14)}}
-                // onPress={() => {
-                //   console.log('TYPE:', 'email');
-                //   console.log('MOBILE:', mobile);
-                //   console.log('EMAIL:', email);
-
-                //   if (!isEmailValid) return;
-                //   setOtpType('email'); // ✅ correct (small letters)
-                //   setOtpType(true);
-                //   setOtp(['', '', '', '']);
-                //   setTimer(119);
-
-                //   refRBSheet.current.open(); // same sheet use કરી શકે
-                // }}
-
                 onPress={() => {
                   console.log('CLICK: Send OTP (Email)');
 
@@ -991,12 +895,11 @@ const BasicInfoScreen = () => {
                     type: SEND_OTP_REQUEST,
                     payload: {
                       data: {email: email},
-                      // token: token,
                     },
                   });
                   console.log('OTP TYPE SET: email');
-                  setOtpType('email'); // ✅ only this
-                  setFinalOtpType('email'); // ✅ ADD THIS
+                  setOtpType('email');
+                  setFinalOtpType('email');
                   setOtp(['', '', '', '']);
                   setTimer(119);
 
@@ -1009,7 +912,6 @@ const BasicInfoScreen = () => {
             <GradientButton
               title={loading ? 'Saving...' : 'Save Changes'}
               onPress={handleSave}
-              // disabled={loading}
               loading={loading}
               buttonStyle={{height: hp(45)}}
             />
@@ -1029,30 +931,34 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E2E2E2',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: wp(20),
     backgroundColor: '#fff',
   },
-  backButton: {paddingRight: 10},
+  backButton: {paddingRight: wp(10)},
   headerText: {
     flex: 1,
     textAlign: 'center',
     fontFamily: fontFamily.poppins500,
-    fontSize: wp(18),
+    fontSize: fontSize(18),
     color: '#000',
-    marginRight: 30,
+    marginRight: wp(30),
   },
   arrowIcon: {width: wp(20), height: hp(18), resizeMode: 'contain'},
-  scrollArea: {paddingHorizontal: 20},
+
+  scrollArea: {
+    paddingHorizontal: wp(20),
+  },
+
   profileCircle: {
     alignSelf: 'center',
     backgroundColor: '#F7E7FF',
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+    width: hp(90),
+    height: hp(90),
+    borderRadius: wp(50),
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 20,
-    overflow: 'hidden', // REQUIRED!
+    marginVertical: hp(20),
+    overflow: 'hidden',
   },
   profileImage: {
     width: '100%',
@@ -1060,41 +966,48 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
 
-  profileInitials: {fontSize: 22, fontWeight: 'bold', color: '#333'},
+  profileInitials: {
+    fontSize: fontSize(24),
+    fontFamily: fontFamily.poppins500,
+    color: '#000000',
+  },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 15,
-    marginBottom: 5,
+    fontSize: fontSize(14),
+    marginTop: hp(13),
+    marginBottom: hp(5),
     fontFamily: fontFamily.poppins500,
     color: '#000000',
   },
   input: {
     backgroundColor: '#fff',
     borderRadius: wp(10),
-    paddingHorizontal: 12,
-    height: 50,
+    paddingHorizontal: wp(20),
+    height: hp(50),
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#E2E2E2',
     color: '#000000',
   },
   rectangle: {
     width: '100%',
-    height: hp(48),
-    backgroundColor: '#fff',
-    marginVertical: 10,
+    height: hp(50),
+    backgroundColor: '#FFFFFF',
+    marginVertical: hp(10),
     borderRadius: wp(10),
     justifyContent: 'center',
     borderWidth: 1,
+    borderRadius: wp(10),
+    paddingHorizontal: wp(20),
+    height: hp(50),
+    borderWidth: 1,
     borderColor: '#E2E2E2',
-    paddingHorizontal: 5,
-    paddingVertical: 5,
+    paddingHorizontal: wp(5),
+    paddingVertical: hp(5),
   },
   genderOuterBox: {
     flexDirection: 'row',
     borderColor: '#E2E2E2',
     borderRadius: wp(10),
-    height: hp(40),
+    height: hp(41),
     overflow: 'hidden',
   },
   genderBtn: {
@@ -1102,53 +1015,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  genderBtnActive: {backgroundColor: '#8225AF', borderRadius: wp(10)},
+  genderBtnActive: {
+    backgroundColor: '#5029F3',
+    borderRadius: wp(10),
+  },
   genderText: {
     fontSize: 15,
     fontFamily: fontFamily.poppins500,
     color: '#000000',
   },
   genderTextActive: {color: '#fff'},
-  // divider: {width: 1, backgroundColor: '#E2E2E2'},
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
-
-  modalBox: {
-    width: wp(80),
-    backgroundColor: 'white',
-    borderRadius: 12,
-    paddingVertical: 15,
-    elevation: 5,
-  },
-
-  modalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
   },
 
   modalText: {
-    fontSize: 16,
-    fontFamily: fontFamily.medium,
+    fontSize: fontSize(18),
+    fontFamily: fontFamily.poppins400,
     color: 'black',
   },
 
-  modalLine: {
-    height: 1,
-    backgroundColor: '#E5E5E5',
-    marginHorizontal: 20,
-  },
-
-  arrow: {
-    fontSize: 18,
-    color: '#A0A0A0',
-  },
+  // arrow: {
+  //   fontSize: 18,
+  //   color: '#A0A0A0',
+  // },
 });
 
 export default BasicInfoScreen;
