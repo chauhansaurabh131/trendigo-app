@@ -61,6 +61,23 @@ export const chatReducer = (state = initialState, action) => {
         ...state,
         messages: state.messages.filter(item => item._id !== action.payload),
       };
+    // case 'APPEND_MESSAGES':
+    //   return {
+    //     ...state,
+    //     messages: [...action.payload, ...state.messages],
+    //   };
+
+    case 'APPEND_MESSAGES':
+      return {
+        ...state,
+        messages: [...state.messages, ...action.payload],
+      };
+    case 'CLEAR_CHAT':
+      return {
+        ...state,
+        conversations: [],
+        messages: [],
+      };
     default:
       return state;
   }

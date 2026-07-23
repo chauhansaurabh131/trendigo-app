@@ -50,6 +50,7 @@ const ProfileScreen = () => {
 
     dispatch(logout());
     dispatch({type: 'RESET_WISHLIST'});
+    dispatch({type: 'CLEAR_CHAT'});
     dispatch({type: 'RESET_CART'});
     navigation.reset({
       index: 0,

@@ -1,4 +1,3 @@
-// redux/reducers/updateUserReducer.js
 import {
   UPDATE_USER_REQUEST,
   UPDATE_USER_SUCCESS,
@@ -22,7 +21,7 @@ export default function updateuserReducer(state = initialState, action) {
       return {...state, loading: false, error: action.payload};
 
     case RESET_UPDATE_USER:
-      return initialState; // VERY IMPORTANT
+      return initialState;
 
     default:
       return state;
