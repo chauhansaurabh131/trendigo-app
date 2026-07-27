@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {colors} from '../../utils/colors';
 import {images} from '../../assets';
-import {hp} from '../../utils/helpers';
+import {hp, wp} from '../../utils/helpers';
 import {fetchBannerRequest} from '../../redux/actions/bannerActions';
 import {useSelector, useDispatch} from 'react-redux';
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
@@ -103,7 +103,7 @@ const HomeHeaderAddBannersComponent = () => {
                 key={i}
                 style={[
                   styles.dot,
-                  {backgroundColor: isActive ? '#8225AF' : '#FFFFFF'},
+                  {backgroundColor: isActive ? '#5029F3' : '#FFFFFF'},
                 ]}
               />
             );
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   dot: {
     width: hp(16),
     height: hp(16),
-    borderRadius: 25,
+    borderRadius: wp(25),
     marginHorizontal: hp(4),
   },
 });

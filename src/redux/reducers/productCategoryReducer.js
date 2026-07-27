@@ -20,12 +20,14 @@ export default function productCategoryReucer(state = initialState, action) {
       return {
         ...state,
         loading: false,
-        // products: action.payload?.results || [], // 🔥 important
-        products: action.payload?.data?.results || [],
+        products:
+          action.payload.data.page === 1
+            ? action.payload.data.results
+            : [...state.products, ...action.payload.data.results],
         pagination: {
-          page: action.payload?.page,
-          totalPages: action.payload?.totalPages,
-          hasNextPage: action.payload?.hasNextPage,
+          page: action.payload?.data?.page,
+          totalPages: action.payload?.data?.totalPages,
+          hasNextPage: action.payload?.data?.hasNextPage,
         },
       };
 

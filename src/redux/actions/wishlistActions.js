@@ -58,3 +58,8 @@ export const removeWishlistSuccess = wishlistId => ({
   type: REMOVE_WISHLIST_SUCCESS,
   payload: wishlistId,
 });
+
+export const removeWishlistFailure = error => ({
+  type: REMOVE_WISHLIST_FAILURE,
+  payload: error,
+});

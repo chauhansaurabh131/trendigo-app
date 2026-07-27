@@ -16,7 +16,7 @@ export default function productByReviewReducer(state = initialState, action) {
       return {...state, loading: true};
 
     case GET_PRODUCT_BY_REVIEW_SUCCESS:
-      console.log('🧾 Reducer received products:', action.payload);
+      console.log(' Reducer received products:', action.payload);
       return {
         ...state,
         loading: false,

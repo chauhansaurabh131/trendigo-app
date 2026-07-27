@@ -8,6 +8,8 @@ const initialState = {
   loading: false,
   products: [],
   error: null,
+  page: 1,
+  totalPages: 1,
 };
 
 export default function productReducer(state = initialState, action) {
@@ -15,11 +17,23 @@ export default function productReducer(state = initialState, action) {
     case GET_PRODUCT_REQUEST:
       return {...state, loading: true};
 
+    // case GET_PRODUCT_SUCCESS:
+    //   return {
+    //     ...state,
+    //     loading: false,
+    //     products: action.payload,
+    //   };
     case GET_PRODUCT_SUCCESS:
       return {
         ...state,
         loading: false,
-        products: action.payload,
+        products:
+          action.payload.page === 1
+            ? action.payload.products
+            : [...state.products, ...action.payload.products],
+
+        page: action.payload.page,
+        totalPages: action.payload.totalPages,
       };
 
     case GET_PRODUCT_FAILURE:

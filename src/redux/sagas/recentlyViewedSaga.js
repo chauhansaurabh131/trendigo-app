@@ -12,7 +12,6 @@ import {
   GET_RECENTLY_VIEWED_SUCCESS,
   GET_RECENTLY_VIEWED_FAILURE,
 } from '../actions/recentlyViewedActions';
-console.log('RecentlyView Working on now...');
 
 function addRecentlyViewedApi(data, token) {
   return api.post('/user/recentlyViewed/', data);
@@ -20,17 +19,17 @@ function addRecentlyViewedApi(data, token) {
 
 function* addRecentlyViewedSaga(action) {
   try {
-    console.log('ADD_RECENTLY_VIEWED_REQUEST TRIGGERED');
+    // console.log('ADD_RECENTLY_VIEWED_REQUEST TRIGGERED');
 
-    console.log('ADD_RECENTLY_VIEWED Action Payload:', action.payload);
+    // console.log('ADD_RECENTLY_VIEWED Action Payload:', action.payload);
 
-    console.log('Sending Product ID:', action.payload?.productId);
+    // console.log('Sending Product ID:', action.payload?.productId);
 
     const response = yield call(addRecentlyViewedApi, {
       productId: action.payload?.productId,
     });
 
-    console.log('ADD_RECENTLY_VIEWED FULL RESPONSE:', response);
+    // console.log('ADD_RECENTLY_VIEWED FULL RESPONSE:', response);
 
     console.log('ADD_RECENTLY_VIEWED RESPONSE.DATA:', response?.data);
 
@@ -43,9 +42,9 @@ function* addRecentlyViewedSaga(action) {
       type: GET_RECENTLY_VIEWED_REQUEST,
     });
   } catch (error) {
-    console.log(' API ERROR:', error);
-    console.log(' ERROR RESPONSE:', error?.response);
-    console.log(' ERROR DATA:', error?.response?.data);
+    console.log(' ADD_RECENTLY_VIEWED_API ERROR:', error);
+    console.log(' ADD_RECENTLY_VIEWED_ERROR RESPONSE:', error?.response);
+    console.log(' ADD_RECENTLY_VIEWED_ERROR DATA:', error?.response?.data);
 
     yield put({
       type: ADD_RECENTLY_VIEWED_FAILURE,
@@ -59,11 +58,11 @@ function getRecentlyViewedApi(token) {
 }
 function* getRecentlyViewedSaga(action) {
   try {
-    console.log('GET_RECENTLY_VIEWED_SAGA started');
+    // console.log('GET_RECENTLY_VIEWED_SAGA started');
 
     const response = yield call(getRecentlyViewedApi);
 
-    console.log('GET_RECENTLY-VIEW API Response:', response.data);
+    console.log('GET_RECENTLY-VIEW API RESPONSE:', response.data);
 
     yield put({
       type: GET_RECENTLY_VIEWED_SUCCESS,
@@ -71,7 +70,7 @@ function* getRecentlyViewedSaga(action) {
     });
   } catch (error) {
     console.error(
-      ' RECENTLY VIEWED API Error :',
+      ' GET_RECENTLY_VIEWED_API ERROR :',
       error.response?.data || error.message,
     );
 

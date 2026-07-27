@@ -25,19 +25,17 @@ const wishlistApi = productId => {
 ========================= */
 function* wishlistWorker(action) {
   try {
-    console.log('WISHLIST SAGA CALLED');
+    console.log('ADD WISHLIST SAGA CALLED');
     console.log(' Product ID:', action.payload.productId);
 
     const response = yield call(wishlistApi, action.payload.productId);
 
-    console.log('add Wishlist Success123:', response.data);
-    console.log('Wishlist added successfully in saga', response),
-      yield put(wishlistSuccess(response.data));
+    console.log('ADD WISHLIST RESPONSE:', response.data);
+    yield put(wishlistSuccess(response.data));
 
-    // yield put({type: GET_WISHLIST_REQUEST});
     yield put(getWishlistRequest());
   } catch (error) {
-    console.log(' Wishlist Error:', error?.response?.data || error.message);
+    console.log(' ADD WISHLIST ERROR:', error?.response?.data || error.message);
 
     yield put(wishlistFailure(error?.response?.data || error.message));
   }
@@ -53,17 +51,17 @@ function* getWishlistWorker() {
 
     const response = yield call(getWishlistApi);
 
-    console.log('Wishlist list...:', response.data.data);
-    console.log('Wishlist fetched successfully in saga', response);
+    console.log('GET WISHLIST.:', response.data.data);
+    // console.log('Wishlist fetched successfully in saga', response);
 
     yield put({
       type: GET_WISHLIST_SUCCESS,
       payload: response.data.data,
     });
   } catch (error) {
-    console.log(' Wishlist error:', error.message);
+    console.log(' GET WISHLIST ERROR:', error.message);
 
-    console.log('Wishlist full error', error);
+    console.log('GET WISHLIST FULL ERROR ', error);
 
     yield put(getWishlistFailure(error.message));
 
@@ -79,23 +77,22 @@ function* removeWishlistSaga(action) {
   try {
     console.log(' REMOVE_WISHLIST_SAGA STARTED');
     if (!action.payload) {
-      console.log('Wishlist ID missing, stopping saga');
+      console.log('REMOVE_WISHLIST ID missing, stopping saga');
       return;
     }
 
-    console.log(' Wishlist ID ', action.payload);
+    console.log(' REMOVE_WISHLIST  ID ', action.payload);
 
-    console.log(' Calling DELETE wishlist API...');
     yield call(removeWishlistApi, action.payload);
 
-    console.log(' Wishlist removed successfully in saga');
+    console.log(' REMOVE_WISHLIST SUCCESSFULLY');
 
     // success → reducer ko id bhejo
     yield put(removeWishlistSuccess(action.payload));
     console.log(' REMOVE_WISHLIST_SUCCESS dispatched', action.payload);
   } catch (error) {
-    console.log('Error in removeWishlistSaga ', error);
-    console.log('Error response ', error?.response);
+    console.log('REMOVE_WISHLIST ', error);
+    console.log('REMOVE_WISHLIST Error response ', error?.response);
 
     yield put(removeWishlistFailure(error?.response?.data || error.message));
   }

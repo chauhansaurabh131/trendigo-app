@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import {colors} from '../../utils/colors';
-import {fontFamily, fontSize, hp, Touchable} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, Touchable, wp} from '../../utils/helpers';
 import {images, NavigationArrowIcon} from '../../assets';
 import {useNavigation} from '@react-navigation/native';
 
@@ -36,7 +36,7 @@ const CategoryScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
-            marginHorizontal: 18,
+            marginHorizontal: wp(18),
             marginTop: hp(17),
           }}>
           <TouchableOpacity
@@ -56,16 +56,16 @@ const CategoryScreen = () => {
                   width: '100%',
                   height: hp(146),
                   resizeMode: 'contain',
-                  borderRadius: 12,
+                  borderRadius: wp(12),
                 }}
               />
 
               <View
                 style={{
                   position: 'absolute',
-                  left: 36,
-                  right: 36,
-                  top: 60,
+                  left: wp(36),
+                  right: wp(36),
+                  top: hp(60),
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -112,16 +112,16 @@ const CategoryScreen = () => {
                   width: '100%',
                   height: hp(146),
                   resizeMode: 'contain',
-                  borderRadius: 12,
+                  borderRadius: wp(12),
                 }}
               />
 
               <View
                 style={{
                   position: 'absolute',
-                  left: 36,
-                  right: 36,
-                  top: 60,
+                  left: wp(36),
+                  right: wp(36),
+                  top: hp(60),
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -167,16 +167,16 @@ const CategoryScreen = () => {
                   width: '100%',
                   height: hp(146),
                   resizeMode: 'contain',
-                  borderRadius: 12,
+                  borderRadius: wp(12),
                 }}
               />
 
               <View
                 style={{
                   position: 'absolute',
-                  left: 36,
-                  right: 36,
-                  top: 60,
+                  left: wp(36),
+                  right: wp(36),
+                  top: hp(60),
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
@@ -222,16 +222,16 @@ const CategoryScreen = () => {
                   width: '100%',
                   height: hp(146),
                   resizeMode: 'contain',
-                  borderRadius: 12,
+                  borderRadius: wp(12),
                 }}
               />
 
               <View
                 style={{
                   position: 'absolute',
-                  left: 36,
-                  right: 36,
-                  top: 60,
+                  left: wp(36),
+                  right: wp(36),
+                  top: hp(60),
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',

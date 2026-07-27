@@ -15,6 +15,7 @@ import {
 
 const initialState = {
   loading: false,
+  cartLoading: false, // ADD/REMOVE loading
   cartData: [],
   error: null,
   cartItems: [],
@@ -28,14 +29,14 @@ export default function cartReducer(state = initialState, action) {
     case ADD_TO_CART_REQUEST:
       return {
         ...state,
-        loading: true,
+        cartLoading: true,
         success: false,
       };
 
     case ADD_TO_CART_SUCCESS:
       return {
         ...state,
-        loading: false,
+        cartLoading: false,
         cartData: action.payload.data,
         success: true,
       };
@@ -43,7 +44,7 @@ export default function cartReducer(state = initialState, action) {
     case ADD_TO_CART_FAILURE:
       return {
         ...state,
-        loading: false,
+        cartLoading: false,
         error: action.payload,
         success: false,
       };
@@ -90,7 +91,7 @@ export default function cartReducer(state = initialState, action) {
     case REMOVE_CART_REQUEST:
       return {
         ...state,
-        loading: true,
+        cartLoading: true,
       };
 
     // case REMOVE_CART_SUCCESS:
@@ -108,8 +109,8 @@ export default function cartReducer(state = initialState, action) {
       console.log('REMOVE_CART_SUCCESS action.payload:', action.payload);
       return {
         ...state,
-        loading: false,
-        // cartData: action.payload.data, // 👈 FULL replace
+        cartLoading: false,
+
         cartData: {
           ...state.cartData,
           productDetailList: state.cartData.productDetailList.filter(
@@ -121,13 +122,14 @@ export default function cartReducer(state = initialState, action) {
     case REMOVE_CART_FAILURE:
       return {
         ...state,
-        loading: false,
+        cartLoading: false,
         error: action.payload,
       };
     case 'RESET_CART':
       return {
         ...state,
-        cartData: null, // or []
+        cartData: [],
+        cartItems: [],
       };
     default:
       return state;

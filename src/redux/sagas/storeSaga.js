@@ -10,12 +10,10 @@ function* getStoreSaga(action) {
   try {
     const response = yield call(
       api.get,
-      // `https://mntrendigo.mntech.website/api/v1/user/store/by-storeId/${action.payload}`,
-
       `/user/store/by-storeId/${action.payload}`,
     );
 
-    console.log('STORE FULL RESPONSE ', response);
+    // console.log('STORE FULL RESPONSE ', response);
     console.log(' STORE RESPONSE DATA ', response.data);
 
     yield put({

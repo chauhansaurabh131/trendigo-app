@@ -17,25 +17,19 @@ import arrow_back from '../../assets/images/arrow_back.png';
 import {useSelector, useDispatch} from 'react-redux';
 import {useEffect} from 'react';
 import {PRODUCT_CATEGORY_REQUEST} from '../../redux/actions/productCategoryActions';
-// import men_banner from "../../assets/images/banner_men_icon.png";
-// import women_banner from "../../assets/images/banner_women_icon.png";
-// import kids_banner from "../../assets/images/banner_kids_icon.png";
-// import beauty_banner from "../../assets/images/banner_beauty_icon.png";
 
 // tab icons
 import topwear_icon from '../../assets/images/topwear_men_icon.png';
 import men_causal from '../../assets/images/men_causal_image.png';
 import formal_image from '../../assets/images/formal_men_image.png';
-import coat_image from '../../assets/images/coat_men_image.png';
-import caps_image from '../../assets/images/caps_men_image.png';
-import rain_image from '../../assets/images/rain_men_image.png';
-import suit_image from '../../assets/images/suit_men_image.png';
+
+import {images} from '../../assets';
 const MenCategoryScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const {title, image, type} = route.params; // params receive
   const [activeTab, setActiveTab] = useState('Topwear');
-
+  const [page, setPage] = useState(1);
   const dispatch = useDispatch();
   const tabs = [
     {key: 'Topwear', label: 'Topwear', icon: topwear_icon},
@@ -45,30 +39,30 @@ const MenCategoryScreen = () => {
   const {
     loading: categoryLoading,
     products: categoryProducts,
-    error,
     pagination,
   } = useSelector(state => state.productCategroy);
-  // useEffect(() => {
-  console.log('PRODUCTS IN UI (ON SCREEN LOAD):', categoryProducts);
-  // }, []); //
 
+  console.log('PRODUCTS IN UI (ON SCREEN LOAD):', categoryProducts);
+
+  console.log('CATEGORY LOADING =>', categoryLoading);
+  console.log('PAGINATION =>', pagination);
   useEffect(() => {
     console.log('PRODUCT_CATEGORY_REQUEST Payload:', {
       category: activeTab,
       page: 1,
-      productType: type,
+      // productType: type,
     });
     dispatch({
       type: PRODUCT_CATEGORY_REQUEST,
-
       payload: {
         category: activeTab,
         page: 1,
-        productType: type,
-        productId,
+        // productType: type,
       },
     });
-  }, [activeTab, type]); // 👈 VERY IMPORTANT
+
+    setPage(1);
+  }, [activeTab, type]);
 
   //product filtering
   const filteredProducts = categoryProducts.filter(
@@ -76,6 +70,8 @@ const MenCategoryScreen = () => {
       item.productTypeId?.value === type &&
       item.productCategoryId?.value === activeTab,
   );
+  console.log('CATEGORY PRODUCTS =>', categoryProducts.length);
+  console.log('FILTERED PRODUCTS =>', filteredProducts.length);
 
   const getSafeImageSource = product => {
     const variant =
@@ -93,12 +89,30 @@ const MenCategoryScreen = () => {
 
     return images.trending_one;
   };
-  // console.log('ROUTE TYPE ===>', type);
-  const {products, loading} = useSelector(state => state.product);
-  const productId = route.params?.productId;
+  console.log('ROUTE TYPE ===>', type);
 
-  console.log('PRODUCT MENS CATEGORY', products);
+  const loadMoreProducts = () => {
+    console.log('LOAD MORE CALLED');
+    console.log('HAS NEXT PAGE =>', pagination?.hasNextPage);
+    console.log('CURRENT PAGE =>', page);
 
+    if (!categoryLoading && pagination?.hasNextPage) {
+      const nextPage = page + 1;
+
+      console.log('FETCHING PAGE =>', nextPage);
+
+      dispatch({
+        type: PRODUCT_CATEGORY_REQUEST,
+        payload: {
+          category: activeTab,
+          page: nextPage,
+          // productType: type,
+        },
+      });
+
+      setPage(nextPage);
+    }
+  };
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -125,7 +139,7 @@ const MenCategoryScreen = () => {
             activeTab === tab.key ? (
               <LinearGradient
                 key={tab.key}
-                colors={['#8225AF', '#0F52BA']}
+                colors={['#5029F3', '#7756FF']}
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}
                 style={[
@@ -162,7 +176,7 @@ const MenCategoryScreen = () => {
         <Text style={styles.sectionTitle}>Explore {activeTab} Collections</Text>
 
         <View style={styles.grid}>
-          {loading ? (
+          {categoryLoading ? (
             <Text
               style={{
                 marginTop: hp(60),
@@ -192,30 +206,31 @@ const MenCategoryScreen = () => {
               keyExtractor={item => item._id}
               numColumns={3}
               showsVerticalScrollIndicator={false}
-              // columnWrapperStyle={{
-              //   justifyContent: 'space-between', // important for spacing
-              //   marginBottom: 10,
-              // }}
+              onEndReached={loadMoreProducts}
+              onEndReachedThreshold={0.5}
               scrollEnabled={false}
               renderItem={({item}) => (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('ProductDetails', {
-                      productId: item._id,
-                    })
-                  }
-                  style={styles.card}>
-                  <Image
-                    source={getSafeImageSource(item)}
-                    style={styles.cardImage}
-                  />
-                  <Text
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                    style={styles.cardText}>
-                    {item.title}
-                  </Text>
-                </TouchableOpacity>
+                console.log('FLATLIST DATA LENGTH =>', filteredProducts.length),
+                (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('ProductDetails', {
+                        productId: item._id,
+                      })
+                    }
+                    style={styles.card}>
+                    <Image
+                      source={getSafeImageSource(item)}
+                      style={styles.cardImage}
+                    />
+                    <Text
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                      style={styles.cardText}>
+                      {item.title}
+                    </Text>
+                  </TouchableOpacity>
+                )
               )}
             />
           )}
@@ -234,15 +249,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    marginBottom: 10,
+    paddingHorizontal: wp(10),
+    marginBottom: hp(10),
   },
   backIcon: {
     width: wp(18),
     height: wp(18),
     resizeMode: 'contain',
-    marginLeft: 10,
-    marginTop: 10,
+    marginLeft: wp(10),
+    marginTop: hp(10),
   },
   headerTitle: {
     flex: 1,
@@ -250,88 +265,88 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.poppins500,
     fontSize: wp(18),
     color: '#000',
-    marginTop: 15,
+    marginTop: hp(15),
   },
   banner: {
     width: '100%',
     height: hp(120),
     // borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: hp(10),
   },
-  tabRow: {marginBottom: 10, marginHorizontal: 3, right: 3},
+  tabRow: {marginBottom: hp(10), marginHorizontal: wp(3), right: wp(3)},
   tabContentContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: wp(20),
     alignItems: 'center',
   },
   activeTab: {
-    borderRadius: 25,
-    marginRight: 15,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    borderRadius: wp(25),
+    marginRight: wp(15),
+    paddingHorizontal: wp(15),
+    paddingVertical: hp(8),
   },
   inactiveTab: {
     backgroundColor: '#f2f2f2',
-    borderRadius: 25,
-    marginRight: 15,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
+    borderRadius: wp(25),
+    marginRight: wp(15),
+    paddingHorizontal: wp(15),
+    paddingVertical: hp(8),
   },
   firstTab: {marginLeft: 0},
-  lastTab: {marginRight: 20},
+  lastTab: {marginRight: wp(20)},
   tabContent: {flexDirection: 'row', alignItems: 'center'},
   tabIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: wp(30),
+    height: hp(30),
+    borderRadius: wp(15),
     resizeMode: 'contain',
-    right: 10,
+    right: wp(10),
   },
   activeTabText: {
     color: '#ffffff',
     fontFamily: fontFamily.poppins400,
-    fontSize: 13,
-    marginLeft: 15,
-    right: 10,
+    fontSize: fontSize(13),
+    marginLeft: wp(15),
+    right: wp(10),
   },
   tabText: {
     color: '#000000',
     fontFamily: fontFamily.poppins400,
-    fontSize: 14,
-    marginLeft: 8,
+    fontSize: fontSize(14),
+    marginLeft: wp(8),
   },
   sectionTitle: {
     fontSize: fontSize(15),
     fontFamily: fontFamily.poppins500,
-    margin: 18,
+    margin: wp(18),
     color: '#000000',
-    marginLeft: 21,
+    marginLeft: wp(21),
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    paddingHorizontal: 10,
-    paddingBottom: 20,
+    paddingHorizontal: wp(10),
+    paddingBottom: hp(20),
     alignItems: 'center',
     justifyContent: 'center',
   },
   card: {
     width: '30%',
-    borderRadius: 10,
+    borderRadius: wp(10),
     alignItems: 'center',
     margin: '1.5%',
-    padding: 5,
+    padding: wp(5),
   },
   cardImage: {
-    width: 100,
-    height: 100,
-    marginBottom: 6,
+    width: wp(100),
+    height: hp(100),
+    marginBottom: hp(6),
     resizeMode: 'cover',
-    borderRadius: 10,
+    borderRadius: wp(10),
   },
   cardText: {
     fontFamily: fontFamily.poppins400,
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#000',
     textAlign: 'center',
   },

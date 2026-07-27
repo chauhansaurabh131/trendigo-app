@@ -25,9 +25,9 @@ const initialState = {
   error: null,
   message: null,
 
-  user: null, // 🔥 ADD
-  email: null, // 🔥 ADD
-  isDeleted: false, // 🔥 ADD THIS
+  user: null,
+  email: null,
+  isDeleted: false,
 };
 
 export default function userAccountReducer(state = initialState, action) {
@@ -90,24 +90,15 @@ export default function userAccountReducer(state = initialState, action) {
           'Something went wrong',
       };
 
-    // case GET_ME_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     user: action.payload.user, // backend returns {user:{}}
-    //   };
-
     case GET_ME_SUCCESS:
       return {
         ...state,
-        user: action.payload.data, // user object
-        email: action.payload.data.email, // <-- ADD THIS
+        user: action.payload.data,
+        email: action.payload.data.email,
       };
     case DELETE_ACCOUNT_REQUEST:
       return {...state, loading: true, isDeleted: false, error: null};
 
-    // case DELETE_ACCOUNT_SUCCESS:
-    //   return {...state, loading: false, isDeleted: true};
     case DELETE_ACCOUNT_SUCCESS:
       return {
         ...initialState,
@@ -117,25 +108,14 @@ export default function userAccountReducer(state = initialState, action) {
     case DELETE_ACCOUNT_FAILURE:
       return {...state, loading: false, error: action.payload};
 
-    // case VERIFY_CHANGE_EMAIL_OTP_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     emailVerified: true,
-    //   };
-
     case RESET_EMAIL_VERIFY_STATUS:
       return {
         ...state,
-        emailVerified: false, // 🔥 reset
+        emailVerified: false,
       };
     case LOGOUT:
-      return initialState; // 🔥 FULL RESET
-    // case SEND_MOBILE_OTP_REQUEST:
-    //   return {...state, loading: true, otpSent: false};
+      return initialState;
 
-    // case SEND_MOBILE_OTP_SUCCESS:
-    //   return {...state, loading: false, otpSent: true};
     case SEND_MOBILE_OTP_REQUEST:
       return {
         ...state,
@@ -162,7 +142,7 @@ export default function userAccountReducer(state = initialState, action) {
       return {
         ...state,
         loading: false,
-        error: action.payload, // 🔥 error store
+        error: action.payload,
       };
     case VERIFY_CHANGE_MOBILE_OTP_SUCCESS:
       return {

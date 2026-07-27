@@ -16,8 +16,8 @@ import {
 } from '../actions/cartActions';
 
 function addToCartApi(data, token) {
-  console.log('ADD TO CART API FUNCTION CALLED');
-  console.log(' Add to Cart Payload going to API ', data);
+  // console.log('ADD TO CART API FUNCTION CALLED');
+  // console.log(' Add to Cart Payload going to API ', data);
   console.log('Token', token);
   return axios.post(
     'https://mntrendigo.mntech.website/api/v1/user/cart/',
@@ -35,25 +35,25 @@ function* addToCartSaga(action) {
     console.log('ADD_TO_CART_REQUEST RECEIVED');
     console.log('Full Action ', action);
     const {payload, token} = action;
-    console.log('Payload inside saga ', payload);
-    console.log('Token inside saga ', token);
+    // console.log('Payload inside saga ', payload);
+    // console.log('Token inside saga ', token);
     const response = yield call(addToCartApi, payload, token);
-    console.log('Add to Cart API RESPONSE SUCCESS ', response.data);
+    console.log('Add to Cart API RESPONSE SUCCESS ==>', response.data);
 
     yield put({
       type: ADD_TO_CART_SUCCESS,
       payload: response.data,
     });
     console.log('SUCCESS ACTION DISPATCHED');
-    // ⭐ IMPORTANT - cart refresh
+    //  cart refresh
     yield put({
       type: GET_CART_REQUEST,
       token: token,
     });
-    console.log('GET CART REQUEST DISPATCHED');
+    // console.log('GET CART REQUEST DISPATCHED');
   } catch (error) {
     console.log('ADD TO CART ERROR ', error);
-    console.log('ERROR RESPONSE ', error?.response?.data);
+    console.log('ADD TO CART ERROR RESPONSE ', error?.response?.data);
     yield put({
       type: ADD_TO_CART_FAILURE,
       payload: error.message,
@@ -84,6 +84,7 @@ function* getCartSaga(action) {
       type: GET_CART_SUCCESS,
       payload: response.data.data,
     });
+    console.log('GET CART RESPONSE===>', response.data.data);
   } catch (error) {
     console.log('GET CART ERROR ', error);
     console.log(' GET CART ERROR:', error?.response?.data || error.message);
@@ -129,7 +130,6 @@ function* updateCartSaga(action) {
       payload: response.data,
     });
 
-    // ⭐ cart refresh
     yield put({
       type: GET_CART_REQUEST,
       token: token,
@@ -172,15 +172,14 @@ function* removeCartSaga(action) {
     yield put({
       type: REMOVE_CART_SUCCESS,
       // payload: {itemId},
-      payload: response, // 👈 API response
+      payload: response,
     });
-    // 👇 VERY IMPORTANT (ADD THIS)
     yield put({
       type: GET_CART_REQUEST,
       token: token,
     });
   } catch (error) {
-    console.log(error, 'Error=====>');
+    console.log(error, 'REMOVE CART Error=====>');
     yield put({
       type: REMOVE_CART_FAILURE,
       payload: error.response?.data || error.message,
@@ -189,12 +188,12 @@ function* removeCartSaga(action) {
 }
 
 export default function* cartSaga() {
-  console.log('CART SAGA STARTED');
+  // console.log('CART SAGA STARTED');
   yield takeLatest(ADD_TO_CART_REQUEST, addToCartSaga);
-  console.log('Get Saga  working');
+  // console.log('Get Saga  working');
   yield takeLatest(GET_CART_REQUEST, getCartSaga);
-  console.log('NOW WORKING ON UPDATE CARD SAGA');
+  // console.log('NOW WORKING ON UPDATE CARD SAGA');
   yield takeLatest(UPDATE_CART_REQUEST, updateCartSaga);
-  console.log('REMOVE SAGA WORKING ON');
+  // console.log('REMOVE SAGA WORKING ON');
   yield takeLatest(REMOVE_CART_REQUEST, removeCartSaga);
 }

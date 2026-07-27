@@ -8,6 +8,7 @@ import {
   View,
   ScrollView,
   ToastAndroid,
+  Alert,
 } from 'react-native';
 import {colors} from '../../utils/colors';
 import {
@@ -48,14 +49,10 @@ const BagScreen = () => {
   const [colorOptions, setColorOptions] = useState([]);
   const [availableSizes, setAvailableSizes] = useState([]);
   const product = route.params?.product;
-  // console.log('RECEIVED PRODUCT:', product);
   const productId = product?.id || product?._id;
-  // console.log('FINAL PRODUCT ID 👉', productId);
+  // console.log('FINAL PRODUCT ID ', productId);
 
-  // const variants = selectedItem?.productId?.variants || [];
-  // const variants = product?.variants || [];
   const {variants} = useSelector(state => state.productVariant);
-  // console.log('Variants 👉', variants);
   // console.log(variants, 'Variants =======>');
   const {cartData, loading, error} = useSelector(state => state.addToCard);
   // console.log('Cart Data', cartData);
@@ -73,7 +70,6 @@ const BagScreen = () => {
     }
   }, [token]);
   // user id
-  // const user = useSelector(state => state.auth.user);
   const userId = useSelector(state => state.user?.user?.id);
   // const userId = user?.id || user?._id;
 
@@ -102,151 +98,13 @@ const BagScreen = () => {
     if (!addressState.loading && !addressState.error) {
       sheetRef2.current?.close();
 
-      resetForm(); // ✅ clear after submit
+      resetForm();
     }
   }, [addressState.loading, addressState.error]);
-
-  // console.log(
-  //   'FULL STATE OF ADDRESS ',
-  //   useSelector(state => state),
-  // );
 
   const sheetRef1 = useRef(); // First bottom sheet - Address
   const sheetRef2 = useRef(); // Second bottom sheet - Add Address
   const sheetRef3 = useRef(); // Third bottom sheet - Edit Item
-
-  // State for selected color and size
-  // const [selectedColor, setSelectedColor] = useState(null);
-  // const [selectedSize, setSelectedSize] = useState(null);
-  // const [selectedQuantity, setSelectedQuantity] = useState('1');
-
-  // // Color options with their respective images - Replace these with your actual image paths
-  // // const colorOptions = [
-  // //   {
-  // //     id: 'sky_blue',
-  // //     name: 'Sky Blue',
-  // //     image: images.trending_one,
-  // //   },
-  // //   {
-  // //     id: 'purple',
-  // //     name: 'Purple',
-  // //     image: images.purple_image,
-  // //   },
-  // //   {
-  // //     id: 'pink',
-  // //     name: 'Pink',
-  // //     image: images.pink_image,
-  // //   },
-  // // ];
-  // useEffect(() => {
-  //   // console.log('=== VARIANTS FETCHED ===', variants);
-
-  //   if (variants && variants.length > 0) {
-  //     const colors = variants.map((variant, index) => {
-  //       console.log(`--- VARIANT ${index} ---`, variant);
-
-  //       const colorObj = variant.variants.find(v => v.key === 'color');
-  //       console.log('ColorObj:', colorObj);
-
-  //       const mainImage =
-  //         variant.images.find(i => i.isSelectedForMainScreen) ||
-  //         variant.images[0];
-  //       console.log('Main Image:', mainImage);
-
-  //       return {
-  //         id: colorObj?.value,
-  //         name: colorObj?.value,
-  //         image: {uri: mainImage?.imageUrl},
-  //       };
-  //     });
-
-  //     console.log('Color Options (Before filter):', colors);
-
-  //     // Remove duplicates and empty ids
-  //     const uniqueColors = colors
-  //       .filter(c => c.id)
-  //       .filter((c, idx, self) => self.findIndex(v => v.id === c.id) === idx);
-  //     console.log('Color Options (Unique & valid):', uniqueColors);
-
-  //     setColorOptions(uniqueColors);
-  //   }
-  // }, [variants]);
-  // // Size options
-  // const sizeOptions = ['S', 'M', 'L', 'XL', 'XXL'];
-
-  // useEffect(() => {
-  //   if (variants?.length > 0 && !selectedItem) {
-  //     const firstVariant = variants[0];
-
-  //     const colorObj = firstVariant?.variants?.find(x => x.key === 'color');
-
-  //     setSelectedColor(colorObj?.value);
-
-  //     // ✅ set sizes for first color
-  //     const sizes = variants
-  //       .filter(v =>
-  //         v.variants.some(
-  //           x => x.key === 'color' && x.value === colorObj?.value,
-  //         ),
-  //       )
-  //       .map(v => v.variants.find(x => x.key === 'size')?.value);
-
-  //     const uniqueSizes = [...new Set(sizes)];
-
-  //     setAvailableSizes(uniqueSizes);
-
-  //     if (uniqueSizes.length > 0) {
-  //       setSelectedSize(uniqueSizes[0]);
-  //     }
-  //   }
-  // }, [variants]);
-
-  // const handleColorSelect = colorId => {
-  //   setSelectedColor(colorId);
-
-  //   const sizes = variants
-  //     ?.filter(v =>
-  //       v.variants.some(
-  //         x =>
-  //           x.key === 'color' &&
-  //           x.value?.toLowerCase() === colorId?.toLowerCase(),
-  //       ),
-  //     )
-  //     ?.map(v => v.variants.find(x => x.key === 'size')?.value);
-
-  //   const uniqueSizes = [...new Set(sizes)];
-
-  //   setAvailableSizes(uniqueSizes);
-
-  //   // ✅ FIX HERE
-  //   const isCurrentSizeAvailable = uniqueSizes.includes(selectedSize);
-
-  //   if (isCurrentSizeAvailable) {
-  //     setSelectedSize(selectedSize);
-  //   } else if (uniqueSizes.length > 0) {
-  //     setSelectedSize(uniqueSizes[0]);
-  //   }
-
-  //   // image
-  //   const selectedVariant = variants.find(v =>
-  //     v.variants.some(x => x.key === 'color' && x.value === colorId),
-  //   );
-
-  //   const mainImage =
-  //     selectedVariant?.images.find(i => i.isSelectedForMainScreen) ||
-  //     selectedVariant?.images[0];
-
-  //   setSelectedImage(mainImage?.imageUrl);
-  // };
-
-  // const quantityOptions = ['1', '2', '3', '4', '5'];
-  // // Get current selected color image for main display
-  // const getCurrentColorImage = () => {
-  //   const selectedColorObj = colorOptions.find(
-  //     color => color.id === selectedColor,
-  //   );
-  //   return selectedColorObj ? selectedColorObj.image : images.trending_one;
-  // };
 
   //  Selected states initially null then dynamic data set )
   const [selectedColor, setSelectedColor] = useState(null);
@@ -289,7 +147,7 @@ const BagScreen = () => {
         v => v.key === 'color',
       )?.value;
 
-      // selected color માટે sizes filter
+      // selected color sizes filter
       const sizes = variants
         .filter(v =>
           v.variants.some(x => x.key === 'color' && x.value === color),
@@ -308,7 +166,7 @@ const BagScreen = () => {
       setSelectedSize(size);
     }
   }, [selectedItem, variants]);
-  // ✅ Color select handler
+  // Color select handler
   const handleColorSelect = colorId => {
     // selected color update
     setSelectedColor(colorId);
@@ -386,15 +244,49 @@ const BagScreen = () => {
     name: '',
     mobileNumber: '',
     pincode: '',
-    addressLineOne: '', // ✅ use only this
+    addressLineOne: '',
     locality: '',
-    isDefaultAddress: false, // ✅ FIXED NAME
+    isDefaultAddress: false,
   });
   // when i click to add address Submit Handler fnction
 
   const handleAddAddress = () => {
     if (!userId) {
       // console.log('User ID is missing. Cannot add address.');
+      return;
+    }
+    if (!form.name.trim()) {
+      Alert.alert('Validation', 'Please enter your name');
+      return;
+    }
+
+    if (!form.mobileNumber.trim()) {
+      Alert.alert('Validation', 'Please enter mobile number');
+      return;
+    }
+
+    if (form.mobileNumber.length !== 10) {
+      Alert.alert('Validation', 'Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    if (!form.pincode.trim()) {
+      Alert.alert('Validation', 'Please enter pincode');
+      return;
+    }
+
+    if (form.pincode.length !== 6) {
+      Alert.alert('Validation', 'Please enter a valid 6-digit pincode');
+      return;
+    }
+
+    if (!form.addressLineOne.trim()) {
+      Alert.alert('Validation', 'Please enter address');
+      return;
+    }
+
+    if (!form.locality.trim()) {
+      Alert.alert('Validation', 'Please enter city/locality');
       return;
     }
     console.log('USER ID in handleAddAddress:', userId);
@@ -404,11 +296,11 @@ const BagScreen = () => {
       mobileNumber: Number(form.mobileNumber),
       pincode: Number(form.pincode),
       addressLineOne: form.addressLineOne || form.address,
-      addressLineTwo: form.locality,
-      city: form.locality, // 👈 mapping
-      state: 'Gujarat', // 👈 FIXED VALUE
+      // addressLineTwo: form.locality,
+      city: form.locality,
+      state: 'Gujarat',
       country: 'India',
-      isDefaultAddress: form.isDefaultAddress, // ✅ correct
+      isDefaultAddress: form.isDefaultAddress,
     };
     console.log(' FINAL PAYLOAD ', payload);
     dispatch({
@@ -417,7 +309,7 @@ const BagScreen = () => {
       // token,
     });
     console.log('PAYLOAD OF ADD ADDRESS REQUEST', payload);
-    // console.log('TOKEN', token)
+    ToastAndroid.show('Address added successfully', ToastAndroid.SHORT);
   };
 
   // isDefault Address show
@@ -437,19 +329,14 @@ const BagScreen = () => {
   };
   // console.log('Default Address show', defaultAddress);
   const renderCartItem = ({item}) => {
-    // console.log('CART ITEM =>', JSON.stringify(item, null, 2));
     const productId = item?.productId?.id;
-
     console.log('PRODUCT ID FROM CART:', productId);
-    // console.log('Rendering Cart Item:', item);
-    // console.log('CART DATA', cartData);
+    console.log('Rendering Cart Item:', item);
+    console.log('CART DATA', cartData);
     const size = item?.variants?.variants?.find(v => v.key === 'size')?.value;
     // console.log('Selected Size:', size);
     const color = item?.variants?.variants?.find(v => v.key === 'color')?.value;
     // console.log('Selected Color:', color);
-    // const image = item?.variants?.images?.find(
-    //   i => i.isSelectedForMainScreen,
-    // )?.imageUrl;
 
     const image =
       item?.variants?.images?.find(i => i.isSelectedForMainScreen)?.imageUrl ||
@@ -460,8 +347,6 @@ const BagScreen = () => {
     const price = item?.variants?.price;
     // console.log('Price:', price);
 
-    // console.log('FINAL IMAGE URL ', image);
-    // console.log('FULL IMAGES ARRAY ', item?.variants?.images);
     const discountedPrice = item?.variants?.discountedPrice;
     // console.log('Discounted Price:', discountedPrice);
     const discount = item?.variants?.discount;
@@ -474,8 +359,7 @@ const BagScreen = () => {
           marginHorizontal: wp(18),
           borderColor: '#E8E8E8',
           borderWidth: 1,
-          // height: hp(240),
-          borderRadius: 16,
+          borderRadius: wp(16),
           marginTop: hp(19),
           justifyContent: 'space-between',
         }}>
@@ -486,7 +370,8 @@ const BagScreen = () => {
           }}>
           <Text
             style={{
-              color: '#9333EA',
+              // color: '#9333EA',
+              color: '#5029F3',
               fontFamily: fontFamily.poppins600,
               fontSize: fontSize(12),
             }}>
@@ -498,8 +383,6 @@ const BagScreen = () => {
             flexDirection: 'row',
             marginTop: hp(21),
             marginHorizontal: wp(13),
-            // backgroundColor: '#165ca1',
-            // backgroundColor: '#F8FAFC',
           }}>
           <TouchableOpacity
             onPress={() => {
@@ -510,18 +393,15 @@ const BagScreen = () => {
             }}
             style={{
               width: '30%',
-              // backgroundColor: 'pink'
             }}>
             <Image
-              // source={getCurrentColorImage()}
-              // source={{uri: image}}
               source={{uri: image}}
               style={{
                 // width: isIOS ? 75 : wp(75),
                 // height: isIOS ? 95 : hp(97),
                 width: isIOS ? 93 : wp(93),
                 height: isIOS ? 110 : hp(112),
-                borderRadius: 16,
+                borderRadius: wp(16),
               }}
             />
           </TouchableOpacity>
@@ -533,9 +413,6 @@ const BagScreen = () => {
             }}>
             <View
               style={{
-                // flexDirection: 'row',
-                // justifyContent: 'space-between',
-                // alignItems: 'center',
                 marginHorizontal: wp(17),
               }}>
               <Text
@@ -546,7 +423,6 @@ const BagScreen = () => {
                   fontSize: fontSize(15),
                   fontFamily: fontFamily.poppins600,
                 }}>
-                {/* Designer Traditional {'\n'}Dress */}
                 {item?.productId?.title}
               </Text>
             </View>
@@ -557,15 +433,13 @@ const BagScreen = () => {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 marginHorizontal: wp(17),
-
-                // backgroundColor: '#F8FAFC',
               }}>
               <View>
                 {/* Size */}
                 <View style={{flexDirection: 'row'}}>
                   <Text
                     style={{
-                      width: 60,
+                      width: wp(60),
                       color: '#64748B',
                       fontSize: fontSize(12),
                       fontFamily: fontFamily.poppins400,
@@ -587,9 +461,8 @@ const BagScreen = () => {
                       color: colors.pureBlack,
                       fontSize: fontSize(12),
                       fontFamily: fontFamily.poppins600,
-                      marginLeft: 5,
+                      marginLeft: wp(5),
                     }}>
-                    {/* {selectedSize} */}
                     {size}
                   </Text>
                 </View>
@@ -598,7 +471,7 @@ const BagScreen = () => {
                 <View style={{flexDirection: 'row', marginTop: hp(1)}}>
                   <Text
                     style={{
-                      width: 60,
+                      width: wp(60),
                       color: '#64748B',
                       fontSize: fontSize(12),
                       lineHeight: hp(13),
@@ -623,10 +496,8 @@ const BagScreen = () => {
                       fontSize: fontSize(12),
                       lineHeight: hp(13),
                       fontFamily: fontFamily.poppins600,
-                      marginLeft: 5,
+                      marginLeft: wp(5),
                     }}>
-                    {/* {colorOptions.find(color => color.id === selectedColor)
-                      ?.name || 'Sky Blue'} */}
                     {color}
                   </Text>
                 </View>
@@ -635,8 +506,7 @@ const BagScreen = () => {
                 <View style={{flexDirection: 'row', marginTop: hp(1)}}>
                   <Text
                     style={{
-                      width: 60,
-
+                      width: wp(60),
                       color: '#64748B',
                       fontSize: fontSize(12),
                       fontFamily: fontFamily.poppins400,
@@ -658,7 +528,7 @@ const BagScreen = () => {
                       color: colors.pureBlack,
                       fontSize: fontSize(12),
                       fontFamily: fontFamily.poppins600,
-                      marginLeft: 5,
+                      marginLeft: wp(5),
                     }}>
                     {/* {selectedQuantity} */}
                     {item?.quantity}
@@ -669,7 +539,7 @@ const BagScreen = () => {
                 style={{
                   width: hp(47),
                   height: hp(22),
-                  borderRadius: 50,
+                  borderRadius: wp(50),
                   // borderWidth: 1,
                   backgroundColor: '#FBF7FF',
                   alignItems: 'center',
@@ -689,7 +559,7 @@ const BagScreen = () => {
 
                   setSelectedItem(item);
 
-                  // ✅ IMPORTANT: set selected values from cart item
+                  //  IMPORTANT: set selected values from cart item
                   const color = item?.variants?.variants?.find(
                     v => v.key === 'color',
                   )?.value;
@@ -702,7 +572,6 @@ const BagScreen = () => {
                   setSelectedSize(size);
                   setSelectedQuantity(item?.quantity?.toString());
 
-                  // ✅ also set image
                   const img =
                     item?.variants?.images?.find(i => i.isSelectedForMainScreen)
                       ?.imageUrl || item?.variants?.images?.[0]?.imageUrl;
@@ -711,10 +580,6 @@ const BagScreen = () => {
 
                   sheetRef3.current?.open();
                 }}>
-                {/* <Image
-                    source={images.edit_icon}
-                    style={{width: hp(9), height: hp(9), resizeMode: 'contain'}}
-                  /> */}
                 <Text
                   style={{
                     color: colors.pureBlack,
@@ -741,13 +606,11 @@ const BagScreen = () => {
         <View>
           <View
             style={{
-              // marginTop: hp(10),
               marginHorizontal: wp(15),
               flexDirection: 'row',
               marginVertical: hp(10),
               justifyContent: 'space-between',
               alignItems: 'center',
-              // backgroundColor: '#34373b',
             }}>
             <TouchableOpacity
               onPress={() => {
@@ -755,17 +618,12 @@ const BagScreen = () => {
                   cartId: cartData?.id || cartData?._id,
                   itemId: item?._id,
                 };
-                console.log('REMOVE PAYLOAD 👉', payloadData);
+                console.log('REMOVE PAYLOAD ', payloadData);
 
                 // loader start
                 setRemovingItemId(item?._id);
 
                 dispatch(removeCartRequest(payloadData, token));
-
-                // ✅ refresh cart
-                // setTimeout(() => {
-
-                // }, 500);
               }}>
               {removingItemId === item?._id ? (
                 <ActivityIndicator size="small" color="#8225AF" />
@@ -778,8 +636,8 @@ const BagScreen = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                flex: 1, // ✅ IMPORTANT
-                marginLeft: wp(123), // optional spacing
+                flex: 1,
+                marginLeft: wp(123),
               }}>
               <Text
                 style={{
@@ -795,7 +653,7 @@ const BagScreen = () => {
                   fontFamily: fontFamily.poppins500,
                   fontSize: fontSize(13),
                   color: '#64748B',
-                  marginRight: 8,
+                  marginRight: wp(8),
                   textDecorationLine: 'line-through',
                 }}>
                 {/* Rs. 780 */}
@@ -825,7 +683,7 @@ const BagScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            marginHorizontal: 18,
+            marginHorizontal: wp(18),
           }}>
           <TouchableOpacity
             style={{position: 'absolute', left: 0}}
@@ -853,16 +711,18 @@ const BagScreen = () => {
           style={{
             backgroundColor: '#F8FAFC',
             marginHorizontal: wp(17),
-            borderRadius: 16,
+            borderRadius: wp(16),
             marginTop: hp(16),
-            height: hp(120),
+            // height: hp(120),
+            paddingVertical: hp(16),
           }}
           activeOpacity={0.5}
           onPress={() => sheetRef1.current?.open()}>
-          <View style={{marginHorizontal: wp(16), marginTop: hp(16)}}>
+          <View style={{marginHorizontal: wp(16), marginTop: hp(0)}}>
             <Text
               style={{
-                color: '#9333EA',
+                // color: '#9333EA',
+                color: '#5029F3',
                 fontSize: fontSize(10),
                 lineHeight: hp(14),
                 fontFamily: fontFamily.poppins700,
@@ -876,17 +736,15 @@ const BagScreen = () => {
                     style={{
                       color: colors.pureBlack,
                       fontSize: fontSize(16),
-                      // lineHeight: hp(18),
                       fontFamily: fontFamily.poppins700,
                     }}>
-                    {/* Rahul Gajjar{' '}/ */}
                     {defaultAddress.name}
                   </Text>
 
                   <View
                     style={{
-                      width: 2,
-                      height: 24,
+                      width: wp(2),
+                      height: hp(24),
                       backgroundColor: '#E6E6E6',
                       marginLeft: wp(10),
                       marginRight: hp(10),
@@ -896,10 +754,8 @@ const BagScreen = () => {
                     style={{
                       color: colors.pureBlack,
                       fontSize: fontSize(14),
-                      // lineHeight: hp(18),
                       fontFamily: fontFamily.poppins500,
                     }}>
-                    {/* +91 10002 00003 */}
                     +91 {defaultAddress.mobileNumber}
                   </Text>
                 </View>
@@ -910,10 +766,8 @@ const BagScreen = () => {
                     fontSize: fontSize(14),
                     lineHeight: hp(18),
                     fontFamily: fontFamily.poppins400,
-                    marginTop: 4,
-                    marginBottom: hp(20),
+                    marginTop: hp(4),
                   }}>
-                  {/* 25/3 Housing Estate, Near by sector 17, Singapore 31134 */}
                   {defaultAddress.addressLineOne},{' '}
                   {defaultAddress.addressLineTwo}, {defaultAddress.city}{' '}
                   {defaultAddress.pincode}
@@ -928,7 +782,7 @@ const BagScreen = () => {
                 }}>
                 <Text
                   style={{
-                    color: '#000',
+                    color: '#64748B',
                     fontFamily: fontFamily.poppins500,
                     fontSize: fontSize(15),
                   }}>
@@ -941,8 +795,8 @@ const BagScreen = () => {
           <View
             style={{
               position: 'absolute',
-              right: 25,
-              top: 50,
+              right: wp(25),
+              top: hp(50),
             }}>
             <NavigationArrowIcon stroke="#64748B" />
           </View>
@@ -977,7 +831,6 @@ const BagScreen = () => {
         />
         <View
           style={{
-            // width: '100%',
             backgroundColor: '#F1F5F9',
             height: 1,
             marginTop: hp(24),
@@ -985,17 +838,11 @@ const BagScreen = () => {
           }}
         />
 
-        <View
-          style={
-            {
-              // backgroundColor: '#FDFAFF'
-            }
-          }>
+        <View>
           <View
             style={{
               marginHorizontal: wp(34),
               marginTop: hp(24),
-              // backgroundColor: '#493c52',
             }}>
             <Text
               style={{
@@ -1051,7 +898,6 @@ const BagScreen = () => {
                   fontSize: fontSize(14),
                   fontFamily: fontFamily.poppins700,
                 }}>
-                {/* Rs. 120.00 */}
                 Rs.{cartData?.totalDiscount ?? '00'}
               </Text>
             </View>
@@ -1126,7 +972,8 @@ const BagScreen = () => {
             }}>
             <Text
               style={{
-                color: '#9333EA',
+                // color: '#9333EA',
+                color: '#5029F3',
                 fontSize: fontSize(18),
                 fontFamily: fontFamily.poppins700,
               }}>
@@ -1134,18 +981,15 @@ const BagScreen = () => {
             </Text>
             <Text
               style={{
-                color: '#9333EA',
+                // color: '#9333EA',
+                color: '#5029F3',
                 fontSize: fontSize(18),
                 fontFamily: fontFamily.poppins700,
               }}>
-              {/* Rs. 780.00 */}
               Rs. {cartData?.grandTotal ?? '00'}
             </Text>
           </View>
         </View>
-        {/* <View style={{marginHorizontal: wp(18), marginTop: hp(42)}}>
-          <GradientButton title={'Pay Now'} />
-        </View> */}
 
         {/* First Bottom Sheet - Address Selection */}
         <RBSheet
@@ -1158,8 +1002,8 @@ const BagScreen = () => {
             wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
             draggableIcon: {backgroundColor: '#C4C4C4'},
             container: {
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
+              borderTopLeftRadius: wp(16),
+              borderTopRightRadius: wp(16),
             },
           }}>
           <View style={{flex: 1, backgroundColor: colors.white}}>
@@ -1199,48 +1043,60 @@ const BagScreen = () => {
                   style={{
                     backgroundColor: '#F8FAFC',
                     // height: hp(120),
+                    paddingVertical: item?.isDefaultAddress ? hp(16) : hp(16),
                     marginHorizontal: wp(18),
-                    borderRadius: 16,
+                    borderRadius: wp(16),
                     marginTop: hp(20),
                   }}
                   activeOpacity={0.5}
                   onPress={() => {
                     sheetRef1.current?.close();
                   }}>
-                  <View style={{marginHorizontal: wp(20), marginTop: hp(16)}}>
-                    <Text
+                  <View
+                    style={{
+                      marginHorizontal: wp(20),
+                      // marginTop: hp(16)
+                    }}>
+                    {/* <Text
                       style={{
                         color: '#8225AF',
                         fontSize: fontSize(12),
                         lineHeight: hp(14),
                         fontFamily: fontFamily.poppins700,
                       }}>
-                      {/* Home */}
-                      {/* {item?.type || 'Home'} */}
+                    
                       {item?.isDefaultAddress && 'Default'}
-                    </Text>
+                    </Text> */}
 
+                    {item?.isDefaultAddress && (
+                      <Text
+                        style={{
+                          color: '#8225AF',
+                          fontSize: fontSize(12),
+                          lineHeight: hp(14),
+                          fontFamily: fontFamily.poppins700,
+                        }}>
+                        Default
+                      </Text>
+                    )}
                     <View
                       style={{
                         marginTop: hp(4),
                         flexDirection: 'row',
-                        alignItems: 'center', // ✅ IMPORTANT
-                        // backgroundColor: '#1e5081',
+                        alignItems: 'center',
                       }}>
                       <Text
                         style={{
                           color: colors.pureBlack,
                           fontSize: fontSize(16),
-                          // lineHeight: hp(18),
                           fontFamily: fontFamily.poppins700,
                         }}>
-                        {/* Rahul Gajjar{' '} */}
                         {item?.name ?? 'No Name'}
                       </Text>
                       <View
                         style={{
-                          width: 2,
-                          height: 17,
+                          width: wp(2),
+                          height: hp(17),
                           backgroundColor: '#E6E6E6',
                           marginLeft: wp(10),
                           marginRight: hp(10),
@@ -1250,10 +1106,8 @@ const BagScreen = () => {
                         style={{
                           color: '#475569',
                           fontSize: fontSize(14),
-                          // lineHeight: hp(18),
                           fontFamily: fontFamily.poppins500,
                         }}>
-                        {/* +91 10002 00003 */}
                         +91 {item?.mobileNumber ?? ''}
                       </Text>
                     </View>
@@ -1264,7 +1118,7 @@ const BagScreen = () => {
                         fontSize: fontSize(14),
                         lineHeight: hp(19),
                         fontFamily: fontFamily.poppins400,
-                        marginTop: 4,
+                        marginTop: hp(4),
                         marginBottom: hp(16),
                       }}>
                       {item.addressLineOne}, {item.addressLineTwo}, {item.city}{' '}
@@ -1272,7 +1126,8 @@ const BagScreen = () => {
                     </Text>
                   </View>
 
-                  <View style={{position: 'absolute', right: 25, top: 50}}>
+                  <View
+                    style={{position: 'absolute', right: wp(25), top: hp(50)}}>
                     <NavigationArrowIcon stroke="#94A3B8" />
                   </View>
                 </Touchable>
@@ -1280,12 +1135,12 @@ const BagScreen = () => {
             />
           </View>
 
-          <View style={{marginHorizontal: 18, bottom: 10}}>
+          <View style={{marginHorizontal: wp(18), bottom: hp(10)}}>
             <GradientButton
               title={'Add New Address'}
               onPress={() => {
                 sheetRef1.current?.close();
-                resetForm(); // ✅ clear after submit
+                resetForm(); // clear after submit
                 setTimeout(() => {
                   sheetRef2.current?.open();
                 }, 300);
@@ -1305,8 +1160,8 @@ const BagScreen = () => {
             wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
             draggableIcon: {backgroundColor: '#C4C4C4'},
             container: {
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
+              borderTopLeftRadius: wp(16),
+              borderTopRightRadius: wp(16),
             },
           }}>
           <View style={{flex: 1, backgroundColor: colors.white}}>
@@ -1324,10 +1179,10 @@ const BagScreen = () => {
             </Text>
 
             <View
-              style={{width: '100%', height: 1, backgroundColor: '#E3E3E3'}}
+              style={{width: '100%', height: hp(1), backgroundColor: '#E3E3E3'}}
             />
 
-            <View style={{marginHorizontal: 18, marginTop: hp(19)}}>
+            <View style={{marginHorizontal: wp(18), marginTop: hp(19)}}>
               <TextInput
                 placeholder="Name"
                 placeholderTextColor="#999"
@@ -1341,8 +1196,8 @@ const BagScreen = () => {
                 style={{
                   borderWidth: 1,
                   borderColor: '#EAEAEA',
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
+                  borderRadius: wp(8),
+                  paddingHorizontal: wp(12),
                   height: hp(45),
                   fontSize: fontSize(13),
                   fontFamily: fontFamily.poppins400,
@@ -1365,8 +1220,8 @@ const BagScreen = () => {
                 style={{
                   borderWidth: 1,
                   borderColor: '#EAEAEA',
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
+                  borderRadius: wp(8),
+                  paddingHorizontal: hp(12),
                   height: hp(45),
                   fontSize: fontSize(13),
                   fontFamily: fontFamily.poppins400,
@@ -1417,8 +1272,8 @@ const BagScreen = () => {
                 style={{
                   borderWidth: 1,
                   borderColor: '#EAEAEA',
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
+                  borderRadius: wp(8),
+                  paddingHorizontal: wp(12),
                   height: hp(45),
                   fontSize: fontSize(13),
                   fontFamily: fontFamily.poppins400,
@@ -1440,8 +1295,8 @@ const BagScreen = () => {
                 style={{
                   borderWidth: 1,
                   borderColor: '#EAEAEA',
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
+                  borderRadius: wp(8),
+                  paddingHorizontal: hp(12),
                   height: hp(45),
                   fontSize: fontSize(13),
                   fontFamily: fontFamily.poppins400,
@@ -1463,8 +1318,8 @@ const BagScreen = () => {
                 style={{
                   borderWidth: 1,
                   borderColor: '#EAEAEA',
-                  borderRadius: 8,
-                  paddingHorizontal: 12,
+                  borderRadius: wp(8),
+                  paddingHorizontal: hp(12),
                   height: hp(45),
                   fontSize: fontSize(13),
                   fontFamily: fontFamily.poppins400,
@@ -1486,7 +1341,6 @@ const BagScreen = () => {
               </View>
 
               <GradientButton
-                // title={'Save Address'}
                 title={loading ? 'Saving...' : 'Save Address'}
                 disabled={loading}
                 opacity={loading ? 0.7 : 1}
@@ -1496,7 +1350,7 @@ const BagScreen = () => {
 
                   sheetRef2.current?.close();
                 }}
-                buttonStyle={{marginTop: 20}}
+                buttonStyle={{marginTop: hp(20)}}
               />
             </View>
           </View>
@@ -1513,8 +1367,8 @@ const BagScreen = () => {
             wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
             draggableIcon: {backgroundColor: '#C4C4C4'},
             container: {
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
+              borderTopLeftRadius: wp(16),
+              borderTopRightRadius: wp(16),
               height: hp(480),
             },
           }}>
@@ -1541,7 +1395,6 @@ const BagScreen = () => {
                 width: '100%',
                 height: 1,
                 backgroundColor: '#E3E3E3',
-                // marginBottom: hp(25),
                 marginBottom: hp(15),
               }}
             />
@@ -1550,7 +1403,7 @@ const BagScreen = () => {
             ) : (
               <> */}
             {/* Change Color Section */}
-            <View style={{marginHorizontal: 18}}>
+            <View style={{marginHorizontal: wp(18)}}>
               <Text
                 style={{
                   color: colors.black,
@@ -1569,16 +1422,14 @@ const BagScreen = () => {
                   // marginBottom: hp(30)
                   marginBottom: hp(20),
                 }}
-                contentContainerStyle={{paddingRight: 20}}>
+                contentContainerStyle={{paddingRight: wp(20)}}>
                 {colorOptions.map((color, index) => (
                   <Touchable
                     // key={color.id}
                     key={`${color.id}-${index}`} // unique key
                     style={{
                       marginRight: wp(15),
-                      // borderWidth: selectedColor === color.id ? 3 : 0,
-                      // borderColor:
-                      //   selectedColor === color.id ? '#8225AF' : '#E0E0E0',
+
                       borderWidth:
                         selectedColor?.toLowerCase() === color.id?.toLowerCase()
                           ? 3
@@ -1588,8 +1439,7 @@ const BagScreen = () => {
                         selectedColor?.toLowerCase() === color.id?.toLowerCase()
                           ? '#8225AF'
                           : '#E0E0E0',
-                      borderRadius: 10,
-                      // padding: 10,
+                      borderRadius: wp(10),
                     }}
                     // onPress={() => setSelectedColor(color.id)}
                     onPress={() => handleColorSelect(color.id)}>
@@ -1598,7 +1448,7 @@ const BagScreen = () => {
                       style={{
                         width: wp(55),
                         height: hp(55),
-                        borderRadius: 8,
+                        borderRadius: wp(8),
                       }}
                     />
                   </Touchable>
@@ -1611,7 +1461,6 @@ const BagScreen = () => {
                   color: colors.black,
                   fontSize: fontSize(14),
                   fontFamily: fontFamily.poppins500,
-                  // marginBottom: hp(20),
                   marginBottom: hp(15),
                 }}>
                 Select Size
@@ -1621,7 +1470,6 @@ const BagScreen = () => {
                 style={{
                   flexDirection: 'row',
                   flexWrap: 'wrap',
-                  // marginBottom: hp(35),
                 }}>
                 {availableSizes.map(
                   (size, index) => (
@@ -1647,7 +1495,6 @@ const BagScreen = () => {
                           alignItems: 'center',
                           justifyContent: 'center',
                           marginRight: wp(12),
-                          // marginBottom: hp(15),
                           marginBottom: hp(20),
                         }}
                         onPress={() => setSelectedSize(size)}>
@@ -1699,7 +1546,6 @@ const BagScreen = () => {
                           alignItems: 'center',
                           justifyContent: 'center',
                           marginRight: wp(12),
-                          // marginBottom: hp(15),
                           marginBottom: hp(25),
                         }}
                         onPress={() => setSelectedQuantity(qty)}>
@@ -1719,8 +1565,6 @@ const BagScreen = () => {
 
               <GradientButton
                 title={loading ? 'Updating...' : 'Update'}
-                // loading={updating}
-                // disabled={loading}
                 onPress={() => {
                   // console.log(
                   //   'FULL VARIANTS',
@@ -1758,32 +1602,14 @@ const BagScreen = () => {
                   console.log('FINAL PAYLOAD', data);
 
                   dispatch(updateCartRequest(data, token));
-
-                  // sheetRef3.current?.close();
+                  // ToastAndroid.show('Updated successfully', ToastAndroid.SHORT);
                 }}
                 buttonStyle={{marginBottom: hp(30)}}></GradientButton>
             </View>
-            {/* </ScrollView>
-             */}
-            {/* </>
-            )} */}
           </View>
         </RBSheet>
       </ScrollView>
-      {/* ✅ FIXED BUTTON */}
-      {/* <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: '#fff',
-          padding: 15,
-          borderTopWidth: 1,
-          borderColor: '#eee',
-        }}>
-        <GradientButton title={'Pay Now'} />
-      </View> */}
+
       {cartData?.productDetailList?.length > 0 && (
         <View
           style={{
@@ -1792,7 +1618,7 @@ const BagScreen = () => {
             left: 0,
             right: 0,
             backgroundColor: '#fff',
-            padding: 15,
+            padding: wp(15),
             borderTopWidth: 1,
             borderColor: '#eee',
           }}>

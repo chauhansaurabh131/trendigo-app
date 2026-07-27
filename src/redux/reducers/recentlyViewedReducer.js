@@ -1,5 +1,3 @@
-// redux/reducers/recentlyViewedReducer.js
-
 import {
   ADD_RECENTLY_VIEWED_REQUEST,
   ADD_RECENTLY_VIEWED_SUCCESS,
@@ -11,7 +9,7 @@ import {
 
 const initialState = {
   loading: false,
-  data: [], // store recently viewed products
+  data: [],
   error: null,
 };
 

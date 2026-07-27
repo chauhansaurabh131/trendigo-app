@@ -1902,18 +1902,16 @@ const ProductDetailsScreen = () => {
   const productId = route.params?.productId;
 
   console.log('PRODUCT ID  New =>', productId);
-
-  console.log('================================');
-  console.log('ROUTE PARAMS =>', route.params);
-  console.log('PRODUCT ID =>', route.params?.productId);
-  console.log('================================');
-  const {product} = useSelector(state => state.productDetails);
-  console.log('Redux Product ID =>', product?._id);
-  console.log('Route Product ID =>', productId);
-  console.log('Product Details ', product);
+  // console.log('================================');
+  // console.log('ROUTE PARAMS =>', route.params);
+  // console.log('PRODUCT ID =>', route.params?.productId);
+  // console.log('================================');
+  const {product, loading} = useSelector(state => state.productDetails);
+  // console.log('Redux Product ID =>', product?._id);
+  // console.log('Route Product ID =>', productId);
+  console.log('PRODUCT DETAILS IN SCREEN ', product);
   const token = useSelector(state => state.auth.token);
   console.log('Auth Token in ProductDetailsScreen:', token);
-  // const ratingsRef = useRef(null);
 
   const scrollRef = useRef(null); // Ref for ScrollView
   const reviewsRef = useRef(null); // Ref for Reviews section
@@ -1925,7 +1923,7 @@ const ProductDetailsScreen = () => {
   };
 
   const [showAdded, setShowAdded] = useState(false);
-  const {loading, cartData, error, success} = useSelector(
+  const {cartLoading, cartData, error, success} = useSelector(
     state => state.addToCard,
   );
   const cartCount = cartData?.productDetailList?.length || 0;
@@ -1940,6 +1938,7 @@ const ProductDetailsScreen = () => {
       });
     }
   }, [token]);
+
   // REVIEW
   const userReviews = useSelector(state => state.review.userReviews);
   console.log('USER REVIEWS FROM REDUX ', userReviews);
@@ -1949,25 +1948,14 @@ const ProductDetailsScreen = () => {
   const totalReviews = reviewData?.totalReviews || 0;
   const ratingBreakdown = reviewData?.ratingBreakdown || {};
   useEffect(() => {
-    console.log(' REVIEW DATA:', reviewData);
-    console.log(' REVIEWS ARRAY:', reviews);
-    console.log(' REVIEWS COUNT:', reviews.length);
+    // console.log(' REVIEW DATA:', reviewData);
+    // console.log(' REVIEWS ARRAY:', reviews);
+    // console.log(' REVIEWS COUNT:', reviews.length);
   }, [reviewData]);
 
   // USERID
   const user = useSelector(state => state.auth.user);
   const userId = user?.id || user?._id;
-
-  // // PRODUCT
-  // const product = route.params?.product;
-
-  // const productId = product?.id || product?._id;
-  // console.log('FINAL PRODUCT ID ', productId);
-  // // ✅ safety check
-  // if (!product) {
-  //   console.log('❌ Product not received from navigation');
-  //   return null;
-  // }
 
   useEffect(() => {
     if (productId) {
@@ -2103,14 +2091,6 @@ const ProductDetailsScreen = () => {
       payload: payload,
       token: token,
     });
-
-    // // ✅ UI CONTROL HERE (BEST)
-    // setShowAdded(true);
-
-    // setTimeout(() => {
-    //   setShowAdded(false);
-    // }, 2000);
-    // ToastAndroid.show('Add to Bag', ToastAndroid.SHORT);
   };
 
   const handleRemoveFromCart = () => {
@@ -2201,18 +2181,18 @@ const ProductDetailsScreen = () => {
     }
   }, [product]);
   useEffect(() => {
-    console.log('===== FINAL STATE =====');
-    console.log('Selected Color:', selectedColor);
-    console.log('Selected Size:', selectedSize);
-    console.log('Selected Variant:', selectedVariant);
-    console.log('Price:', selectedVariant?.price);
-    console.log('Discount:', selectedVariant?.discount);
+    // console.log('===== FINAL STATE =====');
+    // console.log('Selected Color:', selectedColor);
+    // console.log('Selected Size:', selectedSize);
+    // console.log('Selected Variant:', selectedVariant);
+    // console.log('Price:', selectedVariant?.price);
+    // console.log('Discount:', selectedVariant?.discount);
   }, [selectedVariant]);
 
   useEffect(() => {
-    console.log('PRODUCT ', product);
-    console.log('VARIANT ', selectedVariant);
-    console.log('IMAGES ', selectedVariant?.images);
+    // console.log('PRODUCT ', product);
+    // console.log('VARIANT ', selectedVariant);
+    // console.log('IMAGES ', selectedVariant?.images);
   }, [selectedVariant]);
 
   // only variants size show
@@ -2249,7 +2229,6 @@ const ProductDetailsScreen = () => {
   // Add Recently View
   useEffect(() => {
     if (productId) {
-      // dispatch(addRecentlyViewedRequest(productId));
       dispatch(addRecentlyViewedRequest({productId}));
       console.log('ADD REVENTLY VIEW PRODUCT ID====>', productId);
     }
@@ -2265,7 +2244,7 @@ const ProductDetailsScreen = () => {
     const alreadyExists = isInWishlist(productId);
 
     if (alreadyExists) {
-      // 🔍 find item
+      // find item
       const wishlistItem = getWishlistItem(productId);
 
       if (!wishlistItem?.id) {
@@ -2311,10 +2290,10 @@ const ProductDetailsScreen = () => {
   // Get All Reviews of user
   const ReviewItem = ({item}) => {
     useEffect(() => {
-      console.log('REVIEW IMAGES ', item.productImages);
-      console.log('FULL ITEM ', item);
-      console.log('USER DATA ', item.user);
-      console.log('Review item:', item);
+      // console.log('REVIEW IMAGES ', item.productImages);
+      // console.log('FULL ITEM ', item);
+      // console.log('USER DATA ', item.user);
+      // console.log('Review item:', item);
     }, [item]);
     return (
       <View style={{marginTop: hp(24)}}>
@@ -2325,7 +2304,7 @@ const ProductDetailsScreen = () => {
             fontSize: fontSize(14),
             lineHeight: hp(24),
             fontFamily: fontFamily.poppins700,
-            marginHorizontal: 17,
+            marginHorizontal: wp(17),
           }}>
           {item?.title || 'No title'}
         </Text>
@@ -2351,7 +2330,7 @@ const ProductDetailsScreen = () => {
           <View
             style={{
               marginTop: hp(20),
-              marginHorizontal: 17,
+              marginHorizontal: wp(17),
               flexDirection: 'row',
             }}>
             {item.productImages.map((img, index) => (
@@ -2361,7 +2340,7 @@ const ProductDetailsScreen = () => {
                 style={{
                   width: wp(60),
                   height: hp(80),
-                  borderRadius: 14,
+                  borderRadius: wp(14),
                   marginRight: wp(11),
                 }}
               />
@@ -2374,7 +2353,7 @@ const ProductDetailsScreen = () => {
               fontSize: fontSize(12),
               color: '#999',
               fontFamily: fontFamily.poppins400,
-              marginHorizontal: 17,
+              marginHorizontal: wp(17),
             }}>
             No images added in this review
           </Text>
@@ -2387,7 +2366,7 @@ const ProductDetailsScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginHorizontal: 17,
+            marginHorizontal: wp(17),
           }}>
           {/* User info */}
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -2401,7 +2380,7 @@ const ProductDetailsScreen = () => {
                 style={{
                   width: hp(34),
                   height: hp(34),
-                  borderRadius: 50,
+                  borderRadius: wp(50),
                   backgroundColor: '#F7E7FF',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -2434,7 +2413,7 @@ const ProductDetailsScreen = () => {
                 lineHeight: hp(24),
                 fontFamily: fontFamily.poppins400,
                 color: '#C1C1C1',
-                top: 1,
+                top: hp(1),
               }}>
               {item?.createdAt ? new Date(item.createdAt).toDateString() : ''}
             </Text>
@@ -2446,15 +2425,16 @@ const ProductDetailsScreen = () => {
               width={hp(15)}
               height={hp(14)}
               fill="#8225AF"
-              style={{marginRight: 10}}
+              style={{marginRight: wp(10)}}
             />
             <Text
               style={{
                 fontSize: fontSize(14),
                 lineHeight: hp(24),
                 fontFamily: fontFamily.poppins700,
-                color: '#8225AF',
-                top: 2,
+                // color: '#8225AF',
+                color: '#5029F3',
+                top: hp(2),
               }}>
               {item?.rating || 0}
             </Text>
@@ -2483,23 +2463,24 @@ const ProductDetailsScreen = () => {
     ?.replace(/<p><\/p>/g, '')
     ?.replace(/<\/ul>\s*<ul>/g, ''); //  gap fix// remove empty p
 
-  // if (loading) {
-  //   return (
-  //     <View
-  //       style={{
-  //         flex: 1,
-  //         justifyContent: 'center',
-  //         alignItems: 'center',
-  //       }}>
-  //       <ActivityIndicator size="large" color={'#8225AF'} />
-  //     </View>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator size="large" color={'#5029F3'} />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
         style={{
-          marginHorizontal: 17,
+          marginHorizontal: wp(17),
           height: hp(57),
           flexDirection: 'row',
           alignItems: 'center',
@@ -2511,8 +2492,8 @@ const ProductDetailsScreen = () => {
             navigation.goBack();
           }}
           style={{
-            width: 50,
-            height: 50,
+            width: hp(50),
+            height: hp(50),
             justifyContent: 'center',
           }}>
           <BackIcon />
@@ -2527,8 +2508,8 @@ const ProductDetailsScreen = () => {
               })
             }
             style={{
-              width: 50,
-              height: 50,
+              width: hp(50),
+              height: hp(50),
               justifyContent: 'center',
               alignItems: 'center',
             }}>
@@ -2538,9 +2519,9 @@ const ProductDetailsScreen = () => {
           <View>
             <Touchable
               style={{
-                marginLeft: 10,
-                width: 50,
-                height: 50,
+                marginLeft: wp(10),
+                width: hp(50),
+                height: hp(50),
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
@@ -2561,10 +2542,10 @@ const ProductDetailsScreen = () => {
                 <View
                   style={{
                     position: 'absolute',
-                    right: 5,
-                    top: 5,
-                    backgroundColor: '#9333EA',
-                    borderRadius: 20,
+                    right: wp(5),
+                    top: hp(5),
+                    backgroundColor: '#5029F3',
+                    borderRadius: wp(20),
                     width: hp(18),
                     height: hp(18),
                     justifyContent: 'center',
@@ -2598,26 +2579,18 @@ const ProductDetailsScreen = () => {
         <View
           style={{
             marginHorizontal: 17,
-            // marginTop: hp(52),
             flexDirection: 'row',
             justifyContent: 'space-between',
-
-            // backgroundColor: 'red',
           }}>
-          {/* <GradientButton
-            title={'Add to Cart'}
-            buttonStyle={{width: wp(285), height: hp(50)}}
-          /> */}
+          {/* ADD to Cart  */}
           <GradientButton
-            // title="Add to Cart"
-            // title={showAdded ? 'Added to Cart' : 'Add to Cart'}
             title={isAddedToCart ? 'Remove from Cart' : 'Add to Cart'}
             onPress={handleCartAction}
-            // loading={loading}
-            // onPress={handleAddToCart}
+            // disabled={loading}
+            loading={cartLoading}
             buttonStyle={{width: wp(285), height: hp(50)}}
           />
-
+          {/* ADD to wishlist  */}
           <View style={{width: hp(50), height: hp(50)}}>
             {/* Background circular image */}
             <Image
@@ -2636,12 +2609,6 @@ const ProductDetailsScreen = () => {
                 ],
               }}
               onPress={() => onWishlistPress(product)}>
-              {/* {isInWishlist(product.id || product._id) ? (
-                <GradientFullFillLike width={wp(23)} height={hp(20)} />
-              ) : (
-                <GradientLikeIcon width={wp(23)} height={hp(20)} />
-              )} */}
-
               {isInWishlist(productId) ? (
                 <GradientFullFillLike width={wp(23)} height={hp(20)} />
               ) : (
@@ -2653,22 +2620,17 @@ const ProductDetailsScreen = () => {
       </View>
 
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
-        <View
-          style={
-            {
-              // marginTop: 10,
-            }
-          }>
+        <View>
           <ProductImageComponent
             // product={route.params.product}
             product={product}
             // selectedVariant={handleColorChange}
             setSelectedColor={setSelectedColor}
-            setSelectedVariant={setSelectedVariant} //  ADD THIS
+            setSelectedVariant={setSelectedVariant}
           />
         </View>
 
-        <View style={{marginHorizontal: 17, marginTop: hp(31)}}>
+        <View style={{marginHorizontal: wp(17), marginTop: hp(31)}}>
           <Text
             style={{
               color: colors.black,
@@ -2676,7 +2638,6 @@ const ProductDetailsScreen = () => {
               lineHeight: hp(26),
               fontFamily: fontFamily.poppins700,
             }}>
-            {/* Designer Traditional Dress */}
             {product?.title ?? ''}
           </Text>
           <Text
@@ -2689,7 +2650,6 @@ const ProductDetailsScreen = () => {
               color: '#6B6B6B',
               marginTop: hp(2),
             }}>
-            {/* Women Floral Printed Fit & Flare Midi Class */}
             {product?.description ?? ''}
           </Text>
 
@@ -2702,7 +2662,7 @@ const ProductDetailsScreen = () => {
               height: hp(28),
               borderColor: '#D2D2D2',
               borderWidth: 1,
-              borderRadius: 16,
+              borderRadius: wp(16),
               marginTop: hp(19),
               flexDirection: 'row',
               alignItems: 'center',
@@ -2714,13 +2674,7 @@ const ProductDetailsScreen = () => {
                 color: '#8225AF',
                 marginLeft: wp(15),
               }}>
-              {/* 4.2
-               */}
-              {/* {product?.rating ?? '0.0'} */}
-
-              {/* {product?.averageRating?.toFixed(1) ?? '0.0'} */}
               {averageRating ? averageRating.toFixed(1) : '0.0'}
-              {/* {userReviews?.averageRating ?? 0} */}
             </Text>
             <Image
               source={star_icon}
@@ -2733,10 +2687,9 @@ const ProductDetailsScreen = () => {
             />
             <View
               style={{
-                width: 1,
-                height: 18,
+                width: wp(1),
+                height: hp(18),
                 backgroundColor: '#D2D2D2',
-                // marginHorizontal: 8,
                 marginLeft: wp(10),
               }}
             />
@@ -2749,11 +2702,7 @@ const ProductDetailsScreen = () => {
                 marginLeft: wp(14),
                 fontSize: fontSize(13),
               }}>
-              {/* 122 Ratings */}
-              {/* {product?.ratingCount ?? '0.0 Ratings'} */}
-              {/* {product?.totalReviews ?? 0} Ratings */}
               {totalReviews} Ratings
-              {/* {userReviews?.totalReviews ?? 0} Ratings */}
             </Text>
           </TouchableOpacity>
         </View>
@@ -2768,7 +2717,7 @@ const ProductDetailsScreen = () => {
 
         <View
           style={{
-            marginHorizontal: 17,
+            marginHorizontal: wp(17),
             marginTop: hp(25),
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -2779,9 +2728,6 @@ const ProductDetailsScreen = () => {
                 lineHeight: hp(32),
                 fontFamily: fontFamily.poppins700,
               }}>
-              {/* Rs.780
-               */}
-              {/* ₹{product?.variants?.[0]?.price ?? ''}₹ */}
               Rs.
               {selectedVariant?.sellingPrice ??
                 product?.variants[0]?.sellingPrice}
@@ -2804,7 +2750,6 @@ const ProductDetailsScreen = () => {
                 lineHeight: hp(26),
                 fontFamily: fontFamily.poppins400,
               }}>
-              {/* Rs.3443₹{product?.variants?.[0]?.mrp ?? '000'}₹ */}
               Rs.
               {selectedVariant?.price ?? product?.variants[0]?.price ?? '000'}
             </Text>
@@ -2817,8 +2762,6 @@ const ProductDetailsScreen = () => {
                 lineHeight: hp(24),
                 fontFamily: fontFamily.poppins600,
               }}>
-              {/* 34% Off */}
-              {/* {product?.variants?.[0]?.discount ?? ''}% Off */}
               {selectedVariant?.discount ?? product?.variants[0]?.discount}% Off
             </Text>
           </View>
@@ -2845,11 +2788,9 @@ const ProductDetailsScreen = () => {
           <View
             style={{
               flexDirection: 'row',
-              // justifyContent: 'space-between'
               flexWrap: 'wrap',
               marginTop: hp(23),
             }}>
-            {/* {sizes.map(size => ( */}
             {availableSizes.map(size => (
               <TouchableOpacity
                 key={size}
@@ -2878,11 +2819,8 @@ const ProductDetailsScreen = () => {
         <View
           style={{
             width: '100%',
-            // borderWidth: 4,
-
             borderWidth: 0.5,
             borderColor: '#E7E7E7',
-            // borderColor: '#F7F7F7',
             marginTop: hp(22),
           }}
         />
@@ -2915,7 +2853,6 @@ const ProductDetailsScreen = () => {
               marginTop: hp(23),
               flexDirection: 'row',
               justifyContent: 'space-between',
-              // backgroundColor: 'pink',
             }}>
             <TextInput
               value={pincode}
@@ -2924,10 +2861,8 @@ const ProductDetailsScreen = () => {
               placeholderTextColor={'black'}
               style={{
                 width: wp(228),
-                // height: hp(44),
                 backgroundColor: '#F4F4F4',
-                borderRadius: 50,
-                // paddingHorizontal: hp(30),
+                borderRadius: wp(50),
                 paddingHorizontal: hp(15),
                 fontSize: fontSize(14),
                 color: '#969696',
@@ -2945,10 +2880,9 @@ const ProductDetailsScreen = () => {
               title={'Check'}
               buttonStyle={{
                 width: wp(99),
-                // height: hp(44),
                 opacity: pincode.length === 6 ? 1 : 0.7,
               }}
-              disabled={pincode.length !== 6} // Disable button if pincode is not exactly 6 digits
+              disabled={pincode.length !== 6}
             />
           </View>
         </View>
@@ -2956,16 +2890,13 @@ const ProductDetailsScreen = () => {
         <View
           style={{
             width: '100%',
-            // borderWidth: 4,
-            // borderColor: '#F7F7F7',
-
             borderWidth: 0.5,
             borderColor: '#E7E7E7',
             marginTop: hp(34),
           }}
         />
 
-        <View style={{marginHorizontal: 17, marginTop: hp(23)}}>
+        <View style={{marginHorizontal: wp(17), marginTop: hp(23)}}>
           <Text
             style={{
               color: colors.pureBlack,
@@ -2984,17 +2915,15 @@ const ProductDetailsScreen = () => {
                   color: '#6B6B6B',
                   fontSize: fontSize(14),
                   lineHeight: hp(22),
-                  // marginBottom: 6, // ✅ normal spacing // 🔥 reduce space
                   marginTop: 0,
-                  marginBottom: 3,
+                  marginBottom: hp(3),
                 },
                 ul: {
-                  paddingLeft: 15, // ✅ proper indent
-                  marginBottom: 8,
-                  // backgroundColor: 'pink',
+                  paddingLeft: wp(15),
+                  marginBottom: hp(8),
                 },
                 strong: {
-                  fontFamily: fontFamily.poppins700, // 🔥 MUST
+                  fontFamily: fontFamily.poppins700,
                   color: '#000',
                   fontSize: fontSize(14),
                 },
@@ -3002,8 +2931,8 @@ const ProductDetailsScreen = () => {
                   color: '#6B6B6B',
                   fontSize: fontSize(14),
                   lineHeight: hp(22),
-                  marginBottom: 5,
-                  flexDirection: 'row', // 🔥 important
+                  marginBottom: hp(5),
+                  flexDirection: 'row',
                   alignItems: 'center',
                 },
               }}
@@ -3105,7 +3034,7 @@ const ProductDetailsScreen = () => {
                 fontSize: fontSize(14),
                 lineHeight: hp(18),
                 fontFamily: fontFamily.poppins400,
-                color: '#8225AF',
+                color: '#5029F3',
               }}>
               See More
             </Text>
@@ -3123,7 +3052,7 @@ const ProductDetailsScreen = () => {
 
         <View
           style={{
-            marginHorizontal: 17,
+            marginHorizontal: wp(17),
             marginTop: hp(22),
           }}>
           <View>
@@ -3140,7 +3069,6 @@ const ProductDetailsScreen = () => {
                   color: colors.pureBlack,
                   fontFamily: fontFamily.poppins700,
                 }}>
-                {/* 18407738 */}
                 {product?.productCode ?? ''}
               </Text>
             </Text>
@@ -3157,7 +3085,7 @@ const ProductDetailsScreen = () => {
               style={{
                 width: hp(30),
                 height: hp(30),
-                borderRadius: 50,
+                borderRadius: wp(50),
                 backgroundColor: '#F8E9FF',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -3165,7 +3093,6 @@ const ProductDetailsScreen = () => {
               <SellerShopIcon />
             </View>
 
-            {/* Text container: Seller + jnc */}
             <View style={{marginLeft: wp(16)}}>
               <Text
                 style={{
@@ -3173,12 +3100,10 @@ const ProductDetailsScreen = () => {
                   lineHeight: hp(18),
                   fontFamily: fontFamily.poppins700,
                   color: colors.pureBlack,
-                  top: 18,
+                  top: hp(18),
                 }}>
                 Seller :{'  '}
                 <Text style={{fontFamily: fontFamily.poppins400}}>
-                  {/* {storeData?.name ?? ''}
-                   */}
                   {storeData?.name?.charAt(0)?.toUpperCase() +
                     storeData?.name.slice(1) || 'No Name of store'}
                 </Text>
@@ -3186,8 +3111,6 @@ const ProductDetailsScreen = () => {
 
               <View style={{flexDirection: 'row', zIndex: 99, top: 30}}>
                 <TouchableOpacity
-                  // onPress={() => setModalVisible(true)}
-
                   onPress={() => {
                     console.log('STORE DATA BEFORE NAVIGATION =>', storeData);
                     navigation.navigate('MainTabs', {
@@ -3199,12 +3122,12 @@ const ProductDetailsScreen = () => {
                     });
                   }}
                   style={{
-                    width: wp(95), // smaller than container
+                    width: wp(95),
                     height: hp(40),
-                    borderRadius: 50,
+                    borderRadius: wp(50),
                     borderColor: '#CDCDCD',
                     borderWidth: 1,
-                    backgroundColor: 'white', // Inner background
+                    backgroundColor: 'white',
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}
@@ -3222,6 +3145,10 @@ const ProductDetailsScreen = () => {
 
                 <TouchableOpacity
                   onPress={() => {
+                    if (!token) {
+                      navigation.navigate('StartingScreen'); // your login screen
+                      return;
+                    }
                     navigation.navigate('SendEquiryScreen', {
                       productId: productId,
                       // storeId: storeData?.id,
@@ -3230,9 +3157,9 @@ const ProductDetailsScreen = () => {
                     });
                   }}
                   style={{
-                    width: wp(141), // smaller than container
+                    width: wp(141),
                     height: hp(40),
-                    borderRadius: 50,
+                    borderRadius: wp(50),
                     borderColor: '#CDCDCD',
                     borderWidth: 1,
                     backgroundColor: 'white', // Inner background
@@ -3254,7 +3181,6 @@ const ProductDetailsScreen = () => {
                     Send Enquiry
                   </Text>
                 </TouchableOpacity>
-                {/* </LinearGradient> */}
               </View>
             </View>
           </View>
@@ -3263,8 +3189,6 @@ const ProductDetailsScreen = () => {
         <View
           style={{
             width: '100%',
-            // borderWidth: 1,
-            // borderColor: '#E7E7E7',
             borderWidth: 0.5,
             borderColor: '#E7E7E7',
             marginTop: hp(55),
@@ -3292,18 +3216,17 @@ const ProductDetailsScreen = () => {
                   fontFamily: fontFamily.poppins700,
                   color: 'black',
                 }}>
-                {/* 4.2 */}
-                {/* {product?.averageRating?.toFixed(1) ?? '0.0'} */}
                 {averageRating ? averageRating.toFixed(1) : '0.0'}
               </Text>
             }>
             <LinearGradient
-              colors={['#0F52BA', '#8225AF']}
+              // colors={['#0F52BA', '#8225AF']}
+              colors={['#5029F3', '#7756FF']}
               start={{x: 0, y: 0.05}}
               end={{x: 0.3, y: 0.6}}
               style={{
-                width: 200, // Required
-                height: 100, // Required
+                width: wp(200), // Required
+                height: hp(100), // Required
               }}>
               <Text
                 style={{
@@ -3311,13 +3234,12 @@ const ProductDetailsScreen = () => {
                   fontFamily: fontFamily.poppins700,
                   opacity: 0,
                 }}>
-                {/* 4.2 */}
                 {product?.averageRating?.toFixed(1) ?? '0.0'}
               </Text>
             </LinearGradient>
           </MaskedView>
 
-          <View style={{top: -20}}>
+          <View style={{top: hp(-20)}}>
             <ReviewRatingComponent
               ratingBreakdown={ratingBreakdown}
               totalReviews={totalReviews}
@@ -3348,7 +3270,8 @@ const ProductDetailsScreen = () => {
               fontSize: fontSize(16),
               fontFamily: fontFamily.poppins700,
               lineHeight: hp(24),
-              color: '#8225AF',
+              // color: '#8225AF',
+              color: '#5029F3',
               textAlign: 'center',
               marginTop: hp(14),
             }}>
