@@ -169,9 +169,6 @@ const AddressScreen = () => {
 
         <FlatList
           data={addresses}
-          // keyExtractor={item => item._id} // 👈 FIX
-
-          // keyExtractor={item => item.id}
           keyExtractor={(item, index) =>
             item?.id ? item.id.toString() : index.toString()
           }
@@ -208,28 +205,25 @@ const AddressScreen = () => {
             </View>
           }
           renderItem={({item}) => {
-            if (!item) return null; // ✅ IMPORTANT
+            if (!item) return null;
 
             const addressText = `${item.addressLineOne || ''}, ${
               item.addressLineTwo || ''
             }`;
             const isDefault = item.isDefaultAddress;
 
-            console.log('ITEM:', item); // <-- ADD THIS HERE
+            console.log('ITEM:', item);
             return (
               <View style={styles.card}>
                 <View
                   style={{
-                    // width: '100%',
-                    // height: hp(244),
-                    // height: isDefault ? hp(225) : hp(auto), // 🔥 dynamic height
                     borderWidth: 1,
                     borderColor: '#E8E8E8',
-                    borderRadius: 14,
+                    borderRadius: wp(14),
                     paddingHorizontal: wp(18),
                     // marginTop: hp(28),
                     marginTop: hp(7),
-                    marginHorizontal: wp(24), // 👈 ADD THIS
+                    marginHorizontal: wp(24),
                   }}>
                   <View style={styles.defaultRow}>
                     <View
@@ -244,15 +238,14 @@ const AddressScreen = () => {
                       }}>
                       {isDefault && (
                         <LinearGradient
-                          colors={['#8B5CF6', '#A855F7']}
+                          // colors={['#8B5CF6', '#A855F7']}
+                          colors={['#5029F3', '#7756FF']}
                           start={{x: 0, y: 0}}
                           end={{x: 1, y: 0}}
                           style={{
-                            // width: wp(81),
-                            // height: hp(23),
                             width: wp(71.78),
                             height: hp(23),
-                            borderRadius: 20,
+                            borderRadius: wp(20),
                             justifyContent: 'center',
                             alignItems: 'center',
                           }}>
@@ -261,16 +254,6 @@ const AddressScreen = () => {
                           </Text>
                         </LinearGradient>
                       )}
-                      {/* <Text
-                        style={{
-                          color: '#9CA3AF',
-                          fontSize: fontSize(12),
-                          fontFamily: fontFamily.poppins500,
-                          // marginLeft: wp(10),
-                          left: wp(271),
-                        }}>
-                        {item.type || 'Office'}
-                      </Text> */}
                     </View>
                   </View>
 
@@ -292,7 +275,7 @@ const AddressScreen = () => {
                       alignItems: 'center',
                       marginTop: isDefault ? hp(23) : hp(23),
                       marginBottom: isDefault ? hp(16) : hp(23),
-                      justifyContent: 'flex-end', // 🔥 RIGHT ALIGN
+                      justifyContent: 'flex-end',
                     }}>
                     {/* // {styles.actions} */}
 
@@ -302,11 +285,8 @@ const AddressScreen = () => {
                         flexDirection: 'row',
                         alignItems: 'center',
                         paddingRight: wp(16),
-                        // borderRightWidth: 1,
-                        // borderRightColor: '#E5E5E5',
                       }}
                       onPress={() => openEditSheet(item)}>
-                      {/* <Image source={edit_address_icon} style={styles.icon} /> */}
                       <EditIcon />
                       <Text
                         style={{
@@ -332,8 +312,6 @@ const AddressScreen = () => {
                         alignItems: 'center',
                         marginLeft: wp(16),
                       }}
-                      // style={styles.iconButton}
-                      // onPress={() => confirmDelete(item._id)}
                       onPress={() => confirmDelete(item.id)}>
                       {/* <Image source={delete_icon} style={styles.icon} /> */}
                       <RemoveIcon />
@@ -354,7 +332,7 @@ const AddressScreen = () => {
         />
       </ScrollView>
 
-      <View style={{marginHorizontal: 17, marginBottom: 20}}>
+      <View style={{marginHorizontal: wp(17), marginBottom: hp(20)}}>
         <GradientButton title="Add New Address" onPress={openAddSheet} />
       </View>
 
@@ -369,8 +347,8 @@ const AddressScreen = () => {
           wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
           draggableIcon: {backgroundColor: '#ccc'},
           container: {
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            borderTopLeftRadius: wp(20),
+            borderTopRightRadius: wp(20),
             height: '80%',
           },
         }}>
@@ -380,7 +358,6 @@ const AddressScreen = () => {
           <ScrollView
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}>
-            {/* 🔽 ALL TextInputs here */}
             <Text style={styles.modalTitle}>
               {editId ? 'Edit Address' : 'Add New Address'}
             </Text>
@@ -389,11 +366,11 @@ const AddressScreen = () => {
                 borderBottomColor: '#E3E3E3',
                 borderBottomWidth: 1,
                 width: '100%',
-                marginTop: 5,
-                marginBottom: 15,
+                marginTop: hp(5),
+                marginBottom: hp(15),
               }}
             />
-            <View style={{paddingHorizontal: 20}}>
+            <View style={{paddingHorizontal: wp(20)}}>
               <TextInput
                 style={styles.input}
                 placeholder="Name"
@@ -434,7 +411,7 @@ const AddressScreen = () => {
               />
               <TextInput
                 // style={styles.input}
-                style={[styles.input, {minHeight: 45}]}
+                style={[styles.input, {minHeight: hp(45)}]}
                 placeholder="Locality/Town"
                 value={form.locality}
                 onChangeText={val => setForm({...form, locality: val})}
@@ -456,7 +433,7 @@ const AddressScreen = () => {
                 </Text>
               </TouchableOpacity>
 
-              <View style={{marginBottom: 10}}>
+              <View style={{marginBottom: hp(10)}}>
                 <GradientButton
                   // title="Save Address"
                   title={loading ? 'Saving...' : 'Save Address'}
@@ -496,7 +473,7 @@ const AddressScreen = () => {
                 title="Yes, Delete"
                 // onPress={handleDelete}
                 onPress={() => handleDelete(deleteId || null)}
-                buttonStyle={{width: 130}}
+                buttonStyle={{width: wp(130)}}
               />
             </View>
           </View>
@@ -531,8 +508,8 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.poppins500,
     fontSize: wp(18),
     color: '#000',
-    marginRight: 30,
-    marginLeft: 30,
+    marginRight: wp(30),
+    marginLeft: wp(30),
   },
   scrollContainer: {
     flexGrow: 1,
@@ -540,16 +517,9 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#fff',
-    // marginBottom: wp(15),
     marginBottom: hp(10),
-    // borderBottomWidth: 1,
-    // borderBottomColor: '#7a3b3b',s
   },
-  defaultRow: {
-    // flexDirection: 'row',
-    // alignItems: 'center',
-    // marginBottom: wp(10),
-  },
+  defaultRow: {},
   checkIcon: {
     width: wp(18),
     height: wp(18),
@@ -581,7 +551,7 @@ const styles = StyleSheet.create({
     // marginTop: 2,
   },
   type: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     fontFamily: fontFamily.poppins500,
     color: '#B0B0B0',
   },
@@ -589,12 +559,12 @@ const styles = StyleSheet.create({
     fontSize: fontSize(14),
     fontFamily: fontFamily.poppins400,
     color: '#000000',
-    marginTop: 2,
+    marginTop: hp(2),
   },
   mobile: {
     fontFamily: fontFamily.poppins500,
     color: '#000000',
-    marginTop: 2,
+    marginTop: hp(2),
     fontSize: fontSize(14),
   },
   mobileLabel: {
@@ -604,7 +574,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: 'row',
-    marginTop: 10,
+    marginTop: hp(10),
     marginLeft: '70%',
   },
   iconButton: {
@@ -628,49 +598,49 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.poppins500,
     color: '#000',
     textAlign: 'center',
-    marginBottom: 15,
-    marginTop: 18,
+    marginBottom: hp(15),
+    marginTop: hp(18),
   },
   input: {
     borderWidth: 1,
     borderColor: '#EAEAEA',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    marginBottom: 15,
+    borderRadius: wp(10),
+    paddingHorizontal: wp(12),
+    paddingVertical: hp(10),
+    marginBottom: hp(15),
     fontFamily: fontFamily.poppins400,
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#000000',
   },
   iconLabelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: wp(10),
   },
   locationIcon: {
     width: wp(16),
     height: wp(16),
     resizeMode: 'contain',
-    marginBottom: 10,
-    marginRight: 10,
+    marginBottom: wp(10),
+    marginRight: wp(10),
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     fontFamily: fontFamily.poppins500,
     color: '#000',
-    marginTop: 10,
-    marginBottom: 20,
+    marginTop: hp(10),
+    marginBottom: hp(20),
   },
   defaultAddressRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: hp(15),
     alignSelf: 'flex-start',
   },
   checkboxContainer: {
     width: wp(18),
     height: wp(18),
-    marginRight: 20,
+    marginRight: wp(20),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -678,15 +648,15 @@ const styles = StyleSheet.create({
     width: wp(18),
     height: wp(18),
     borderWidth: 1,
-    borderColor: '#9317CF',
-    borderRadius: 3,
+    borderColor: '#5029F3',
+    borderRadius: wp(3),
   },
   defaultAddressText: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontFamily: fontFamily.poppins500,
     color: '#000',
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: hp(10),
+    marginBottom: hp(10),
   },
 
   modalOverlay: {
@@ -698,15 +668,15 @@ const styles = StyleSheet.create({
   confirmBox: {
     backgroundColor: '#fff',
     width: '90%',
-    borderRadius: 15,
-    padding: 40,
+    borderRadius: wp(15),
+    padding: wp(40),
     alignItems: 'center',
   },
   confirmText: {
-    fontSize: 18,
+    fontSize: fontSize(18),
     fontFamily: fontFamily.poppins500,
     color: '#000',
-    marginBottom: 20,
+    marginBottom: wp(20),
     textAlign: 'center',
   },
   confirmButtons: {
@@ -717,21 +687,21 @@ const styles = StyleSheet.create({
   cancelButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#0F52BA',
-    paddingVertical: 12,
+    borderColor: '#5029F3',
+    paddingVertical: hp(12),
     alignItems: 'center',
     borderRadius: wp(25),
-    marginRight: 20,
-    width: 130,
+    marginRight: wp(20),
+    width: wp(130),
   },
   cancelText: {
-    fontSize: 15,
+    fontSize: fontSize(15),
     fontFamily: fontFamily.poppins500,
     color: '#0E0E0E',
   },
   deleteText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: fontSize(14),
     fontFamily: fontFamily.poppins500,
   },
 });

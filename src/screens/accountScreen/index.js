@@ -328,7 +328,7 @@ const AccountScreen = () => {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{paddingBottom: 30}}>
+      contentContainerStyle={{paddingBottom: hp(30)}}>
       <>
         {/* Header */}
         <SafeAreaView style={styles.header}>
@@ -392,8 +392,8 @@ const AccountScreen = () => {
               wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
               draggableIcon: {backgroundColor: '#C4C4C4'},
               container: {
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: wp(20),
+                borderTopRightRadius: wp(20),
                 backgroundColor: '#FFFFFF',
               },
             }}>
@@ -405,8 +405,8 @@ const AccountScreen = () => {
                   height: hp(432),
                   backgroundColor: '#FFFFFF',
                   borderWidth: 1,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderTopLeftRadius: wp(20),
+                  borderTopRightRadius: wp(20),
                 }}>
                 <View
                   style={{
@@ -446,12 +446,15 @@ const AccountScreen = () => {
                 </View>
                 <View
                   style={{
-                    borderWidth: 1,
-                    borderColor: '#CDCDCD',
-                    borderRadius: 25,
-                    marginHorizontal: wp(39),
-                    height: hp(45),
                     marginTop: hp(9),
+                    // width: '100%',
+                    marginHorizontal: wp(39),
+                    height: hp(50),
+                    borderWidth: 1,
+                    borderRadius: wp(25),
+                    borderColor: '#CDCDCD',
+                    justifyContent: 'center',
+                    // paddingVertical: hp(15),
                   }}>
                   <TextInput
                     value={email}
@@ -460,8 +463,9 @@ const AccountScreen = () => {
                       color: '#000',
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
-                      // marginLeft: wp(26),
                       marginLeft: wp(15),
+                      paddingVertical: 0,
+                      includeFontPadding: false, // Android
                     }}
                   />
                 </View>
@@ -482,13 +486,15 @@ const AccountScreen = () => {
                 </View>
                 <View
                   style={{
-                    borderWidth: 1,
-                    borderColor: '#CDCDCD',
-                    borderRadius: 25,
-                    marginHorizontal: wp(39),
-                    // height: hp(50),
-                    height: hp(45),
                     marginTop: hp(9),
+                    // width: '100%',
+                    marginHorizontal: wp(39),
+                    height: hp(50),
+                    borderWidth: 1,
+                    borderRadius: wp(25),
+                    borderColor: '#CDCDCD',
+                    justifyContent: 'center',
+                    // paddingVertical: hp(15),
                   }}>
                   <TextInput
                     value={newEmail}
@@ -497,8 +503,9 @@ const AccountScreen = () => {
                       color: '#000',
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
-                      // marginLeft: wp(26),
                       marginLeft: wp(15),
+                      paddingVertical: 0,
+                      includeFontPadding: false,
                     }}
                   />
                 </View>
@@ -510,25 +517,25 @@ const AccountScreen = () => {
                     marginHorizontal: wp(39),
                   }}>
                   <LinearGradient
-                    colors={['#0F52BA', '#985DD2']}
+                    colors={['#5029F3', '#7756FF']}
                     style={{
                       width: wp(136),
                       height: hp(50),
-                      borderRadius: 30,
-                      padding: 1, // ⭐ THIS IS THE KEY
+                      borderRadius: wp(30),
+                      padding: 1,
                     }}>
                     <TouchableOpacity
                       activeOpacity={0.5}
                       style={{
                         flex: 1,
                         backgroundColor: '#FFFFFF',
-                        borderRadius: 30, // 👈 25 - padding
+                        borderRadius: wp(30),
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                       onPress={() => {
                         // setShowEditModal(false);
-                        sheetRef.current?.close(); // 👈 IMPORTANT
+                        sheetRef.current?.close();
                         setEditingField(null);
                       }}>
                       <Text
@@ -578,8 +585,8 @@ const AccountScreen = () => {
                   height: hp(432),
                   backgroundColor: '#FFFFFF',
                   // borderWidth: 1,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderTopLeftRadius: wp(20),
+                  borderTopRightRadius: wp(20),
                 }}>
                 <View
                   style={{
@@ -648,16 +655,12 @@ const AccountScreen = () => {
                     />
                   ))}
                 </View>
-                <View style={{marginTop: hp(59), marginLeft: wp(126)}}>
-                  {/* <Text
-                    style={{
-                      fontSize: fontSize(14),
-                      fontFamily: fontFamily.poppins400,
-                    }}>
-                    <Text style={{color: '#A3A3A3'}}>Resend in </Text>
-                    <Text style={{color: '#000000'}}>{formatTime(timer)}</Text>
-                  </Text> */}
-
+                <View
+                  style={{
+                    marginTop: hp(59),
+                    marginLeft: wp(0),
+                    alignItems: 'center',
+                  }}>
                   {timer > 0 ? (
                     <Text
                       style={{
@@ -689,7 +692,7 @@ const AccountScreen = () => {
                           payload,
                         });
 
-                        setTimer(119); // restart timer
+                        setTimer(119);
                       }}>
                       <Text
                         style={{
@@ -729,8 +732,8 @@ const AccountScreen = () => {
               wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
               draggableIcon: {backgroundColor: '#C4C4C4'},
               container: {
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: wp(20),
+                borderTopRightRadius: wp(20),
                 backgroundColor: '#FFFFFF',
               },
             }}>
@@ -746,8 +749,8 @@ const AccountScreen = () => {
                   width: wp(375),
                   height: hp(257),
                   backgroundColor: '#FFFFFF',
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderTopLeftRadius: wp(20),
+                  borderTopRightRadius: wp(20),
                 }}>
                 <View
                   style={{
@@ -783,17 +786,9 @@ const AccountScreen = () => {
                     marginLeft: wp(127),
                   }}>
                   <GradientButton
-                    // onPress={() => {
-                    //   setShowSecondModal(false);
-                    //   // navigation.navigate('Account');
-                    // }}
-
                     onPress={() => {
-                      // setShowSecondModal(false);
                       setEditingField(null);
-                      // setShowEditModal(false);
                       successSheetRef.current?.close();
-                      // navigation.goBack(); // or navigation.navigate('Account')
                     }}
                     title={'Ok'}
                     buttonStyle={{width: wp(120), height: hp(50)}}
@@ -834,14 +829,10 @@ const AccountScreen = () => {
 
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={
-                  () => {
-                    setEditingField('mobile');
-                    // setShowMobileEditModal(true);
-                    mobileSheetRef.current?.open();
-                  }
-                  // setEditingField(editingField === 'mobile' ? null : 'mobile')
-                }>
+                onPress={() => {
+                  setEditingField('mobile');
+                  mobileSheetRef.current?.open();
+                }}>
                 <Image source={edit_icon} style={styles.editIcon} />
               </TouchableOpacity>
             </View>
@@ -856,43 +847,25 @@ const AccountScreen = () => {
             customStyles={{
               wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
               container: {
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: wp(20),
+                borderTopRightRadius: wp(20),
                 backgroundColor: '#FFFFFF',
                 paddingBottom: hp(20),
               },
-              draggableIcon: {backgroundColor: '#C4C4C4', width: 50},
+              draggableIcon: {backgroundColor: '#C4C4C4', width: wp(50)},
             }}>
             <View style={styles.modalOverlay}>
               <View
                 style={{
                   width: wp(375),
-                  // height: hp(432),
                   backgroundColor: '#FFFFFF',
-                  // borderWidth: 1,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderTopLeftRadius: wp(20),
+                  borderTopRightRadius: wp(20),
                 }}>
-                {/* <View
-                  style={{
-                    marginTop: hp(24),
-                    marginLeft: wp(30),
-                  }}> */}
                 <View
                   style={{
                     marginLeft: wp(30),
-                    // marginTop: hp(24),
-                    // alignItems: 'center',
-                    // justifyContent: 'center',
                   }}>
-                  {/* <Text
-                    style={{
-                      fontFamily: fontFamily.poppins500,
-                      fontSize: fontSize(16),
-                      color: '#000',
-                    }}>
-                    Update Mobile Number
-                  </Text> */}
                   <Text
                     style={{
                       // textAlign: 'center',
@@ -928,20 +901,15 @@ const AccountScreen = () => {
                 </View>
                 <View
                   style={{
-                    // borderWidth: 1,
-                    // borderColor: '#CDCDCD',
-                    // borderRadius: 25,
-                    // marginHorizontal: wp(39),
-                    // height: hp(50),
-                    // // height: hp(45),
-                    // marginTop: hp(9),
-                    // height: hp(50),
-                    borderWidth: 1,
-                    borderColor: '#CDCDCD',
-                    borderRadius: 25,
-                    marginHorizontal: wp(39),
-                    height: hp(45),
                     marginTop: hp(9),
+                    // width: '100%',
+                    marginHorizontal: wp(39),
+                    height: hp(50),
+                    borderWidth: 1,
+                    borderRadius: wp(25),
+                    borderColor: '#CDCDCD',
+                    justifyContent: 'center',
+                    // paddingVertical: hp(15),
                   }}>
                   <TextInput
                     value={mobile}
@@ -951,6 +919,8 @@ const AccountScreen = () => {
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
                       marginLeft: wp(15),
+                      paddingVertical: 0,
+                      includeFontPadding: false, // Android
                     }}
                   />
                 </View>
@@ -971,19 +941,15 @@ const AccountScreen = () => {
                 </View>
                 <View
                   style={{
-                    // borderWidth: 1,
-                    // borderColor: '#CDCDCD',
-                    // borderRadius: 25,
-                    // marginHorizontal: wp(39),
-                    // // height: hp(50),
-                    // height: hp(45),
-                    // marginTop: hp(9),
-                    borderWidth: 1,
-                    borderColor: '#CDCDCD',
-                    borderRadius: 25,
-                    marginHorizontal: wp(39),
-                    height: hp(45),
                     marginTop: hp(9),
+                    // width: '100%',
+                    marginHorizontal: wp(39),
+                    height: hp(50),
+                    borderWidth: 1,
+                    borderRadius: wp(25),
+                    borderColor: '#CDCDCD',
+                    justifyContent: 'center',
+                    // paddingVertical: hp(15),
                   }}>
                   <TextInput
                     value={newMobileNumber}
@@ -995,6 +961,8 @@ const AccountScreen = () => {
                       fontSize: fontSize(14),
                       fontFamily: fontFamily.poppins400,
                       // marginLeft: wp(26),
+                      paddingVertical: 0,
+                      includeFontPadding: false, // Android
                       marginLeft: wp(15),
                     }}
                   />
@@ -1007,23 +975,22 @@ const AccountScreen = () => {
                     marginHorizontal: wp(39),
                   }}>
                   <LinearGradient
-                    colors={['#0F52BA', '#985DD2']}
+                    colors={['#5029F3', '#7756FF']}
                     style={{
                       width: wp(136),
                       height: hp(50),
-                      borderRadius: 30,
+                      borderRadius: wp(30),
                       padding: 1,
                     }}>
                     <TouchableOpacity
                       style={{
                         flex: 1,
                         backgroundColor: '#FFFFFF',
-                        borderRadius: 30, //
+                        borderRadius: wp(30), //
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                       onPress={() => {
-                        // setShowEditModal(false);
                         mobileSheetRef.current?.close();
                         setShowMobileEditModal(null);
                       }}>
@@ -1052,8 +1019,7 @@ const AccountScreen = () => {
                         Alert.alert('Error', 'Please enter new mobile number');
                         return;
                       }
-                      // setShowEditModal(false);
-                      // setShowMobileOtpModal(true);
+
                       dispatch(
                         sendMobileOtpRequest({
                           // token,
@@ -1064,13 +1030,13 @@ const AccountScreen = () => {
                         }),
                       );
 
-                      console.log('📤 DATA SENT:', {
+                      console.log(' DATA SENT:', {
                         currentMobileNumber: mobile,
                         newMobileNumber: newMobileNumber,
                       });
 
                       setShowMobileOtpModal(true);
-                      mobileSheetRef.current?.close(); // 👈 IMPORTANT
+                      mobileSheetRef.current?.close();
                       mobileOtpSheetRef.current?.open();
                     }}
                   />
@@ -1089,8 +1055,8 @@ const AccountScreen = () => {
             customStyles={{
               wrapper: {backgroundColor: 'rgba(0,0,0,0.5)'},
               container: {
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: wp(20),
+                borderTopRightRadius: wp(20),
                 backgroundColor: '#FFFFFF',
               },
               draggableIcon: {backgroundColor: '#C4C4C4'},
@@ -1102,8 +1068,8 @@ const AccountScreen = () => {
                   height: hp(432),
                   backgroundColor: '#FFFFFF',
                   // borderWidth: 1,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderTopLeftRadius: wp(20),
+                  borderTopRightRadius: wp(20),
                 }}>
                 <View
                   style={{
@@ -1130,7 +1096,8 @@ const AccountScreen = () => {
                 <View
                   style={{
                     marginTop: wp(34),
-                    marginLeft: hp(57),
+                    // marginLeft: hp(57),
+                    alignItems: 'center',
                   }}>
                   <Text
                     style={{
@@ -1151,7 +1118,7 @@ const AccountScreen = () => {
                   {[0, 1, 2, 3].map((_, index) => (
                     <TextInput
                       key={index}
-                      ref={ref => (inputRefs.current[index] = ref)} // 🔥 FIX
+                      ref={ref => (inputRefs.current[index] = ref)}
                       style={{
                         width: wp(60),
                         height: hp(50),
@@ -1168,11 +1135,11 @@ const AccountScreen = () => {
                       keyboardType="number-pad"
                       value={otp[index]}
                       onChangeText={value => handleOtpChange(value, index)}
-                      onKeyPress={e => handleKeyPress(e, index)} // 🔥 ADD
+                      onKeyPress={e => handleKeyPress(e, index)}
                     />
                   ))}
                 </View>
-                <View style={{marginTop: hp(59), marginLeft: wp(126)}}>
+                <View style={{marginTop: hp(59), alignItems: 'center'}}>
                   {timer > 0 ? (
                     <Text
                       style={{
@@ -1187,14 +1154,14 @@ const AccountScreen = () => {
                   ) : (
                     <TouchableOpacity
                       onPress={() => {
-                        console.log('🔄 RESEND MOBILE OTP CLICKED');
+                        console.log(' RESEND MOBILE OTP CLICKED');
 
                         const payload = {
                           currentMobileNumber: mobile,
                           newMobileNumber: newMobileNumber,
                         };
 
-                        console.log('📤 RESEND MOBILE OTP PAYLOAD:', payload);
+                        console.log('RESEND MOBILE OTP PAYLOAD:', payload);
 
                         dispatch(sendMobileOtpRequest(payload));
 
@@ -1220,12 +1187,12 @@ const AccountScreen = () => {
                   <GradientButton
                     title={loading ? 'Loading...' : 'Verify Code'}
                     buttonStyle={{
-                      opacity: loading || !isOtpValid ? 0.5 : 1, //  opacity
+                      opacity: loading || !isOtpValid ? 0.5 : 1,
                     }}
                     disabled={loading || !isOtpValid} // disable
                     onPress={() => {
                       if (!isOtpValid) {
-                        alert('Please enter full 4-digit OTP');
+                        Alert.alert('Please enter full 4-digit OTP');
                         return;
                       }
 
@@ -1245,8 +1212,6 @@ const AccountScreen = () => {
                         finalOtp,
                       );
                       console.log('OTP ENTERED:', finalOtp);
-
-                      // setShowMobileSuccessModal(true);
                     }}
                   />
                 </View>
@@ -1263,8 +1228,8 @@ const AccountScreen = () => {
             closeOnPressMask={true}
             customStyles={{
               container: {
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
+                borderTopLeftRadius: wp(20),
+                borderTopRightRadius: wp(20),
                 backgroundColor: '#FFFFFF',
               },
               draggableIcon: {
@@ -1283,8 +1248,8 @@ const AccountScreen = () => {
                   width: wp(375),
                   height: hp(257),
                   backgroundColor: '#FFFFFF',
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
+                  borderTopLeftRadius: wp(20),
+                  borderTopRightRadius: wp(20),
                 }}>
                 <View
                   style={{
@@ -1395,18 +1360,18 @@ const AccountScreen = () => {
                   marginTop: hp(39),
                 }}>
                 <LinearGradient
-                  colors={['#0F52BA', '#985DD2']}
+                  colors={['#5029F3', '#7756FF']}
                   style={{
                     width: wp(135),
                     height: hp(44),
-                    borderRadius: 25,
-                    padding: 2,
+                    borderRadius: wp(25),
+                    padding: 1,
                   }}>
                   <TouchableOpacity
                     style={{
                       flex: 1,
                       backgroundColor: '#FFFFFF',
-                      borderRadius: 23,
+                      borderRadius: wp(23),
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
@@ -1452,7 +1417,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     backgroundColor: '#fff',
-    paddingHorizontal: 15,
+    paddingHorizontal: wp(15),
   },
   backButton: {zIndex: 2},
   arrowIcon: {width: wp(20), height: hp(18), resizeMode: 'contain'},
@@ -1462,21 +1427,21 @@ const styles = StyleSheet.create({
     right: 0,
     textAlign: 'center',
     fontFamily: fontFamily.poppins500,
-    fontSize: 18,
+    fontSize: fontSize(18),
     color: '#000',
   },
-  contentWrapper: {paddingHorizontal: 20},
+  contentWrapper: {paddingHorizontal: wp(20)},
 
   row: {
-    paddingVertical: 20,
+    paddingVertical: hp(20),
     borderBottomWidth: 1,
     borderBottomColor: '#E7E7E7',
   },
   label: {
-    fontSize: 16,
+    fontSize: fontSize(16),
     fontFamily: fontFamily.poppins500,
     color: '#000',
-    marginBottom: 8,
+    marginBottom: hp(8),
   },
 
   valueRow: {
@@ -1490,19 +1455,19 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   valueText: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#000',
     fontFamily: fontFamily.poppins500,
-    paddingVertical: 2,
-    marginRight: 6,
+    paddingVertical: hp(2),
+    marginRight: wp(6),
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: fontSize(14),
     color: '#000',
     fontFamily: fontFamily.poppins400,
-    paddingVertical: 2,
-    marginRight: 6,
+    paddingVertical: hp(2),
+    marginRight: wp(6),
   },
   checkIcon: {
     width: wp(16),
@@ -1522,17 +1487,17 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
 
-  deleteSection: {marginTop: 25},
+  deleteSection: {marginTop: hp(25)},
   deleteText: {
-    fontSize: 12,
+    fontSize: fontSize(12),
     color: '#898989',
-    marginTop: 5,
-    marginBottom: 50,
+    marginTop: hp(5),
+    marginBottom: hp(50),
     fontFamily: fontFamily.poppins400,
   },
   deleteBtn: {
     backgroundColor: '#000',
-    paddingVertical: 5,
+    paddingVertical: hp(5),
     borderRadius: wp(60),
     alignItems: 'center',
     justifyContent: 'center',
@@ -1542,7 +1507,7 @@ const styles = StyleSheet.create({
   },
   deleteBtnText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: fontSize(14),
     fontFamily: fontFamily.poppins400,
   },
 
@@ -1554,7 +1519,7 @@ const styles = StyleSheet.create({
   },
   modalBox: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 10,
+    borderRadius: wp(10),
     // padding: 25,
     // width: '85%',
     width: wp(340),
@@ -1563,11 +1528,11 @@ const styles = StyleSheet.create({
     top: hp(50),
   },
   modalText: {
-    fontSize: 18,
+    fontSize: fontSize(18),
     fontFamily: fontFamily.poppins400,
     color: '#000000',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: hp(22),
     marginBottom: hp(60),
     top: hp(30),
   },
@@ -1583,12 +1548,12 @@ const styles = StyleSheet.create({
     borderColor: '#0F52BA',
     height: hp(44),
     borderWidth: 1,
-    borderRadius: 25,
+    borderRadius: wp(25),
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelBtnText: {
-    fontSize: 14,
+    fontSize: fontSize(14),
     fontFamily: fontFamily.poppins400,
     color: '#0E0E0E',
   },

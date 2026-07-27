@@ -37,11 +37,18 @@ const HomeTrendingComponent = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [localWishlist, setLocalWishlist] = useState([]);
+
   const token = useSelector(state => state.auth.token);
   console.log('Auth Token in HomeTrendingComponent:', token);
-  // product
-  const {products, loading} = useSelector(state => state.product);
+  // redux store
+  // const {products, loading} = useSelector(state => state.product);
+  const {products, loading, page, totalPages} = useSelector(
+    state => state.product,
+  );
   // console.log('PRODUCT IN UI  ===>', products);
+  // console.log('PRODUCT IN LOADING  ===>', loading);
+  console.log('PRODUCT IN PAGE  ===>', page);
+  console.log('PRODUCT IN TOTAL PAGES  ===>', totalPages);
   const {wishlistData} = useSelector(state => state.wishlist);
 
   useEffect(() => {
@@ -50,12 +57,14 @@ const HomeTrendingComponent = () => {
     }
   }, [wishlistData]);
 
+  //dispatch
   useEffect(() => {
-    dispatch(getProductRequest());
-    dispatch(getWishlistRequest()); // ✅ ADD THIS
+    // dispatch(getProductRequest());
+    dispatch(getProductRequest({page: 1}));
+    dispatch(getWishlistRequest());
   }, []);
-  // console.log('Products in UI...:', products);
 
+  //token
   useEffect(() => {
     if (!token) {
       setLocalWishlist([]);
@@ -65,7 +74,7 @@ const HomeTrendingComponent = () => {
     <SafeAreaView>
       <Text
         style={{
-          paddingHorizontal: 10,
+          paddingHorizontal: wp(10),
           fontSize: fontSize(16),
           color: colors.pureBlack,
           fontFamily: fontFamily.poppins700,
@@ -76,16 +85,27 @@ const HomeTrendingComponent = () => {
       </Text>
       <FlatList
         data={products}
-        // keyExtractor={item => item.id.toString()}
         keyExtractor={item => item._id}
         numColumns={2}
         columnWrapperStyle={{
           justifyContent: 'space-between',
-          paddingHorizontal: wp(10), // 👈 ONLY HERE spacing control
+          paddingHorizontal: wp(10),
         }}
+        onEndReached={() => {
+          if (!loading && page < totalPages) {
+            dispatch(
+              getProductRequest({
+                page: page + 1,
+              }),
+            );
+          }
+        }}
+        onEndReachedThreshold={0.5}
         contentContainerStyle={styles.container}
         renderItem={({item}) => {
+          console.log('RENDER PRODUCT ID =>', item._id);
           // console.log('PRODUCT ITEM IN HOME TRENDIGO ', item);
+
           // Now check if product exist in wishlist
           const safeWishlist = Array.isArray(wishlistData) ? wishlistData : [];
 
@@ -97,10 +117,7 @@ const HomeTrendingComponent = () => {
               return String(productId) === String(item._id);
             });
           // console.log('ITEM:', item._id);
-          // console.log(' WISHLIST CHECK:', isWishlisted);
 
-          // console.log('wishlistData:', wishlistData);
-          // console.log('current item:', item._id);
           const mainVariant =
             item.variants?.find(v =>
               v.images?.some(img => img.isSelectedForMainScreen),
@@ -126,11 +143,8 @@ const HomeTrendingComponent = () => {
                   productId: item._id,
                 });
               }}>
-              {/* <Image source={item.image} style={styles.image} /> */}
               <Image
-                source={
-                  imageUrl ? {uri: imageUrl} : images.trending_one // fallback image
-                }
+                source={imageUrl ? {uri: imageUrl} : images.trending_one}
                 style={styles.image}
               />
 
@@ -258,7 +272,7 @@ const HomeTrendingComponent = () => {
                       console.log(' AFTER LOCAL WISHLIST:', localWishlist);
                     }}>
                     {isWishlisted ? (
-                      <GradientFullFillLike />
+                      <GradientFullFillLike fill={''} />
                     ) : (
                       <GradientLikeIcon />
                     )}
@@ -277,29 +291,27 @@ const cardWidth = (screenWidth - 40) / 2;
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 10,
-    // paddingTop: 10,
+    paddingHorizontal: wp(10),
   },
   card: {
     width: cardWidth,
-    marginBottom: 15,
-    marginHorizontal: 5,
-    borderRadius: 12,
+    marginBottom: hp(15),
+    marginHorizontal: wp(5),
+    borderRadius: wp(12),
     borderWidth: 1,
     borderColor: '#eee',
     backgroundColor: '#fff',
     overflow: 'hidden',
-    // marginTop: hp(18),
   },
   image: {
     width: '100%',
     height: hp(170),
     resizeMode: 'cover',
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
+    borderBottomLeftRadius: wp(14),
+    borderBottomRightRadius: wp(14),
   },
   content: {
-    padding: 10,
+    padding: wp(10),
   },
   title: {
     fontSize: fontSize(10),
@@ -310,11 +322,11 @@ const styles = StyleSheet.create({
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: hp(6),
     justifyContent: 'space-between',
   },
   price: {
-    marginRight: 6,
+    marginRight: wp(6),
     fontSize: fontSize(12),
     fontFamily: fontFamily.poppins700,
     lineHeight: hp(16),
@@ -324,7 +336,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(10),
     color: '#A5A5A5',
     textDecorationLine: 'line-through',
-    marginRight: 6,
+    marginRight: wp(6),
     fontFamily: fontFamily.poppins500,
     lineHeight: hp(14),
   },
@@ -337,12 +349,12 @@ const styles = StyleSheet.create({
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: hp(6),
   },
   ratingBox: {
-    backgroundColor: '#8225AF',
-    paddingHorizontal: 5,
-    borderRadius: 16,
+    backgroundColor: '#5029F3',
+    paddingHorizontal: wp(5),
+    borderRadius: wp(16),
     width: hp(42),
     height: hp(18),
     justifyContent: 'center',
@@ -354,12 +366,10 @@ const styles = StyleSheet.create({
     fontSize: fontSize(9),
     fontFamily: fontFamily.poppins500,
     marginRight: hp(5),
-    // top: 1,
   },
   reviews: {
     fontSize: fontSize(10),
     color: colors.pureBlack,
-    // marginRight: 6,
     fontFamily: fontFamily.poppins500,
     marginLeft: hp(12),
   },

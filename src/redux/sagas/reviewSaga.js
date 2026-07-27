@@ -30,28 +30,12 @@ const uploadImageToS3 = async (uploadUrl, file) => {
 };
 
 function addReviewApi(data, token) {
-  // return axios.post(
-  //   'https://mntrendigo.mntech.website/api/v1/user/review/',
-  //   data,
-  //   {
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   },
-  // );
   return api.post('/user/review/', data);
 }
 function* addReviewSaga(action) {
   try {
     console.log(' ADD REVIEW SAGA CALLED');
     console.log(' Payload:', action.payload);
-
-    // const token = yield call(AsyncStorage.getItem, 'authToken');
-    // console.log(' TOKEN FROM ASYNC STORAGE IN REVIEW SAGA:', token);
-    // if (!token) {
-    //   throw new Error('Token missing');
-    // }
 
     const response = yield call(addReviewApi, action.payload);
     console.log(' API RESPONSE:', response.data);
@@ -66,16 +50,6 @@ function* addReviewSaga(action) {
 }
 
 function getPresignedUrlApi(data, token) {
-  // return axios.post(
-  //   'https://mntrendigo.mntech.website/api/v1/s3/presignedurlv2',
-  //   data,
-  //   {
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   },
-  // );
   return api.post('/api/v1/s3/presignedurlv2', data);
 }
 function* getPresignedUrlSaga(action) {
@@ -83,14 +57,6 @@ function* getPresignedUrlSaga(action) {
     console.log(' GET_PRESIGNED_URL_SAGA CALLED');
     console.log('Incoming Payload:', action.payload);
 
-    // const token = yield call(AsyncStorage.getItem, 'authToken');
-    // console.log(' Token from AsyncStorage:', token);
-
-    // if (!token) {
-    //   throw new Error('Token missing in presigned saga');
-    // }
-
-    //  ONLY send required fields to backend
     const presignedPayload = {
       key: action.payload.key,
       contentType: action.payload.contentType,
@@ -146,9 +112,6 @@ function* getPresignedUrlSaga(action) {
   }
 }
 function getUserReviewsApi(productId) {
-  // return axios.get(
-  //   `https://mntrendigo.mntech.website/api/v1/user/review/by-product/${productId}`,
-  // );
   return api.get(`user/review/by-product/${productId}`);
 }
 function* getUserReviewsSaga(action) {

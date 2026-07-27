@@ -39,50 +39,7 @@ import {useEffect} from 'react';
 import {StyleSheet} from 'react-native';
 import TopBrandComponent from '../../components/topBrandComponent';
 import {ActivityIndicator} from 'react-native';
-const products = [
-  {
-    id: 1,
-    image: images.trending_one,
-    title: 'Designer Traditional Dress1',
-    price: 780,
-    mrp: 1280,
-    discount: '34% Off',
-    rating: '4.2',
-    reviews: 122,
-  },
-  {
-    id: 2,
-    image: images.trending_two,
-    title: 'Designer Traditional Dress2',
-    price: 780,
-    mrp: 1280,
-    discount: '34% Off',
-    rating: '4.2',
-    reviews: 122,
-  },
-  {
-    id: 3,
-    image: images.trending_three,
-    title: 'Designer Traditional Dress3',
-    price: 780,
-    mrp: 1280,
-    discount: '34% Off',
-    rating: '4.2',
-    reviews: 122,
-  },
-  {
-    id: 4,
-    image: images.trending_one,
-    title: 'Designer Traditional Dress',
-    price: 780,
-    mrp: 1280,
-    discount: '34% Off',
-    rating: '4.2',
-    reviews: 122,
-  },
 
-  // ...add more as needed
-];
 const screenWidth = Dimensions.get('window').width;
 const cardWidth = (screenWidth - 40) / 2;
 
@@ -91,9 +48,14 @@ const SearchResultScreen = () => {
   const route = useRoute();
   const dispatch = useDispatch();
   const [localWishlist, setLocalWishlist] = useState([]);
-  const {products, loading} = useSelector(state => state.search);
+  const {products, loading, currentPage, totalPages} = useSelector(
+    state => state.search,
+  );
+  console.log('SEARCH RESULT PRODUCTS =>', products);
+  console.log('CURRENT PAGE =>', currentPage);
+  console.log('TOTAL PAGES =>', totalPages);
+  console.log('PRODUCT COUNT =>', products.length);
 
-  console.log('SEARCH PRODUCTS =>', products);
   // get search text
   const searchText = route?.params?.search || '';
 
@@ -103,7 +65,7 @@ const SearchResultScreen = () => {
 
   useEffect(() => {
     if (!token) {
-      setLocalWishlist([]); // logout clear
+      setLocalWishlist([]);
     }
   }, [token]);
 
@@ -114,7 +76,7 @@ const SearchResultScreen = () => {
     }
   }, [wishlistData]);
   useEffect(() => {
-    dispatch(getWishlistRequest()); // ✅ ADD THIS
+    dispatch(getWishlistRequest());
   }, []);
 
   const [activeTab, setActiveTab] = useState('Top Brand');
@@ -134,12 +96,6 @@ const SearchResultScreen = () => {
 
       case 'Top Rated':
         return <TopBrandComponent />;
-
-      // case 'Deals':
-      //   return <DealsScreen />;
-
-      // case 'Crazy Deals':
-      //   return <CrazyDealsScreen />;
 
       default:
         return null;
@@ -211,8 +167,6 @@ const SearchResultScreen = () => {
             </Text>
 
             <TouchableOpacity style={styles.heartButton}>
-              {/*<Text style={{fontSize: 18}}>♡</Text>*/}
-
               <TouchableOpacity
                 style={styles.heartButton}
                 onPress={() => {
@@ -232,7 +186,7 @@ const SearchResultScreen = () => {
                   console.log(' ALREADY EXISTS:', alreadyExists);
 
                   if (alreadyExists) {
-                    // 🔍 find wishlist item
+                    // find wishlist item
                     const wishlistItem = localWishlist.find(w => {
                       const pid = w.productId?.id || w.productId?._id;
                       return String(pid) === String(item._id);
@@ -271,7 +225,7 @@ const SearchResultScreen = () => {
                   } else {
                     console.log(' ADD FLOW START');
 
-                    // ✅ UI instant update
+                    //  UI instant update
                     setLocalWishlist(prev => [
                       ...prev,
                       {productId: {id: item._id}},
@@ -304,98 +258,13 @@ const SearchResultScreen = () => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      {/* 
-      <FlatList
-        data={products}
-        keyExtractor={(_, index) => index.toString()}
-        columnWrapperStyle={{
-          justifyContent: 'space-between',
-          paddingHorizontal: 10,
-        }}
-        contentContainerStyle={{
-          paddingBottom: hp(60),
-        }}
-        numColumns={2}
-        renderItem={renderProduct}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={
-          <>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingHorizontal: wp(17),
-                marginTop: hp(25),
-                marginBottom: hp(10),
-              }}>
-              {tabs.map((tab, index) => {
-                const isActive = activeTab === tab;
-
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => setActiveTab(tab)}
-                    style={{marginRight: 12}}>
-                    {isActive ? (
-                      <LinearGradient
-                        colors={['#8225AF', '#0F52BA']}
-                        start={{x: 0, y: 0}}
-                        end={{x: 1, y: 0}}
-                        style={{
-                          width: wp(94),
-                          height: hp(30),
-                          borderRadius: 24,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#fff',
-                            fontSize: fontSize(12),
-                            fontFamily: fontFamily.poppins400,
-                          }}>
-                          {tab}
-                        </Text>
-                      </LinearGradient>
-                    ) : (
-                      <View
-                        style={{
-                          backgroundColor: '#F7F7F7',
-                          width: wp(94),
-                          height: hp(30),
-                          borderRadius: 24,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#000',
-                            fontSize: fontSize(12),
-                            fontFamily: fontFamily.poppins400,
-                          }}>
-                          {tab}
-                        </Text>
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-
-            {renderTabContent()}
-
-            <View style={{height: hp(20)}} />
-          </>
-        }
-      /> */}
-
       <FlatList
         // data={products}
         data={products || []}
         keyExtractor={(_, index) => index.toString()}
         columnWrapperStyle={{
           justifyContent: 'space-between',
-          paddingHorizontal: 10,
+          paddingHorizontal: wp(10),
         }}
         contentContainerStyle={{
           paddingBottom: hp(60),
@@ -404,6 +273,17 @@ const SearchResultScreen = () => {
         numColumns={2}
         renderItem={renderProduct}
         showsVerticalScrollIndicator={false}
+        onEndReached={() => {
+          if (!loading && currentPage < totalPages) {
+            dispatch(
+              searchProductRequest({
+                keyword: searchText,
+                page: currentPage + 1,
+                limit: 12,
+              }),
+            );
+          }
+        }}
         ListHeaderComponent={
           <>
             {/* TABS */}
@@ -422,16 +302,17 @@ const SearchResultScreen = () => {
                   <TouchableOpacity
                     key={index}
                     onPress={() => setActiveTab(tab)}
-                    style={{marginRight: 12}}>
+                    style={{marginRight: wp(12)}}>
                     {isActive ? (
                       <LinearGradient
-                        colors={['#8225AF', '#0F52BA']}
+                        // colors={['#8225AF', '#0F52BA']}
+                        colors={['#5029F3', '#7756FF']}
                         start={{x: 0, y: 0}}
                         end={{x: 1, y: 0}}
                         style={{
                           width: wp(94),
                           height: hp(30),
-                          borderRadius: 24,
+                          borderRadius: wp(24),
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}>
@@ -443,7 +324,7 @@ const SearchResultScreen = () => {
                           backgroundColor: '#F7F7F7',
                           width: wp(94),
                           height: hp(30),
-                          borderRadius: 24,
+                          borderRadius: wp(24),
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}>
@@ -466,7 +347,7 @@ const SearchResultScreen = () => {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <ActivityIndicator size="large" color="#8225AF" />
+                <ActivityIndicator size="large" color="#5029F3" />
               </View>
             )}
 
@@ -480,7 +361,7 @@ const SearchResultScreen = () => {
                 }}>
                 <Text
                   style={{
-                    color: '#000',
+                    color: 'grey',
                     fontSize: fontSize(18),
                     fontFamily: fontFamily.poppins500,
                   }}>
@@ -497,29 +378,27 @@ const SearchResultScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 10,
-    // paddingTop: 10,
+    paddingHorizontal: wp(10),
   },
   card: {
     width: cardWidth,
-    marginBottom: 15,
-    marginHorizontal: 5,
-    borderRadius: 12,
+    marginBottom: wp(15),
+    marginHorizontal: wp(5),
+    borderRadius: wp(12),
     borderWidth: 1,
     borderColor: '#eee',
     backgroundColor: '#fff',
     overflow: 'hidden',
-    // marginTop: hp(15),
   },
   image: {
     width: '100%',
     height: hp(170),
     resizeMode: 'cover',
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
+    borderBottomLeftRadius: wp(14),
+    borderBottomRightRadius: wp(14),
   },
   content: {
-    padding: 10,
+    padding: wp(10),
   },
   title: {
     fontSize: fontSize(10),
@@ -530,11 +409,11 @@ const styles = StyleSheet.create({
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: hp(6),
     justifyContent: 'space-between',
   },
   price: {
-    marginRight: 6,
+    marginRight: wp(6),
     fontSize: fontSize(12),
     fontFamily: fontFamily.poppins700,
     lineHeight: hp(16),
@@ -544,7 +423,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize(10),
     color: '#A5A5A5',
     textDecorationLine: 'line-through',
-    marginRight: 6,
+    marginRight: wp(6),
     fontFamily: fontFamily.poppins500,
     lineHeight: hp(14),
   },
@@ -557,12 +436,13 @@ const styles = StyleSheet.create({
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: hp(6),
   },
   ratingBox: {
-    backgroundColor: '#8225AF',
-    paddingHorizontal: 5,
-    borderRadius: 16,
+    // backgroundColor: '#8225AF',
+    backgroundColor: '#5029F3',
+    paddingHorizontal: wp(5),
+    borderRadius: wp(16),
     width: hp(42),
     height: hp(18),
     justifyContent: 'center',
@@ -574,12 +454,10 @@ const styles = StyleSheet.create({
     fontSize: fontSize(9),
     fontFamily: fontFamily.poppins500,
     marginRight: hp(5),
-    // top: 1,
   },
   reviews: {
     fontSize: fontSize(10),
     color: colors.pureBlack,
-    // marginRight: 6,
     fontFamily: fontFamily.poppins500,
     marginLeft: hp(12),
   },

@@ -289,6 +289,12 @@ function* deleteAccountSaga(action) {
     console.log(' CALLING DELETE ACCOUNT API...');
 
     const res = yield call(deleteAccountApi);
+    // Reset Redux states
+    yield put({type: 'RESET_WISHLIST'});
+    yield put({type: 'RESET_CART'});
+    // yield put({type: 'RESET_RECENT_SEARCH'});
+    // yield put({type: 'RESET_RECENTLY_VIEWED'});
+    // yield put({type: 'LOGOUT'}); // if you have this in authReducer
 
     console.log(' DELETE API SUCCESS RESPONSE:', res);
     console.log('RESPONSE DATA:', res.data);
@@ -323,6 +329,5 @@ export default function* userAccountSaga() {
   yield takeLatest(GET_ME_REQUEST, getMeSaga);
   yield takeLatest(DELETE_ACCOUNT_REQUEST, deleteAccountSaga);
   yield takeLatest(SEND_MOBILE_OTP_REQUEST, sendMobileOtpSaga);
-  console.log('SETTING UP VERIFY MOBILE OTP SAGA');
   yield takeLatest(VERIFY_CHANGE_MOBILE_OTP_REQUEST, verifyMobileOtpSaga);
 }

@@ -87,12 +87,6 @@ const SellerProfileScreen = ({route}) => {
           style={{
             marginTop: hp(16),
           }}>
-          {/* <Image
-            // source={images.seller_image}
-            source={bannerImage ? {uri: bannerImage} : images.seller_image}
-            style={{width: '100%', height: hp(121)}}
-          /> */}
-
           {bannerImage ? (
             <Image
               source={{uri: bannerImage}}
@@ -100,18 +94,12 @@ const SellerProfileScreen = ({route}) => {
             />
           ) : null}
         </View>
-        <View style={{marginTop: 17, alignItems: 'center'}}>
-          {/* <Image
-            // source={images.seller_shop}
-            source={shopImage ? {uri: shopImage} : images.shopClothImage}
-            style={{width: hp(84), height: hp(84), resizeMode: 'contain'}}
-          /> */}
-
+        <View style={{marginTop: hp(17), alignItems: 'center'}}>
           <View
             style={{
               width: hp(90),
               height: hp(90),
-              borderRadius: 50,
+              borderRadius: wp(50),
               backgroundColor: '#fff',
               borderColor: '#ccc',
               borderWidth: 0.5,
@@ -124,7 +112,7 @@ const SellerProfileScreen = ({route}) => {
                 style={{
                   width: hp(84),
                   height: hp(84),
-                  borderRadius: 50,
+                  borderRadius: wp(50),
                   resizeMode: 'cover',
                 }}
               />
@@ -132,7 +120,7 @@ const SellerProfileScreen = ({route}) => {
               <Text
                 style={{
                   fontSize: fontSize(28),
-
+                  fontFamily: fontFamily.poppins500,
                   color: '#000',
                 }}>
                 {store?.name?.charAt(0)?.toUpperCase() || '?'}
@@ -220,16 +208,16 @@ const SellerProfileScreen = ({route}) => {
               <TouchableOpacity
                 key={index}
                 onPress={() => setActiveTab(tab)}
-                style={{marginRight: 12}}>
+                style={{marginRight: wp(12)}}>
                 {isActive ? (
                   <LinearGradient
-                    colors={['#8225AF', '#0F52BA']}
+                    colors={['#5029F3', '#7756FF']}
                     start={{x: 0, y: 0}}
                     end={{x: 1, y: 0}}
                     style={{
                       width: wp(94), // fixed width
                       height: hp(30),
-                      borderRadius: 24,
+                      borderRadius: wp(24),
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
@@ -248,7 +236,7 @@ const SellerProfileScreen = ({route}) => {
                       backgroundColor: '#F7F7F7',
                       width: wp(94), // fixed width
                       height: hp(30),
-                      borderRadius: 24,
+                      borderRadius: wp(24),
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
@@ -266,7 +254,6 @@ const SellerProfileScreen = ({route}) => {
             );
           })}
         </ScrollView>
-        {/* <View style={{marginTop: hp(20)}}>{renderTabContent()}</View> */}
 
         <View style={{marginTop: hp(20)}}>{renderTabContent()}</View>
       </ScrollView>

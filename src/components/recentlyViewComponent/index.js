@@ -1,27 +1,3 @@
-// import React from 'react';
-// import {SafeAreaView, Text, View} from 'react-native';
-// import {fontFamily, fontSize, wp} from '../../utils/helpers';
-// const RecentlyViewComponent = () => {
-//   return (
-//     <SafeAreaView>
-// <View style={{marginLeft: wp(17)}}>
-//   <Text
-//     style={{
-//       color: '#000',
-//       fontFamily: fontFamily.poppins600,
-//       fontSize: fontSize(18),
-//     }}>
-//     Recently Viewed
-//   </Text>
-// </View>
-//       <View>
-
-//       </View>
-//     </SafeAreaView>
-//   );
-// };
-// export default RecentlyViewComponent;
-
 import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
@@ -63,7 +39,7 @@ const RecentlyViewComponent = () => {
 
   const {data, loading} = useSelector(state => state.recentlyView);
 
-  console.log('RECENTLY PRODUCT ', data);
+  console.log('RECENTLY PRODUCT IN SCREEN OF DATA', data);
 
   const [localWishlist, setLocalWishlist] = useState([]);
   const {wishlistData} = useSelector(state => state.wishlist);
@@ -82,12 +58,11 @@ const RecentlyViewComponent = () => {
   const {products} = useSelector(state => state.product);
 
   useEffect(() => {
-    dispatch(getWishlistRequest()); // ✅ ADD THIS
+    dispatch(getWishlistRequest());
   }, []);
-  // console.log('Products in UI...:', products);
 
   const token = useSelector(state => state.auth.token);
-  console.log('Auth Token in HomeTrendingComponent:', token);
+  console.log('Recently Com. Token:', token);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
@@ -113,8 +88,9 @@ const RecentlyViewComponent = () => {
                 justifyContent: 'space-between',
               }}
               renderItem={({item, index}) => {
-                console.log('RECENTY OF PRODUCT ITEM ', item);
+                // console.log('RECENTY PRODUCT OF ITEM ', item);
                 // console.log('RECENT PRODUCT =>', JSON.stringify(item, null, 2));
+
                 // Now check if product exist in wishlist
                 const safeWishlist = Array.isArray(wishlistData)
                   ? wishlistData
@@ -143,10 +119,8 @@ const RecentlyViewComponent = () => {
                   <TouchableOpacity
                     style={{
                       width: cardWidth,
-                      // marginBottom: 15,
-                      // marginHorizontal: 5,
-                      marginRight: index % 2 === 0 ? 10 : 0, // 👈 Only left card right gap
-                      borderRadius: 12,
+                      marginRight: index % 2 === 0 ? 10 : 0,
+                      borderRadius: wp(12),
                       borderWidth: 1,
                       borderColor: '#eee',
                       backgroundColor: '#fff',
@@ -157,7 +131,6 @@ const RecentlyViewComponent = () => {
                     // onPress={() => {
                     //   navigation.navigate('ProductDetails', {product: item});
                     // }}
-
                     onPress={() => {
                       console.log('RECENT PRODUCT ID =>', item?._id);
                       navigation.navigate('ProductDetails', {
@@ -171,12 +144,12 @@ const RecentlyViewComponent = () => {
                         width: '100%',
                         height: hp(170),
                         resizeMode: 'cover',
-                        borderBottomLeftRadius: 14,
-                        borderBottomRightRadius: 14,
+                        borderBottomLeftRadius: wp(14),
+                        borderBottomRightRadius: wp(14),
                       }}
                     />
 
-                    <View style={{padding: 10}}>
+                    <View style={{padding: wp(10)}}>
                       <Text
                         numberOfLines={1}
                         ellipsizeMode="tail"
@@ -193,12 +166,12 @@ const RecentlyViewComponent = () => {
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
-                          marginTop: 6,
+                          marginTop: hp(6),
                           justifyContent: 'space-between',
                         }}>
                         <Text
                           style={{
-                            marginRight: 6,
+                            marginRight: wp(6),
                             fontSize: fontSize(12),
                             fontFamily: fontFamily.poppins700,
                             lineHeight: hp(16),
@@ -212,7 +185,7 @@ const RecentlyViewComponent = () => {
                             fontSize: fontSize(10),
                             color: '#A5A5A5',
                             textDecorationLine: 'line-through',
-                            marginRight: 6,
+                            marginRight: wp(6),
                             fontFamily: fontFamily.poppins500,
                             lineHeight: hp(14),
                           }}>
@@ -234,13 +207,14 @@ const RecentlyViewComponent = () => {
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
-                          marginTop: 6,
+                          marginTop: wp(6),
                         }}>
                         <View
                           style={{
-                            backgroundColor: '#8225AF',
-                            paddingHorizontal: 5,
-                            borderRadius: 16,
+                            // backgroundColor: '#8225AF',
+                            backgroundColor: '#5029F3',
+                            paddingHorizontal: wp(5),
+                            borderRadius: wp(16),
                             width: hp(42),
                             height: hp(18),
                             justifyContent: 'center',
@@ -258,7 +232,7 @@ const RecentlyViewComponent = () => {
                             {item?.averageRating}
                           </Text>
                           <StarIcon
-                            style={{top: -1, width: hp(9), height: hp(8)}}
+                            style={{top: hp(-1), width: hp(9), height: hp(8)}}
                           />
                         </View>
                         <Text
@@ -286,7 +260,7 @@ const RecentlyViewComponent = () => {
                             console.log(' ALREADY EXISTS:', alreadyExists);
 
                             if (alreadyExists) {
-                              // 🔍 find wishlist item
+                              //  find wishlist item
                               const wishlistItem = localWishlist.find(w => {
                                 const pid = w.productId?.id || w.productId?._id;
                                 return String(pid) === String(item._id);
@@ -319,7 +293,7 @@ const RecentlyViewComponent = () => {
 
                               console.log('UI UPDATED (REMOVED)');
 
-                              // 🚀 API call
+                              // API call
                               dispatch({
                                 type: REMOVE_WISHLIST_REQUEST,
                                 payload: wishlistItem.id,
@@ -338,7 +312,7 @@ const RecentlyViewComponent = () => {
                             } else {
                               console.log(' ADD FLOW START');
 
-                              // ✅ UI instant update
+                              //  UI instant update
                               setLocalWishlist(prev => [
                                 ...prev,
                                 {productId: {id: item._id}},
