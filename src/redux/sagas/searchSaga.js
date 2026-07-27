@@ -14,19 +14,26 @@ function* searchProductWorker(action) {
   try {
     console.log(' SEARCH API CALLED:', action.payload);
 
+    console.log('SEARCH KEYWORD =>', action.payload.keyword);
+
     const response = yield call(api.get, '/user/product/search', {
       params: {
-        keyword: action.payload,
+        keyword: action.payload.keyword,
+        page: action.payload.page,
+        limit: action.payload.limit,
       },
     });
+    console.log(' SEARCH PRODUCT SUCCESS:', response.data);
+    console.log(' CURRENT PAGE =>', response.data.results.page);
+    console.log('TOTAL PAGES =>', response.data.results.totalPages);
+    console.log('TOTAL RESULTS =>', response.data.results.totalResults);
+    console.log('SEARCH PRODUCT SUCCESS:', response.data);
 
-    console.log(' SEARCH SUCCESS:', response.data);
-
-    console.log('FINAL DATA ', response.data.results.results);
-
+    console.log('PRODUCT FINAL DATA ', response.data.results.results);
+    console.log('API RESULT COUNT =>', response.data.results.results.length);
     yield put(searchProductSuccess(response.data));
   } catch (error) {
-    console.log(' SEARCH ERROR:', error);
+    console.log(' SEARCH PRODUCT ERROR:', error);
 
     yield put(searchProductFailure(error.message));
   }

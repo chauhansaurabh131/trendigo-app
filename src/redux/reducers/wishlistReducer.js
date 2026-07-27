@@ -13,29 +13,13 @@ import {
 const initialState = {
   loading: false,
   error: null,
-  wishlistData: [], // ✅ MUST be array
+  wishlistData: [],
 };
 
 export default function wishlistReducer(state = initialState, action) {
   switch (action.type) {
     case WISHLIST_REQUEST:
       return {...state, loading: true};
-
-    // case WISHLIST_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     wishlistData: action.payload,
-    //   };
-
-    // case WISHLIST_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     wishlistData: Array.isArray(action.payload)
-    //       ? action.payload
-    //       : action.payload?.data || [],
-    //   };
 
     case WISHLIST_SUCCESS:
       return {
@@ -51,16 +35,6 @@ export default function wishlistReducer(state = initialState, action) {
     case GET_WISHLIST_REQUEST:
       return {...state, loading: true};
 
-    // case GET_WISHLIST_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     loading: false,
-    //     wishlistData: Array.isArray(action.payload)
-    //       ? action.payload
-    //       : action.payload?.data || [],
-    //   };
-
     case GET_WISHLIST_SUCCESS:
       return {
         ...state,
@@ -72,7 +46,6 @@ export default function wishlistReducer(state = initialState, action) {
           : [],
       };
 
-    // / 🔄 API call start
     case REMOVE_WISHLIST_REQUEST:
       return {
         ...state,
@@ -80,17 +53,15 @@ export default function wishlistReducer(state = initialState, action) {
         error: null,
       };
 
-    // ✅ API success → state  item remove
     case REMOVE_WISHLIST_SUCCESS:
       return {
         ...state,
         loading: false,
         wishlistData: state.wishlistData.filter(
-          item => item.id !== action.payload, // ← wishlistId
+          item => item.id !== action.payload,
         ),
       };
 
-    // ❌ API fail
     case REMOVE_WISHLIST_FAILURE:
       return {
         ...state,
@@ -98,7 +69,7 @@ export default function wishlistReducer(state = initialState, action) {
         error: action.payload,
       };
 
-    case CLEAR_WISHLIST: // ✅ add this
+    case CLEAR_WISHLIST:
       return {...state, wishlistData: []};
 
     case 'RESET_WISHLIST':

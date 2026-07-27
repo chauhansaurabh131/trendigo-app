@@ -12,6 +12,8 @@ const initialState = {
   products: [],
   suggestions: [],
   recentSearches: [],
+  currentPage: 1,
+  totalPages: 1,
   error: null,
 };
 
@@ -21,19 +23,20 @@ export default function searchReducer(state = initialState, action) {
       return {
         ...state,
         loading: true,
-        products: [], // clear old products
       };
 
     case SEARCH_PRODUCT_SUCCESS:
+      const responseData = action.payload.results;
+
       return {
         ...state,
         loading: false,
-        // products: action.payload.results.results, // 🔥 correct path
+        currentPage: responseData.page,
+        totalPages: responseData.totalPages,
         products:
-          action.payload?.results?.results ||
-          action.payload?.results ||
-          action.payload?.data ||
-          [],
+          responseData.page === 1
+            ? responseData.results
+            : [...state.products, ...responseData.results],
       };
 
     case SEARCH_PRODUCT_FAILURE:

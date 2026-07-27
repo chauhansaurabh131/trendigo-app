@@ -138,7 +138,6 @@ function* deleteAddressSaga(action) {
 
 export default function* addressSaga() {
   yield takeLatest(GET_ADDRESS_REQUEST, getAddressSaga);
-  console.log(' Add Address WATCHER SAGA STARTED');
   yield takeLatest(ADD_ADDRESS_REQUEST, addAddressSaga);
   yield takeLatest(UPDATE_ADDRESS_REQUEST, updateAddressSaga);
   yield takeLatest(DELETE_ADDRESS_REQUEST, deleteAddressSaga);

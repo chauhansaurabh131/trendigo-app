@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import {colors} from '../../utils/colors';
-import {fontFamily, fontSize, hp} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {
   BackIcon,
   GradientFullFillLike,
@@ -31,19 +31,20 @@ const cardWidth = (screenWidth - 40) / 2;
 
 const WishlistScreen = () => {
   const navigation = useNavigation();
-
   const dispatch = useDispatch();
+
+  //redux
   const {wishlistData} = useSelector(state => state.wishlist);
   useEffect(() => {
-    // dispatch(getProductRequest());
-    dispatch(getWishlistRequest()); // ✅ ADD THIS
+    dispatch(getWishlistRequest());
   }, []);
+
   console.log('WISHLIST UI ', wishlistData);
 
   const handleRemoveWishlist = item => {
-    console.log('REMOVE CLICKED ITEM 👉', item);
+    console.log('REMOVE CLICKED ITEM ', item);
 
-    const wishlistId = item?.id; // ✅ IMPORTANT
+    const wishlistId = item?.id;
     console.log('WISHLIST ID', wishlistId);
     if (!wishlistId) {
       console.log('wishlistId missing');
@@ -61,7 +62,7 @@ const WishlistScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'center',
-            marginHorizontal: 18,
+            marginHorizontal: wp(18),
           }}>
           <TouchableOpacity
             style={{position: 'absolute', left: 0}}
@@ -89,7 +90,27 @@ const WishlistScreen = () => {
         data={wishlistData}
         keyExtractor={item => item.id.toString()}
         numColumns={2}
-        contentContainerStyle={{paddingHorizontal: 10}}
+        contentContainerStyle={{
+          paddingHorizontal: wp(10),
+          flexGrow: wishlistData?.length === 0 ? 1 : 0,
+        }}
+        ListEmptyComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                fontSize: fontSize(18),
+                fontFamily: fontFamily.poppins500,
+                color: '#666',
+              }}>
+              No items in wishlist
+            </Text>
+          </View>
+        )}
         renderItem={({item}) => {
           // console.log(
           //   'FULL PRODUCT DATA =>',
@@ -108,8 +129,8 @@ const WishlistScreen = () => {
               style={{
                 width: cardWidth,
                 // marginBottom: 15,
-                marginHorizontal: 5,
-                borderRadius: 12,
+                marginHorizontal: wp(5),
+                borderRadius: wp(12),
                 borderWidth: 1,
                 borderColor: '#eee',
                 backgroundColor: '#fff',
@@ -144,12 +165,12 @@ const WishlistScreen = () => {
                   width: '100%',
                   height: hp(170),
                   resizeMode: 'cover',
-                  borderBottomLeftRadius: 14,
-                  borderBottomRightRadius: 14,
+                  borderBottomLeftRadius: wp(14),
+                  borderBottomRightRadius: wp(14),
                 }}
               />
 
-              <View style={{padding: 10}}>
+              <View style={{padding: wp(10)}}>
                 <Text
                   numberOfLines={1}
                   ellipsizeMode="tail"
@@ -184,7 +205,7 @@ const WishlistScreen = () => {
                       fontSize: fontSize(10),
                       color: '#A5A5A5',
                       textDecorationLine: 'line-through',
-                      marginRight: 6,
+                      marginRight: wp(6),
                       fontFamily: fontFamily.poppins500,
                       lineHeight: hp(14),
                     }}>
@@ -205,13 +226,13 @@ const WishlistScreen = () => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    marginTop: 6,
+                    marginTop: hp(6),
                   }}>
                   <View
                     style={{
                       backgroundColor: '#8225AF',
-                      paddingHorizontal: 5,
-                      borderRadius: 16,
+                      paddingHorizontal: wp(5),
+                      borderRadius: wp(16),
                       width: hp(42),
                       height: hp(18),
                       justifyContent: 'center',
@@ -227,7 +248,9 @@ const WishlistScreen = () => {
                       }}>
                       {product?.rating ?? '00'}
                     </Text>
-                    <StarIcon style={{top: -1, width: hp(9), height: hp(8)}} />
+                    <StarIcon
+                      style={{top: hp(-1), width: hp(9), height: hp(8)}}
+                    />
                   </View>
                   <Text
                     style={{

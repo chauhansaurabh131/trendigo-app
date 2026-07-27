@@ -6,7 +6,7 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
-import {fontFamily, fontSize} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {colors} from '../../utils/colors';
 
 const CheckBoxComponent = ({isDefault, onPress}) => {
@@ -35,24 +35,25 @@ const styles = StyleSheet.create({
     // padding: 20,
   },
   checkboxBase: {
-    width: 18,
-    height: 18,
-    borderRadius: 3,
+    width: hp(18),
+    height: hp(18),
+    borderRadius: wp(3),
     borderWidth: 2,
-    borderColor: '#8e44ad',
+    // borderColor: '#8e44ad',
+    borderColor: '#5029F3',
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#8e44ad',
+    backgroundColor: '#5029F3',
   },
   checkmark: {
     color: 'white',
-    fontSize: 10,
+    fontSize: fontSize(10),
   },
   label: {
-    marginLeft: 10,
+    marginLeft: wp(10),
     fontSize: fontSize(16),
     color: colors.pureBlack,
     fontFamily: fontFamily.poppins400,

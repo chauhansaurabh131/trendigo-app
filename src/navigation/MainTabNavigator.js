@@ -33,7 +33,7 @@ import {
 } from '../assets';
 
 // Utils
-import {fontFamily, fontSize, hp, isIOS} from '../utils/helpers';
+import {fontFamily, fontSize, hp, isIOS, wp} from '../utils/helpers';
 import RevewsScreen from '../screens/revewsScreen';
 import SellerProfileScreen from '../screens/sellerProfileScreen';
 import {GET_CART_REQUEST} from '../redux/actions/cartActions';
@@ -81,7 +81,6 @@ const HomeStackScreen = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
-      {/* ✅ MyOrderScreen inside HomeStack so tab bar stays visible */}
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
       <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
       <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
@@ -162,14 +161,12 @@ const MainTabNavigator = () => {
         const isMainScreen =
           (route.name === 'HomeStack' &&
             (childRouteName === '' || childRouteName === 'HomeScreen')) ||
-          // (route.name === 'SearchStack' &&
-          //   (childRouteName === '' || childRouteName === 'SearchScreen')) ||
           (route.name === 'SearchStack' &&
             (childRouteName === '' ||
               childRouteName === 'SearchScreen' ||
-              childRouteName === 'SellerProfile')); // ✅ ADD THIS
-        (route.name === 'CategoryStack' &&
-          (childRouteName === '' || childRouteName === 'CategoryScreen')) ||
+              childRouteName === 'SellerProfile')) ||
+          (route.name === 'CategoryStack' &&
+            (childRouteName === '' || childRouteName === 'CategoryScreen')) ||
           (route.name === 'ChatStack' &&
             (childRouteName === '' || childRouteName === 'ChatScreen')) ||
           (route.name === 'BagStack' &&
@@ -177,26 +174,6 @@ const MainTabNavigator = () => {
 
         return {
           headerShown: false,
-          // tabBarStyle: {height: isIOS ? hp(75) : hp(70), paddingTop: 5},
-          // tabBarStyle: {
-          //   height:
-          //     route.name === 'BagStack' &&
-          //     (childRouteName === 'BagScreen' || childRouteName === '')
-          //       ? 0
-          //       : isIOS
-          //       ? hp(75)
-          //       : hp(70),
-          //   paddingTop: 5,
-          //   display:
-          //     route.name === 'BagStack' &&
-          //     (childRouteName === 'BagScreen' || childRouteName === '')
-          //       ? 'none'
-          //       : 'flex',
-          //   //if you want to close hori. line then use it
-          //   // borderTopWidth: 0, // Remove horizontal line
-          //   // elevation: 0, // Android shadow
-          //   // shadowOpacity: 0, // iOS shadow
-          // },
 
           tabBarStyle: {
             height:
@@ -258,14 +235,6 @@ const MainTabNavigator = () => {
               height: hp(20),
             };
 
-            // return (
-            //   <View style={{width: sizeStyle.width, height: sizeStyle.height}}>
-            //     <IconComponent
-            //       width={sizeStyle.width}
-            //       height={sizeStyle.height}
-            //     />
-            //   </View>
-            // );
             return (
               <View style={{width: sizeStyle.width, height: sizeStyle.height}}>
                 <IconComponent
@@ -277,15 +246,15 @@ const MainTabNavigator = () => {
                   <View
                     style={{
                       position: 'absolute',
-                      right: -13,
-                      top: -12,
-                      backgroundColor: '#9333EA',
-                      borderRadius: 20,
+                      right: wp(-13),
+                      top: wp(-12),
+                      backgroundColor: '#5029F3',
+                      borderRadius: wp(20),
                       width: hp(18),
                       height: hp(18),
                       justifyContent: 'center',
                       alignItems: 'center',
-                      paddingHorizontal: 3,
+                      paddingHorizontal: wp(3),
                     }}>
                     <Text
                       style={{

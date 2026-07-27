@@ -12,13 +12,13 @@ const getBannersApi = () => {
 
 function* fetchBannerSaga() {
   try {
-    console.log(' FETCH BANNER SAGA START');
+    // console.log(' FETCH BANNER SAGA START');
 
     const response = yield call(getBannersApi);
 
-    console.log(' FETCH BANNER SAGA RAW RESPONSE', response);
+    // console.log(' FETCH BANNER SAGA RAW RESPONSE', response);
 
-    console.log(' FETCH BANNER SAGA RESPONSE', response.data);
+    // console.log(' FETCH BANNER SAGA RESPONSE', response.data);
 
     yield put(fetchBannerSuccess(response.data));
   } catch (error) {
@@ -32,6 +32,5 @@ function* fetchBannerSaga() {
 }
 
 export function* bannerSaga() {
-  console.log('BANNER SAGA WATCHER RUNNING');
   yield takeLatest(FETCH_BANNER_REQUEST, fetchBannerSaga);
 }
