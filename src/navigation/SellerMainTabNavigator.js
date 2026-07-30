@@ -8,15 +8,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {useDispatch, useSelector} from 'react-redux';
 import {Keyboard} from 'react-native';
 // Screens
-import HomeScreen from '../screens/homeScreen';
-import SearchScreen from '../screens/searchScreen';
-import CategoryScreen from '../screens/categoryScreen';
-import ChatScreen from '../screens/chatScreen';
-import BagScreen from '../screens/bagScreen';
-import MyOrderScreen from '../screens/myOrderScreen';
-import ProfileScreen from '../screens/profileScreen';
-import BasicInfoScreen from '../screens/basicInfoScreen';
-import WishlistScreen from '../screens/WishlistScreen';
+
 import {useState} from 'react';
 // Icons
 import {
@@ -30,6 +22,7 @@ import {
   ChatIcon,
   ColorBagIcon,
   BagIcon,
+  SellerHome,
 } from '../assets';
 
 // Utils
@@ -37,6 +30,11 @@ import {fontFamily, fontSize, hp, isIOS, wp} from '../utils/helpers';
 import RevewsScreen from '../screens/revewsScreen';
 import SellerProfileScreen from '../screens/sellerProfileScreen';
 import {GET_CART_REQUEST} from '../redux/actions/cartActions';
+import HomeScreen from '../AllSellerScreens/HomeScreen';
+import OrderScreen from '../AllSellerScreens/OrderScreen';
+import ProductScreen from '../AllSellerScreens/ProductScreen';
+import MessageScreen from '../AllSellerScreens/MessageScreen';
+import AlerttScreen from '../AllSellerScreens/AlertScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -57,7 +55,7 @@ const GradientText = ({text}) => (
       </Text>
     }>
     <LinearGradient
-      colors={['#0F52BA', '#8225AF']}
+      colors={['#5029F4', '#5029F4']}
       start={{x: 0, y: 0}}
       end={{x: 1, y: 1.2}}>
       <Text
@@ -81,49 +79,39 @@ const HomeStackScreen = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
-      {/* <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-      <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
-      <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
-      <Stack.Screen name="WishlistScreen" component={WishlistScreen} />
-      <Stack.Screen name="ReviewsScreen" component={RevewsScreen} /> */}
     </Stack.Navigator>
   );
 };
 
-const SearchStackScreen = () => (
+const OrderStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="SearchScreen" component={SearchScreen} />
-    <Stack.Screen name="SellerProfile" component={SellerProfileScreen} />
+    <Stack.Screen name="OrderScreen" component={OrderScreen} />
   </Stack.Navigator>
 );
 
-const CategoryStackScreen = () => (
+const ProductStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="CategoryScreen" component={CategoryScreen} />
+    <Stack.Screen name="ProductScreen" component={ProductScreen} />
   </Stack.Navigator>
 );
 
-const ChatStackScreen = () => (
+const MesssageStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="ChatScreen" component={ChatScreen} />
+    <Stack.Screen name="MessageScreen" component={MessageScreen} />
   </Stack.Navigator>
 );
 
-const BagStackScreen = () => (
+const AlertsStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="BagScreen" component={BagScreen} />
+    <Stack.Screen name="AlertsScreen" component={AlerttScreen} />
   </Stack.Navigator>
 );
 
 /* --------------------------
    MAIN TAB NAVIGATOR
 --------------------------- */
-const MainTabNavigator = () => {
+const SellerMainTabNavigator = () => {
   const [keyboardVisible, setKeyboardVisible] = React.useState(false);
-  const dispatch = useDispatch();
-  const token = useSelector(state => state.auth.token);
-  const {loading, cartData, error} = useSelector(state => state.addToCard);
-  const cartCount = cartData?.productDetailList?.length || 0;
 
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', () => {
@@ -139,18 +127,6 @@ const MainTabNavigator = () => {
       hideSub.remove();
     };
   }, []);
-  console.log('TAB CART COUNT =>', cartCount);
-
-  useEffect(() => {
-    if (token) {
-      console.log('ALLING CART API FROM PRODUCT DETAILS');
-
-      dispatch({
-        type: GET_CART_REQUEST,
-        token: token,
-      });
-    }
-  }, [token]);
 
   return (
     <Tab.Navigator
@@ -161,15 +137,15 @@ const MainTabNavigator = () => {
         const isMainScreen =
           (route.name === 'HomeStack' &&
             (childRouteName === '' || childRouteName === 'HomeScreen')) ||
-          (route.name === 'SearchStack' &&
+          (route.name === 'OrderStack' &&
             (childRouteName === '' ||
               childRouteName === 'SearchScreen' ||
               childRouteName === 'SellerProfile')) ||
-          (route.name === 'CategoryStack' &&
+          (route.name === 'ProductStack' &&
             (childRouteName === '' || childRouteName === 'CategoryScreen')) ||
-          (route.name === 'ChatStack' &&
+          (route.name === 'MesssageStack' &&
             (childRouteName === '' || childRouteName === 'ChatScreen')) ||
-          (route.name === 'BagStack' &&
+          (route.name === 'AlertsStack' &&
             (childRouteName === '' || childRouteName === 'BagScreen'));
 
         return {
@@ -197,32 +173,31 @@ const MainTabNavigator = () => {
           tabBarIcon: ({focused}) => {
             const iconSizeStyles = {
               HomeStack: {width: hp(15), height: hp(16)},
-              SearchStack: {width: hp(16), height: hp(16)},
-              CategoryStack: {width: hp(16), height: hp(16)},
-              ChatStack: {width: hp(16), height: hp(16)},
-              BagStack: {width: hp(13), height: hp(16)},
+              OrderStack: {width: hp(16), height: hp(16)},
+              ProductStack: {width: hp(16), height: hp(16)},
+              MesssageStack: {width: hp(16), height: hp(16)},
+              AlertsStack: {width: hp(13), height: hp(16)},
             };
 
             let IconComponent;
             switch (route.name) {
               case 'HomeStack':
-                IconComponent =
-                  focused && isMainScreen ? ColorHomeIcon : HomeIcon;
+                IconComponent = focused && isMainScreen ? SellerHome : HomeIcon;
                 break;
-              case 'SearchStack':
+              case 'OrderStack':
                 IconComponent =
                   focused && isMainScreen ? ColorSearchIcon : SearchIcon;
                 break;
 
-              case 'CategoryStack':
+              case 'ProductStack':
                 IconComponent =
-                  focused && isMainScreen ? ColorCategoryIcon : CategoryIcon;
+                  focused && isMainScreen ? ColorSearchIcon : SearchIcon;
                 break;
-              case 'ChatStack':
+              case 'MesssageStack':
                 IconComponent =
                   focused && isMainScreen ? ColorChatIcon : ChatIcon;
                 break;
-              case 'BagStack':
+              case 'AlertsStack':
                 IconComponent =
                   focused && isMainScreen ? ColorBagIcon : BagIcon;
                 break;
@@ -241,31 +216,6 @@ const MainTabNavigator = () => {
                   width={sizeStyle.width}
                   height={sizeStyle.height}
                 />
-
-                {route.name === 'BagStack' && cartCount > 0 && (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      right: wp(-13),
-                      top: wp(-12),
-                      backgroundColor: '#5029F3',
-                      borderRadius: wp(20),
-                      width: hp(18),
-                      height: hp(18),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      paddingHorizontal: wp(3),
-                    }}>
-                    <Text
-                      style={{
-                        color: '#fff',
-                        fontSize: fontSize(10),
-                        fontFamily: fontFamily.poppins400,
-                      }}>
-                      {cartCount}
-                    </Text>
-                  </View>
-                )}
               </View>
             );
           },
@@ -298,12 +248,12 @@ const MainTabNavigator = () => {
           },
         })}
       />
-      <Tab.Screen name="SearchStack" component={SearchStackScreen} />
-      <Tab.Screen name="CategoryStack" component={CategoryStackScreen} />
-      <Tab.Screen name="ChatStack" component={ChatStackScreen} />
-      <Tab.Screen name="BagStack" component={BagStackScreen} />
+      <Tab.Screen name="OrderStack" component={OrderStackScreen} />
+      <Tab.Screen name="ProductStack" component={ProductStackScreen} />
+      <Tab.Screen name="MesssageStack" component={MesssageStackScreen} />
+      <Tab.Screen name="AlertsStack" component={AlertsStackScreen} />
     </Tab.Navigator>
   );
 };
 
-export default MainTabNavigator;
+export default SellerMainTabNavigator;

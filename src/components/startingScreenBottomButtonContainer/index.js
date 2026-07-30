@@ -334,7 +334,7 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
             <Touchable onPress={() => console.log('Terms pressed')}>
               <Text
                 style={{
-                  color: '#9317CF',
+                  color: '#5029F3',
                   fontSize: fontSize(12),
                   fontFamily: fontFamily.poppins400,
                 }}>
@@ -406,7 +406,7 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
                 marginTop: hp(8),
                 textAlign: 'center',
               }}>
-              sent on <Text style={{color: '#9317CF'}}>{input}</Text>
+              sent on <Text style={{color: '#5029F3'}}>{input}</Text>
             </Text>
             {/* OTP Input */}
             <View style={{marginTop: 40}}>
@@ -450,7 +450,7 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
                   ) : (
                     <>
                       Resend in{' '}
-                      <Text style={{color: '#9317CF'}}>{formatTime()}</Text>
+                      <Text style={{color: '#5029F3'}}>{formatTime()}</Text>
                     </>
                   )}
                 </Text>

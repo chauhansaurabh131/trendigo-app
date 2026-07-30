@@ -22,6 +22,9 @@ import revewsScreen from '../screens/revewsScreen';
 import RevewsScreen from '../screens/revewsScreen';
 import SearchResultScreen from '../screens/SearchResultsScreen';
 import SendEquiryScreen from '../screens/SendEquiryScreen';
+import NotificationScreen from '../AllSellerScreens/NotificationScreen';
+import HomeScreen from '../AllSellerScreens/HomeScreen';
+import SellerMainTabNavigator from './SellerMainTabNavigator';
 // import sellerProfileScreen from '../screens/sellerProfileScreen';
 // import SellerProfileScreen from '../screens/sellerProfileScreen';
 
@@ -62,7 +65,6 @@ const RootNavigator = () => {
   if (loading) return null;
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {/* 🔥 ALWAYS HOME FIRST */}
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
 
       {/* OTHER SCREENS */}
@@ -86,6 +88,13 @@ const RootNavigator = () => {
       {/* <Stack.Screen name="SellerProfile" component={SellerProfileScreen} /> */}
       <Stack.Screen name="SearchResultScreen" component={SearchResultScreen} />
       <Stack.Screen name="SendEquiryScreen" component={SendEquiryScreen} />
+
+      {/* Seller Screens */}
+      <Stack.Screen name="SellerNotification" component={NotificationScreen} />
+      <Stack.Screen
+        name="SellerMainTabNavigator"
+        component={SellerMainTabNavigator}
+      />
     </Stack.Navigator>
   );
 };

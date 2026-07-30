@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import {
@@ -21,6 +22,7 @@ import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import StartingScreenBottomButtonContainer from '../../components/startingScreenBottomButtonContainer';
 import {useNavigation} from '@react-navigation/native';
+import SellerStartingScreenBottomButtonComponent from '../../components/SellerStartingScreenBottomButtonContainer';
 
 const {width, height} = Dimensions.get('window');
 
@@ -38,7 +40,8 @@ const StartingScreen = () => {
   const navigation = useNavigation();
 
   const demoRef = useRef(null);
-
+  // seller red
+  const sellerRef = useRef(null);
   const openBottomSheet = () => {
     demoRef.current?.open();
   };
@@ -116,7 +119,7 @@ const StartingScreen = () => {
             width: '100%',
             alignItems: 'center',
             // paddingBottom: 50, // Optional: Add some padding if needed
-            paddingBottom: 75,
+            paddingBottom: hp(105),
             zIndex: 99,
           }}>
           {/* First Button */}
@@ -199,41 +202,79 @@ const StartingScreen = () => {
         </View>
 
         <StartingScreenBottomButtonContainer ref={demoRef} />
-        <View
-          style={{marginHorizontal: wp(63), position: 'absolute', bottom: 15}}>
-          <Text
+        <View>
+          <View
             style={{
-              fontSize: fontSize(12),
-              // lineHeight: hp(19),
-              fontFamily: fontFamily.poppins400,
-              textAlign: 'center',
+              marginHorizontal: wp(63),
+              position: 'absolute',
+              bottom: hp(55),
             }}>
             <Text
               style={{
-                color: '#000000',
+                fontSize: fontSize(12),
+                // lineHeight: hp(19),
+                fontFamily: fontFamily.poppins400,
+                textAlign: 'center',
               }}>
-              By continuing, you agree to our{' '}
+              <Text
+                style={{
+                  color: '#000000',
+                }}>
+                By continuing, you agree to our{' '}
+              </Text>
+              <Text
+                style={{
+                  color: '#5029F4',
+                  lineHeight: hp(20),
+                }}>
+                Terms of Use{' '}
+              </Text>
+              <Text
+                style={{
+                  color: '#000000',
+                }}>
+                and{' '}
+              </Text>
+              <Text
+                style={{
+                  color: '#5029F4',
+                }}>
+                Privacy Policy
+              </Text>
             </Text>
+          </View>
+          <View
+            pointerEvents="none"
+            style={{
+              // width: '100%',
+              height: hp(1),
+              backgroundColor: '#E3E3E3',
+              position: 'absolute',
+              bottom: hp(45),
+
+              left: wp(39),
+              right: wp(39),
+            }}
+          />
+          <SellerStartingScreenBottomButtonComponent ref={sellerRef} />
+          <TouchableOpacity
+            onPress={() => sellerRef.current?.open()}
+            style={{
+              alignItems: 'center',
+              // backgroundColor: 'red',
+              justifyContent: 'center',
+              height: hp(50),
+              zIndex: 999,
+            }}>
             <Text
               style={{
                 color: '#5029F4',
-                lineHeight: hp(20),
+                fontSize: fontSize(14),
+                fontFamily: fontFamily.poppins400,
               }}>
-              Terms of Use{' '}
+              Seller Login
             </Text>
-            <Text
-              style={{
-                color: '#000000',
-              }}>
-              and{' '}
-            </Text>
-            <Text
-              style={{
-                color: '#5029F4',
-              }}>
-              Privacy Policy
-            </Text>
-          </Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </GestureHandlerRootView>

@@ -174,7 +174,7 @@ const GradientButton = ({
         onPress={onPress}
         disabled={isDisabled}>
         <LinearGradient
-          colors={isDisabled ? ['#5029F3', '#7756FF'] : ['#5029F3', '#7756FF']}
+          colors={isDisabled ? ['#5029F3', '#7251FF'] : ['#5029F3', '#7251FF']}
           start={{x: 0, y: 0}}
           end={{x: 1, y: 1.2}}
           style={[

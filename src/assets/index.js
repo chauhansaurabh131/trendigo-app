@@ -46,6 +46,7 @@ import Icon from './svgIcons/icon.svg';
 import TrulyBag from './svgIcons/truly_bag.svg';
 import FullImage from './svgIcons/fullimage.svg';
 import SmallTrulyBag from './svgIcons/small_trulybag.svg';
+import SellerHome from './svgIcons/seller_home.svg';
 export {
   Icon,
   ShareIcon,
@@ -94,6 +95,7 @@ export {
   SendEquiry1,
   MapIcon,
   CrossIcon,
+  SellerHome,
   ThreeDotsIcon,
 };
 

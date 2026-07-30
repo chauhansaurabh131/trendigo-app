@@ -2455,6 +2455,7 @@ const ProductDetailsScreen = () => {
 
   // Html code
   const htmlContent = product?.productDetails
+
     ?.replace(/&lt;/g, '<')
     ?.replace(/&gt;/g, '>')
     ?.replace(/&amp;/g, '&')

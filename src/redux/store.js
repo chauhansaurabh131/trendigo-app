@@ -26,6 +26,7 @@ import searchReducer from './reducers/searchReducer';
 import emailAndMobile from './reducers/emailAndMobileReducer';
 import otpReducer from './reducers/otpReducer';
 import {chatReducer} from './reducers/chatReducer';
+import sellerAuthReducer from './reducers/sellerAuthReducer';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -55,6 +56,7 @@ const rootReducer = combineReducers({
   emailAndMobile: emailAndMobile,
   optVerify: otpReducer,
   chat: chatReducer,
+  sellerAuth: sellerAuthReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));

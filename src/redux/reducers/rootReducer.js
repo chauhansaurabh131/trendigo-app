@@ -22,13 +22,14 @@ import productVariantReducer from './productVariantReducer';
 import searchReducer from './searchReducer';
 import emailAndMobile from './emailAndMobileReducer';
 import otpReducer from './otpReducer';
+import sellerAuthReducer from './sellerAuthReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
   user: userReducer,
-  updateUser: updateuserReducer, // ✅ unique key
+  updateUser: updateuserReducer,
   addresses: addressReducer,
-  userAccount: userAccountReducer, // ✅ unique key
+  userAccount: userAccountReducer,
   profileImage: profileImageReducer,
   banner: bannerReducer,
   product: productReducer,
@@ -43,9 +44,10 @@ const appReducer = combineReducers({
   recentlyView: recentlyViewedReducer,
   addToCard: cartReducer,
   productVariant: productVariantReducer,
-  search: searchReducer, // ✅ unique key
+  search: searchReducer,
   emailAndMobile: emailAndMobile,
   optVerify: otpReducer,
+  sellerAuth: sellerAuthReducer,
 });
 
 const rootReducer = (state, action) => {
