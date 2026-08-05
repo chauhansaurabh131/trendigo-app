@@ -23,6 +23,7 @@ import searchReducer from './searchReducer';
 import emailAndMobile from './emailAndMobileReducer';
 import otpReducer from './otpReducer';
 import sellerAuthReducer from './sellerAuthReducer';
+import sellerProductReducer from './SellerproductReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -48,11 +49,12 @@ const appReducer = combineReducers({
   emailAndMobile: emailAndMobile,
   optVerify: otpReducer,
   sellerAuth: sellerAuthReducer,
+  sellerProduct: sellerProductReducer,
 });
 
 const rootReducer = (state, action) => {
   if (action.type === LOGOUT) {
-    state = undefined; // 🔥 RESET EVERYTHING
+    state = undefined;
   }
   return appReducer(state, action);
 };

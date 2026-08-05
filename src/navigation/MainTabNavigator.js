@@ -81,11 +81,11 @@ const HomeStackScreen = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
-      {/* <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
       <Stack.Screen name="BasicInfo" component={BasicInfoScreen} />
       <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
       <Stack.Screen name="WishlistScreen" component={WishlistScreen} />
-      <Stack.Screen name="ReviewsScreen" component={RevewsScreen} /> */}
+      <Stack.Screen name="ReviewsScreen" component={RevewsScreen} />
     </Stack.Navigator>
   );
 };

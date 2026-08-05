@@ -47,10 +47,27 @@ import TrulyBag from './svgIcons/truly_bag.svg';
 import FullImage from './svgIcons/fullimage.svg';
 import SmallTrulyBag from './svgIcons/small_trulybag.svg';
 import SellerHome from './svgIcons/seller_home.svg';
+import SellerMessages from './svgIcons/seller_messages.svg';
+import SellerOrder from './svgIcons/seller_order.svg';
+import SellerAlert from './svgIcons/seller_alert.svg';
+import TotalOrder from './svgIcons/total_order.svg';
+import TotalSales from './svgIcons/toal_sales.svg';
+import ShipIcon from './svgIcons/shipIcon.svg';
+import TabIcon from './svgIcons/tab_icon.svg';
+import ShareBlueIcon from './svgIcons/share_blue_icon.svg';
+import SellerProfile from './svgIcons/seller_profile.svg';
 export {
   Icon,
+  SellerProfile,
+  TabIcon,
+  ShareBlueIcon,
+  ShipIcon,
+  TotalSales,
+  SellerAlert,
+  TotalOrder,
   ShareIcon,
   FullImage,
+  SellerOrder,
   SmallTrulyBag,
   TrulyBag,
   WhiteTrendiGo,
@@ -97,6 +114,7 @@ export {
   CrossIcon,
   SellerHome,
   ThreeDotsIcon,
+  SellerMessages,
 };
 
 export const images = {

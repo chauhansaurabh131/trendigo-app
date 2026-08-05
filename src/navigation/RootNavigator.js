@@ -22,9 +22,10 @@ import revewsScreen from '../screens/revewsScreen';
 import RevewsScreen from '../screens/revewsScreen';
 import SearchResultScreen from '../screens/SearchResultsScreen';
 import SendEquiryScreen from '../screens/SendEquiryScreen';
-import NotificationScreen from '../AllSellerScreens/NotificationScreen';
-import HomeScreen from '../AllSellerScreens/HomeScreen';
-import SellerMainTabNavigator from './SellerMainTabNavigator';
+import HomeScreen from '../SellerScreens/HomeScreen.js';
+import SellerMainTabNavigator from './SellerMainTabNavigation.js';
+import ProductFullDetailsScreen from '../SellerScreens/ProductFullDetailsScreen/index.js';
+import SellerProfileScreen from '../SellerScreens/SellerProfileScreen/index.js';
 // import sellerProfileScreen from '../screens/sellerProfileScreen';
 // import SellerProfileScreen from '../screens/sellerProfileScreen';
 
@@ -90,11 +91,14 @@ const RootNavigator = () => {
       <Stack.Screen name="SendEquiryScreen" component={SendEquiryScreen} />
 
       {/* Seller Screens */}
-      <Stack.Screen name="SellerNotification" component={NotificationScreen} />
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="SellerMains" component={SellerMainTabNavigator} />
       <Stack.Screen
-        name="SellerMainTabNavigator"
-        component={SellerMainTabNavigator}
+        name="ProductFullDetailsScreen"
+        component={ProductFullDetailsScreen}
       />
+
+      <Stack.Screen name="SellerProfile" component={SellerProfileScreen} />
     </Stack.Navigator>
   );
 };

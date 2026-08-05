@@ -15,14 +15,19 @@ import {
   sellerResetPasswordFailure,
 } from '../actions/sellerAuthActions';
 import api from '../../api/apiClient';
-
+import axios from 'axios';
 function* sellerLoginSaga(action) {
   try {
     console.log('SELLER LOGIN REQUEST PAYLOAD =>', action.payload);
 
+    // const response = yield call(
+    //   api.post,
+    //   '/user/seller-auth/login',
+    //   action.payload,
+    // );
     const response = yield call(
-      api.post,
-      '/user/seller-auth/login',
+      axios.post,
+      'https://mntrendigo.mntech.website/api/v1/user/seller-auth/login',
       action.payload,
     );
 
@@ -77,9 +82,15 @@ function* sellerForgotPasswordSaga(action) {
   try {
     console.log('FORGOT PASSWORD REQUEST =>', action.payload);
 
+    // const response = yield call(
+    //   api.post,
+    //   '/user/seller-auth/forgot-password',
+    //   action.payload,
+    // );
+
     const response = yield call(
-      api.post,
-      '/user/seller-auth/forgot-password',
+      axios.post,
+      'https://mntrendigo.mntech.website/api/v1/user/seller-auth/forgot-password',
       action.payload,
     );
 
@@ -100,8 +111,8 @@ function* sellerVerifyResetOtpSaga(action) {
     console.log('VERIFY RESET OTP REQUEST =>', action.payload);
 
     const response = yield call(
-      api.post,
-      '/user/seller-auth/verify-reset-otp',
+      axios.post,
+      'https://mntrendigo.mntech.website/api/v1/user/seller-auth/verify-reset-otp',
       action.payload,
     );
 
@@ -122,8 +133,8 @@ function* sellerResetPasswordSaga(action) {
     console.log('RESET PASSWORD REQUEST =>', action.payload);
 
     const response = yield call(
-      api.post,
-      '/user/seller-auth/reset-password',
+      axios.post,
+      'https://mntrendigo.mntech.website/api/v1/user/seller-auth/reset-password',
       action.payload,
     );
 

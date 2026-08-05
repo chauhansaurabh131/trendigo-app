@@ -957,7 +957,7 @@ const SellerStartingScreenBottomButtonComponent = forwardRef((props, ref) => {
                 notificationSheetRef.current?.close();
 
                 dispatch(sellerLoginReset()); // reset sellerData
-                navigation.replace('SellerMainTabNavigator');
+                navigation.navigate('SellerMains');
               }}
             />
           </View>

@@ -27,6 +27,8 @@ import {watchSearchProduct} from './searchSaga';
 import otpSaga from './otpSaga';
 import chatSaga from './chatSaga'; // Import the chatSaga
 import sellerAuthSaga from './sellerAuthSaga';
+import sellerProductSaga from './sellerproductSaga';
+import sellerProductDetailsSaga from './sellerProductDetailsSaga';
 export default function* rootSaga() {
   yield all([
     authRootSaga(),
@@ -57,5 +59,7 @@ export default function* rootSaga() {
     chatSaga(),
     //seller saga
     sellerAuthSaga(),
+    sellerProductSaga(),
+    sellerProductDetailsSaga(),
   ]);
 }

@@ -8,6 +8,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import {useDispatch, useSelector} from 'react-redux';
 import {Keyboard} from 'react-native';
 // Screens
+import SearchScreen from '../screens/searchScreen';
+import CategoryScreen from '../screens/categoryScreen';
+import ChatScreen from '../screens/chatScreen';
+import BagScreen from '../screens/bagScreen';
+import HomeScreen from '../SellerScreens/HomeScreen.js';
 
 import {useState} from 'react';
 // Icons
@@ -23,18 +28,17 @@ import {
   ColorBagIcon,
   BagIcon,
   SellerHome,
+  SellerOrder,
+  SellerMessages,
+  SellerAlert,
 } from '../assets';
 
 // Utils
 import {fontFamily, fontSize, hp, isIOS, wp} from '../utils/helpers';
-import RevewsScreen from '../screens/revewsScreen';
-import SellerProfileScreen from '../screens/sellerProfileScreen';
-import {GET_CART_REQUEST} from '../redux/actions/cartActions';
-import HomeScreen from '../AllSellerScreens/HomeScreen';
-import OrderScreen from '../AllSellerScreens/OrderScreen';
-import ProductScreen from '../AllSellerScreens/ProductScreen';
-import MessageScreen from '../AllSellerScreens/MessageScreen';
-import AlerttScreen from '../AllSellerScreens/AlertScreen';
+import OrderScreen from '../SellerScreens/OrderScreen/index.js';
+import ProductScreen from '../SellerScreens/ProductScreen/index.js';
+import NotificationScreen from '../SellerScreens/Notificationscreen/index.js';
+import AlertScreen from '../SellerScreens/AlertScreen/index.js';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -95,15 +99,15 @@ const ProductStackScreen = () => (
   </Stack.Navigator>
 );
 
-const MesssageStackScreen = () => (
+const NotificationStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="MessageScreen" component={MessageScreen} />
+    <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
   </Stack.Navigator>
 );
 
-const AlertsStackScreen = () => (
+const AlertStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="AlertsScreen" component={AlerttScreen} />
+    <Stack.Screen name="AlertsScreen" component={AlertScreen} />
   </Stack.Navigator>
 );
 
@@ -138,15 +142,14 @@ const SellerMainTabNavigator = () => {
           (route.name === 'HomeStack' &&
             (childRouteName === '' || childRouteName === 'HomeScreen')) ||
           (route.name === 'OrderStack' &&
-            (childRouteName === '' ||
-              childRouteName === 'SearchScreen' ||
-              childRouteName === 'SellerProfile')) ||
+            (childRouteName === '' || childRouteName === 'OrderScree')) ||
           (route.name === 'ProductStack' &&
-            (childRouteName === '' || childRouteName === 'CategoryScreen')) ||
-          (route.name === 'MesssageStack' &&
-            (childRouteName === '' || childRouteName === 'ChatScreen')) ||
+            (childRouteName === '' || childRouteName === 'ProductScreen')) ||
+          (route.name === 'MessagesStack' &&
+            (childRouteName === '' ||
+              childRouteName === 'NotificationScreen')) ||
           (route.name === 'AlertsStack' &&
-            (childRouteName === '' || childRouteName === 'BagScreen'));
+            (childRouteName === '' || childRouteName === 'AlertScreen'));
 
         return {
           headerShown: false,
@@ -175,7 +178,7 @@ const SellerMainTabNavigator = () => {
               HomeStack: {width: hp(15), height: hp(16)},
               OrderStack: {width: hp(16), height: hp(16)},
               ProductStack: {width: hp(16), height: hp(16)},
-              MesssageStack: {width: hp(16), height: hp(16)},
+              MessagesStack: {width: hp(16), height: hp(16)},
               AlertsStack: {width: hp(13), height: hp(16)},
             };
 
@@ -186,20 +189,19 @@ const SellerMainTabNavigator = () => {
                 break;
               case 'OrderStack':
                 IconComponent =
-                  focused && isMainScreen ? ColorSearchIcon : SearchIcon;
+                  focused && isMainScreen ? SellerOrder : SearchIcon;
                 break;
 
               case 'ProductStack':
                 IconComponent =
-                  focused && isMainScreen ? ColorSearchIcon : SearchIcon;
+                  focused && isMainScreen ? SellerOrder : SearchIcon;
                 break;
-              case 'MesssageStack':
+              case 'MessagesStack':
                 IconComponent =
-                  focused && isMainScreen ? ColorChatIcon : ChatIcon;
+                  focused && isMainScreen ? SellerMessages : ChatIcon;
                 break;
               case 'AlertsStack':
-                IconComponent =
-                  focused && isMainScreen ? ColorBagIcon : BagIcon;
+                IconComponent = focused && isMainScreen ? SellerAlert : BagIcon;
                 break;
               default:
                 IconComponent = HomeIcon;
@@ -250,8 +252,8 @@ const SellerMainTabNavigator = () => {
       />
       <Tab.Screen name="OrderStack" component={OrderStackScreen} />
       <Tab.Screen name="ProductStack" component={ProductStackScreen} />
-      <Tab.Screen name="MesssageStack" component={MesssageStackScreen} />
-      <Tab.Screen name="AlertsStack" component={AlertsStackScreen} />
+      <Tab.Screen name="MessagesStack" component={NotificationStackScreen} />
+      <Tab.Screen name="AlertsStack" component={AlertStackScreen} />
     </Tab.Navigator>
   );
 };
