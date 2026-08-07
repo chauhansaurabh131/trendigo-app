@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   Image,
   SafeAreaView,
@@ -10,57 +10,142 @@ import {
 } from 'react-native';
 import {images} from '../../assets';
 import {hp, wp} from '../../utils/helpers';
+import {useNavigation} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 
-const ProductFullImageComponets = () => {
-  const groupOneImages = [
-    images.productImageTwo,
-    images.productImageOne,
-    images.productImageThree,
-    images.productImageFour,
-  ];
+const ProductFullImageComponents = ({
+  product,
+  setSelectedColor,
+  setSelectedVariant,
+}) => {
+  const navigation = useNavigation();
 
-  const groupTwoImages = [
-    images.productImageFive,
-    images.productImageSix,
-    images.productImageSeven,
-    images.productImageFive,
-  ];
+  const variants = product?.variants || [];
 
+  const fullVariantImages = variants.map(v =>
+    (v.images || [])
+      .filter(img => img.imageUrl)
+      .map(img => ({uri: img.imageUrl})),
+  );
+  // console.log(
+  //   'PRODUCT RECEIVED IN IMAGE COMPONENT =>',
+  //   JSON.stringify(product, null, 2),
+  // );
+
+  const imageVariants = variants.filter(item => item.images?.length > 0);
+  const thumbnailImages = imageVariants.map(v => {
+    const mainImage =
+      v.images.find(img => img.isSelectedForMainScreen) || v.images[0];
+
+    return {
+      uri: mainImage.imageUrl,
+    };
+  });
+  console.log(thumbnailImages, 'thumbnailImages====>');
   const [selectedGroupKey, setSelectedGroupKey] = useState('groupOne');
-  const [selectedGroup, setSelectedGroup] = useState(groupOneImages);
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef(null);
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  const [selectedGroup, setSelectedGroup] = useState(
+    fullVariantImages[0] || [],
+  );
 
-  const handleGroupChange = (group, key) => {
-    setSelectedGroup(group);
-    setSelectedGroupKey(key);
+  useEffect(() => {
+    if (!variants.length) return;
+
+    const firstVariantWithImage = variants.findIndex(v => v.images?.length > 0);
+
+    if (firstVariantWithImage !== -1) {
+      setSelectedGroup(fullVariantImages[firstVariantWithImage]);
+
+      setSelectedVariantIndex(firstVariantWithImage);
+    }
+  }, [variants]);
+
+  const handleGroupChange = index => {
+    // console.log('=================================');
+    // console.log('THUMBNAIL CLICKED INDEX =>', index);
+
+    // Get variant from filtered imageVariants
+    const variant = imageVariants[index];
+
+    console.log('SELECTED IMAGE VARIANT =>', JSON.stringify(variant, null, 2));
+
+    // Get color from variant
+    const colorObj = variant?.variants?.find(item => item.key === 'color');
+
+    console.log('COLOR OBJECT =>', colorObj);
+
+    if (colorObj?.value) {
+      console.log('SELECTED COLOR =>', colorObj.value);
+      setSelectedColor(colorObj.value);
+    }
+
+    // Update thumbnail selection
+    setSelectedVariantIndex(index);
+
+    // Update carousel images
+    const variantImages = (variant?.images || []).map(img => ({
+      uri: img.imageUrl,
+    }));
+
+    // console.log('VARIANT IMAGES =>', JSON.stringify(variantImages, null, 2));
+
+    setSelectedGroup(variantImages);
+
+    // Reset carousel to first image
     setActiveIndex(0);
-    flatListRef.current?.scrollToIndex({index: 0, animated: false});
-  };
 
+    flatListRef.current?.scrollToIndex({
+      index: 0,
+      animated: false,
+    });
+  };
   const handleScroll = event => {
     const index = Math.round(event.nativeEvent.contentOffset.x / width);
     setActiveIndex(index);
   };
 
+  // console.log(
+  //   'Selected Group Images =>',
+  //   JSON.stringify(selectedGroup, null, 2),
+  // );
+
+  // console.log('VARIANTS DATA =>', JSON.stringify(variants, null, 2));
+  // console.log('Thumbnail Images =>', JSON.stringify(thumbnailImages, null, 2));
+
+  // console.log('MAIN IMAGE URI =>', selectedGroup?.[0]?.uri);
   return (
     <SafeAreaView style={styles.container}>
       {/* Big Image Carousel */}
       <View style={styles.carouselWrapper}>
         <FlatList
           ref={flatListRef}
+          key={selectedVariantIndex}
           data={selectedGroup}
+          // data={selectedGroup}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           keyExtractor={(_, index) => index.toString()}
           onScroll={handleScroll}
           scrollEventThrottle={16}
-          renderItem={({item}) => (
+          renderItem={({item, index}) => (
             <View style={styles.imageWrapper}>
-              <Image source={item} style={styles.mainImage} />
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onPress={() =>
+                  navigation.navigate('FullImage', {
+                    images: selectedGroup, // current group images
+                    startIndex: index, // open at the tapped image index
+                    groupKey: selectedGroupKey, // 'groupOne' | 'groupTwo'
+                  })
+                }>
+                {/* <Image source={item} style={styles.mainImage} />
+                 */}
+                <Image source={{uri: item.uri}} style={styles.mainImage} />
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -73,7 +158,7 @@ const ProductFullImageComponets = () => {
               style={[
                 styles.dot,
                 {
-                  backgroundColor: activeIndex === index ? '#5029F4' : '#888',
+                  backgroundColor: activeIndex === index ? '#5029F3' : '#888',
                 },
               ]}
             />
@@ -83,36 +168,27 @@ const ProductFullImageComponets = () => {
 
       {/* Thumbnails */}
       <View style={styles.thumbnailsRow}>
-        <TouchableOpacity
-          onPress={() => handleGroupChange(groupOneImages, 'groupOne')}
-          style={{marginRight: hp(20)}}>
-          <Image
-            source={groupOneImages[0]}
-            style={[
-              styles.thumbnail,
-              {
-                borderWidth: selectedGroupKey === 'groupOne' ? 2 : 0,
-                borderColor:
-                  selectedGroupKey === 'groupOne' ? '#5029F4' : 'transparent',
-              },
-            ]}
-          />
-        </TouchableOpacity>
+        {thumbnailImages.map((img, index) => {
+          if (!img?.uri) return null;
 
-        <TouchableOpacity
-          onPress={() => handleGroupChange(groupTwoImages, 'groupTwo')}>
-          <Image
-            source={groupTwoImages[0]}
-            style={[
-              styles.thumbnail,
-              {
-                borderWidth: selectedGroupKey === 'groupTwo' ? 2 : 0,
-                borderColor:
-                  selectedGroupKey === 'groupTwo' ? '#5029F4' : 'transparent',
-              },
-            ]}
-          />
-        </TouchableOpacity>
+          return (
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleGroupChange(index)}
+              style={{marginRight: hp(20)}}>
+              <Image
+                source={{uri: img.uri}}
+                style={[
+                  styles.thumbnail,
+                  {
+                    borderWidth: selectedVariantIndex === index ? 2 : 0,
+                    borderColor: '#5029F3',
+                  },
+                ]}
+              />
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </SafeAreaView>
   );
@@ -121,12 +197,10 @@ const ProductFullImageComponets = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    // flex: 1,
-    // paddingTop: 20,
   },
   carouselWrapper: {
     position: 'relative',
-    height: hp(457),
+    // height: 457,
     width: width,
   },
   imageWrapper: {
@@ -137,8 +211,6 @@ const styles = StyleSheet.create({
   mainImage: {
     width: width,
     height: hp(457),
-    resizeMode: 'cover',
-    borderRadius: wp(15),
   },
   paginationContainer: {
     position: 'absolute',
@@ -154,6 +226,7 @@ const styles = StyleSheet.create({
   },
   thumbnailsRow: {
     flexDirection: 'row',
+    // justifyContent: 'space-around',
     paddingHorizontal: wp(20),
     marginTop: hp(20),
     alignSelf: 'center',
@@ -166,4 +239,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductFullImageComponets;
+export default ProductFullImageComponents;

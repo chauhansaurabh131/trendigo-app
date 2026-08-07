@@ -51,6 +51,18 @@ function* verifyEmailOtpSaga(action) {
     if (token) {
       // yield AsyncStorage.setItem('authToken', token);
       yield call([AsyncStorage, 'setItem'], 'authToken', token);
+
+      // type of login
+      yield call(
+        [AsyncStorage, 'setItem'],
+        'userSession',
+        JSON.stringify({
+          type: 'customer',
+          token,
+        }),
+      );
+
+      console.log('LOGIN TYPE SAVED => customer');
     }
 
     if (refreshToken) {

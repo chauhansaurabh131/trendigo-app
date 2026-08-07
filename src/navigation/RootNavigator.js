@@ -33,14 +33,37 @@ const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
   const dispatch = useDispatch();
+  const [userType, setUserType] = React.useState(null);
   const token = useSelector(state => state.auth.token);
   const [loading, setLoading] = React.useState(true);
+  // useEffect(() => {
+  //   const initAuth = async () => {
+  //     const storedToken = await AsyncStorage.getItem('authToken');
+
+  //     if (storedToken) {
+  //       dispatch(setAuthToken(storedToken));
+  //     }
+
+  //     setLoading(false);
+  //   };
+
+  //   initAuth();
+  // }, []);
+
   useEffect(() => {
     const initAuth = async () => {
-      const storedToken = await AsyncStorage.getItem('authToken');
+      const sessionString = await AsyncStorage.getItem('userSession');
 
-      if (storedToken) {
-        dispatch(setAuthToken(storedToken));
+      console.log('SESSION STRING =>', sessionString);
+
+      if (sessionString) {
+        const session = JSON.parse(sessionString);
+
+        console.log('SESSION =>', session);
+
+        setUserType(session?.type);
+
+        dispatch(setAuthToken(session?.token));
       }
 
       setLoading(false);
@@ -48,7 +71,6 @@ const RootNavigator = () => {
 
     initAuth();
   }, []);
-
   useEffect(() => {
     const loadLoginType = async () => {
       const savedType = await AsyncStorage.getItem('loginType');
@@ -64,9 +86,17 @@ const RootNavigator = () => {
   }, []);
 
   if (loading) return null;
+
+  console.log('USER TYPE IN ROOT NAVI.. =>', userType);
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator
+      initialRouteName={userType === 'seller' ? 'SellerMains' : 'MainTabs'}
+      screenOptions={{headerShown: false}}>
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+
+      <Stack.Screen name="SellerMains" component={SellerMainTabNavigator} />
+
+      {/* Other screens */}
 
       {/* OTHER SCREENS */}
       <Stack.Screen name="StartingScreen" component={StartingScreen} />
@@ -86,13 +116,12 @@ const RootNavigator = () => {
       />
       <Stack.Screen name="ReviewRating" component={ReviewandRatingsScreen} />
       <Stack.Screen name="ReviewsScreen" component={RevewsScreen} />
-      {/* <Stack.Screen name="SellerProfile" component={SellerProfileScreen} /> */}
       <Stack.Screen name="SearchResultScreen" component={SearchResultScreen} />
       <Stack.Screen name="SendEquiryScreen" component={SendEquiryScreen} />
 
       {/* Seller Screens */}
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
-      <Stack.Screen name="SellerMains" component={SellerMainTabNavigator} />
+      {/* <Stack.Screen name="SellerMains" component={SellerMainTabNavigator} /> */}
       <Stack.Screen
         name="ProductFullDetailsScreen"
         component={ProductFullDetailsScreen}

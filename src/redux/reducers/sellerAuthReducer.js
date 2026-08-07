@@ -11,8 +11,8 @@ import {
   SELLER_RESET_PASSWORD_FAILURE,
   SELLER_RESET_PASSWORD_REQUEST,
   SELLER_RESET_PASSWORD_SUCCESS,
+  LOGOUT,
 } from '../actions/sellerAuthActions';
-
 const initialState = {
   loading: false,
   sellerData: null,
@@ -111,6 +111,9 @@ export default function sellerAuthReducer(state = initialState, action) {
         resetPasswordLoading: false,
         resetPasswordError: action.payload,
       };
+
+    case LOGOUT:
+      return initialState;
     default:
       return state;
   }

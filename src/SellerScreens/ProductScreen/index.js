@@ -18,16 +18,18 @@ import {
   StarIcon,
   GradientLikeIcon,
   images,
+  BlueSaveIcon,
 } from '../../assets';
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {colors} from '../../utils/colors';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {getSellerProductsRequest} from '../../redux/actions/sellerProductActions';
 const ProductScreen = () => {
   const navigation = useNavigation();
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
   const dispatch = useDispatch();
 
   const {sellerData, error} = useSelector(state => state.sellerAuth);
@@ -39,14 +41,45 @@ const ProductScreen = () => {
   // You want to call the API when the screen opens and when sellerId becomes available.
   useEffect(() => {
     if (sellerId) {
-      dispatch(getSellerProductsRequest(sellerId));
+      const payload = {
+        sellerId,
+        page: 1,
+        limit: 10,
+      };
+
+      console.log('INITIAL DISPATCH =>', payload);
+
+      dispatch(getSellerProductsRequest(payload));
     }
   }, [sellerId]);
 
-  const {sellerProducts, sellerLoading} = useSelector(
+  const {sellerProducts, sellerLoading, page, totalPages} = useSelector(
     state => state.sellerProduct,
   );
 
+  const loadMore = () => {
+    console.log('LOAD MORE CALLED =>', currentPage, totalPages, loadingMore);
+
+    if (loadingMore || currentPage >= totalPages) {
+      console.log('LOAD MORE STOPPED');
+      return;
+    }
+
+    const nextPage = currentPage + 1;
+
+    const payload = {
+      sellerId,
+      page: nextPage,
+      limit: 10,
+    };
+
+    console.log('LOAD MORE DISPATCH =>', payload);
+
+    setLoadingMore(true);
+    setCurrentPage(nextPage);
+
+    dispatch(getSellerProductsRequest(payload));
+  };
   // console.log('SELLER PRODUCTS =>', sellerProducts);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
@@ -91,12 +124,19 @@ const ProductScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={sellerProducts?.data || []}
+          data={sellerProducts}
           keyExtractor={(item, index) =>
             item._id?.toString() || index.toString()
           }
           numColumns={2}
           contentContainerStyle={styles.container}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? (
+              <ActivityIndicator size="small" color="#5029F4" />
+            ) : null
+          }
           ListEmptyComponent={
             <View
               style={{
@@ -139,13 +179,30 @@ const ProductScreen = () => {
                     productId: item.id,
                   });
                 }}>
-                <Image
-                  source={{
-                    uri: mainImage?.imageUrl,
-                  }}
-                  style={styles.image}
-                />
-
+                <View style={{position: 'relative'}}>
+                  <Image
+                    source={{
+                      uri: mainImage?.imageUrl,
+                    }}
+                    style={styles.image}
+                  />
+                  <TouchableOpacity
+                    onPress={() => console.log('Save Icon Click')}
+                    style={{
+                      position: 'absolute',
+                      borderRadius: wp(25),
+                      right: wp(10),
+                      top: hp(10),
+                      width: hp(22),
+                      height: hp(22),
+                      backgroundColor: '#FFFFFF',
+                      justifyContent: 'center',
+                    }}>
+                    <View style={{alignItems: 'center'}}>
+                      <BlueSaveIcon />
+                    </View>
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.content}>
                   <Text numberOfLines={1} style={styles.title}>
                     {item.title}
@@ -159,17 +216,20 @@ const ProductScreen = () => {
 
                   <View style={styles.ratingRow}>
                     <View style={styles.ratingBox}>
-                      <Text style={styles.ratingText}>{'00'}</Text>
+                      <Text style={styles.ratingText}>
+                        {item.averageRating?.toFixed(1) || '0.0'}
+                      </Text>
                       <StarIcon
                         style={{top: -1, width: hp(9), height: hp(8)}}
                       />
                     </View>
-                    <Text style={styles.reviews}>({'00'})</Text>
+                    <Text style={styles.reviews}>
+                      ({item.totalReviews || '00'})
+                    </Text>
 
-                    <TouchableOpacity style={styles.heartButton}>
-                      {/*<Text style={{fontSize: 18}}>♡</Text>*/}
+                    {/* <TouchableOpacity style={styles.heartButton}>
                       <GradientLikeIcon />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 </View>
               </TouchableOpacity>
@@ -192,7 +252,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: cardWidth,
-    marginBottom: hp(15),
+    marginBottom: hp(18),
     marginHorizontal: wp(5),
     borderRadius: wp(12),
     borderWidth: 1,
@@ -202,7 +262,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: hp(170),
+    height: hp(277),
     resizeMode: 'cover',
     borderBottomLeftRadius: wp(14),
     borderBottomRightRadius: wp(14),

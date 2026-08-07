@@ -53,6 +53,18 @@ function* sellerLoginSaga(action) {
       yield call(AsyncStorage.setItem, 'sellerAccessToken', sellerAccessToken);
 
       console.log('SELLER ACCESS TOKEN SAVED');
+
+      // type of login like seller
+      yield call(
+        AsyncStorage.setItem,
+        'userSession',
+        JSON.stringify({
+          type: 'seller',
+          token: sellerAccessToken,
+        }),
+      );
+
+      console.log('LOGIN TYPE SAVED => seller');
     }
 
     if (sellerRefreshToken) {

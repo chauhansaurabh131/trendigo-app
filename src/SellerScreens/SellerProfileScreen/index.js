@@ -5,9 +5,10 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  ToastAndroid,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   BackIcon,
   ProfileIcon,
@@ -17,8 +18,11 @@ import {
 import {colors} from '../../utils/colors';
 import {fontSize, fontFamily, hp, wp} from '../../utils/helpers';
 import DashboardComponent from '../../SellerComponents/DashboardComponent';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {logout} from '../../redux/actions/sellerAuthActions';
 
 const SellerProfileScreen = () => {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const {loading, sellerData, error} = useSelector(state => state.sellerAuth);
   console.log('SELLER DATA =>', sellerData);
@@ -32,6 +36,26 @@ const SellerProfileScreen = () => {
     .map(word => word[0].toUpperCase())
     .slice(0, 2)
     .join('');
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('userSession');
+      await AsyncStorage.removeItem('sellerAccessToken');
+      await AsyncStorage.removeItem('sellerRefreshToken');
+
+      dispatch(logout());
+      ToastAndroid.show('Log Out Successful', ToastAndroid.SHORT);
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'StartingScreen'}],
+      });
+
+      console.log('LOGOUT SUCCESS');
+    } catch (error) {
+      console.log('LOGOUT ERROR =>', error);
+      ToastAndroid.show("Logout Failed'", ToastAndroid.SHORT);
+    }
+  };
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View style={{height: hp(57), justifyContent: 'center'}}>
@@ -217,7 +241,9 @@ const SellerProfileScreen = () => {
           }}
         />
 
-        <View style={{alignItems: 'center', paddingVertical: hp(20)}}>
+        <TouchableOpacity
+          onPress={handleLogout}
+          style={{alignItems: 'center', paddingVertical: hp(20)}}>
           <Text
             style={{
               fontSize: fontSize(15),
@@ -226,7 +252,7 @@ const SellerProfileScreen = () => {
             }}>
             Log Out
           </Text>
-        </View>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );

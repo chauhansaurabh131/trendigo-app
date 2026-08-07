@@ -15,6 +15,9 @@ import ProductImageComponent from '../../components/productImageComponent';
 import {colors} from '../../utils/colors';
 import {fontFamily, fontSize, hp, Touchable, wp} from '../../utils/helpers';
 import {useSelector} from 'react-redux';
+import RenderHtml, {RenderHTML} from 'react-native-render-html';
+import {useWindowDimensions} from 'react-native';
+
 import {
   BackIcon,
   BagIcon,
@@ -57,7 +60,10 @@ export const CustomStarIcon = ({
 
 const ProductFullDetailsScreen = () => {
   const route = useRoute();
+  const {width} = useWindowDimensions();
   const dispatch = useDispatch();
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedVariant, setSelectedVariant] = useState(null);
   // const ratingsRef = useRef(null);
   const scrollRef = useRef(null); // Ref for ScrollView
   const reviewsRef = useRef(null); // Ref for Reviews section
@@ -69,13 +75,13 @@ const ProductFullDetailsScreen = () => {
   };
   // const {product} = route.params;
 
-  const [selectedSize, setSelectedSize] = useState('S'); // Default selection
+  const [selectedSize, setSelectedSize] = useState(null); // Default selection
   const [pincode, setPincode] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
   const navigation = useNavigation();
 
-  const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+  // const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
   const handlePincodeChange = text => {
     // Allow only digits and limit input to 6 characters
@@ -96,24 +102,100 @@ const ProductFullDetailsScreen = () => {
   console.log('PRODUCT ID IN PRODUCT FULL DETAILS =>', productId);
   // console.log('FULL PRODUCT DETAILS =>', productDetails);
 
-  const product = productDetails?.data;
-  console.log('PRODUCT DETAILS IN PRODUCT FULL DETAILS SCREEN =>', product);
+  const product = productDetails?.results;
+  // console.log('PRODUCT DETAILS IN PRODUCT FULL DETAILS SCREEN =>', product);
+  // console.log('PRODUCT =>', JSON.stringify(product, null, 2));
+
   useEffect(() => {
     if (productId) {
       dispatch(getProductDetailsRequest(productId));
     }
   }, [productId]);
 
-  console.log(
-    'FIRST VARIANT =>',
-    JSON.stringify(product?.variants?.[0], null, 2),
-  );
+  // console.log(
+  //   'FIRST VARIANT =>',
+  //   JSON.stringify(product?.variants?.[0], null, 2),
+  // );
   //get the variants from productDetails
+
   const variants = product?.variants || [];
-  const price = product?.variants?.[0]?.price;
-  console.log('PRICE =>', price);
-  const discount = product?.variants?.[0]?.discount;
-  console.log('DISCOUNT =>', discount);
+  const price = selectedVariant?.price || 0;
+  // console.log('PRICE =>', price);
+  const discount = selectedVariant?.discount || 0;
+  // console.log('DISCOUNT =>', discount);
+  const averageRating = product?.averageRating || 0;
+  // console.log('AVERAGE RATING =>', averageRating);
+  const totalReviews = product?.totalReviews || 0;
+  // console.log('TOTAL REVIEWS =>', totalReviews);
+  const sellingPrice = selectedVariant?.sellingPrice || 0;
+  // console.log('SELLING PRICE =>', sellingPrice);
+  // console.log('PRODUCT In details =>', JSON.stringify(product, null, 2));
+  //specification
+  const specifications = product?.specifications || [];
+  // console.log('SPECIFICATION', specifications);
+
+  // Set default selected color and size when product details are loaded
+  useEffect(() => {
+    if (variants.length > 0) {
+      const firstVariant = variants[0];
+
+      const defaultColor = firstVariant.variants.find(
+        v => v.key === 'color',
+      )?.value;
+
+      const defaultSize = firstVariant.variants.find(
+        v => v.key === 'size',
+      )?.value;
+
+      setSelectedColor(defaultColor);
+      setSelectedSize(defaultSize);
+    }
+  }, [variants]);
+
+  console.log('selectedColor =>', selectedColor);
+  console.log('selectedSize =>', selectedSize);
+  console.log('selectedVariant =>', selectedVariant);
+
+  // Update selectedVariant whenever selectedColor or selectedSize changes
+  useEffect(() => {
+    const matchedVariant = variants.find(item => {
+      const color = item.variants.find(v => v.key === 'color')?.value;
+      const size = item.variants.find(v => v.key === 'size')?.value;
+
+      return color === selectedColor && size === selectedSize;
+    });
+
+    setSelectedVariant(matchedVariant);
+  }, [selectedColor, selectedSize, variants]);
+
+  console.log('SELECTED VARIANT =>', selectedVariant);
+  // Get the first variant with images
+  const colorOptions = [
+    ...new Set(
+      variants.map(item => item.variants.find(v => v.key === 'color')?.value),
+    ),
+  ];
+
+  console.log('COLORS =>', colorOptions);
+
+  // Get the first variant with images
+  const sizeOptions = [
+    ...new Set(
+      variants.map(item => item.variants.find(v => v.key === 'size')?.value),
+    ),
+  ];
+  console.log('SIZES =>', sizeOptions);
+
+  // product details may contain HTML entities, so we need to decode them before rendering
+  const htmlContent = product?.productDetails
+    // console.log('HTML CONTENT =>', htmlContent)
+    ?.replace(/&lt;/g, '<')
+    ?.replace(/&gt;/g, '>')
+    ?.replace(/&amp;/g, '&')
+    ?.replace(/<li>\s*<p>/g, '<li>')
+    ?.replace(/<\/p>\s*<\/li>/g, '</li>')
+    ?.replace(/<p><\/p>/g, '')
+    ?.replace(/<\/ul>\s*<ul>/g, '');
 
   //when get productDetailsLoading is true, show a loading indicator
   if (sellerProductDetailsLoading) {
@@ -146,7 +228,12 @@ const ProductFullDetailsScreen = () => {
         </Touchable>
 
         {/* Right Side - Search & Bag Icons */}
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            // backgroundColor: 'red',
+          }}>
           <Touchable
             style={{
               width: wp(50),
@@ -159,7 +246,7 @@ const ProductFullDetailsScreen = () => {
 
           <Touchable
             style={{
-              marginLeft: wp(10),
+              // marginLeft: wp(10),
               width: wp(50),
               height: hp(50),
               justifyContent: 'center',
@@ -221,7 +308,12 @@ const ProductFullDetailsScreen = () => {
 
       <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
         <View style={{marginTop: hp(10)}}>
-          <ProductFullImageComponets />
+          <ProductFullImageComponets
+            product={product}
+            // selectedVariant={handleColorChange}
+            setSelectedColor={setSelectedColor}
+            // setSelectedVariant={setSelectedVariant}
+          />
         </View>
 
         <View style={{marginHorizontal: wp(17), marginTop: hp(31)}}>
@@ -269,7 +361,7 @@ const ProductFullDetailsScreen = () => {
                 color: '#5029F4',
                 marginLeft: wp(10),
               }}>
-              4.2
+              {averageRating?.toFixed(1) || '00'}
             </Text>
             {/* <Image
               source={star_icon}
@@ -303,7 +395,7 @@ const ProductFullDetailsScreen = () => {
                 marginLeft: wp(14),
                 fontSize: fontSize(13),
               }}>
-              122 Ratings
+              {totalReviews || '00'} Ratings
             </Text>
           </TouchableOpacity>
         </View>
@@ -329,7 +421,7 @@ const ProductFullDetailsScreen = () => {
                 lineHeight: hp(32),
                 fontFamily: fontFamily.poppins700,
               }}>
-              {price ? `Rs.${price}` : 'N/A'}
+              {sellingPrice ? `Rs.${sellingPrice}` : 'N/A'}
             </Text>
             <Text
               style={{
@@ -386,10 +478,11 @@ const ProductFullDetailsScreen = () => {
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              // justifyContent: 'space-between',
+              gap: wp(10),
               marginTop: hp(23),
             }}>
-            {sizes.map(size => (
+            {sizeOptions.map(size => (
               <TouchableOpacity
                 key={size}
                 onPress={() => setSelectedSize(size)}
@@ -412,7 +505,7 @@ const ProductFullDetailsScreen = () => {
                     lineHeight: hp(26),
                     fontFamily: fontFamily.poppins400,
                   }}>
-                  {size}
+                  {size.toUpperCase()}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -512,149 +605,45 @@ const ProductFullDetailsScreen = () => {
             Product Details
           </Text>
 
-          <Text
-            style={{
-              marginTop: hp(24),
-              color: '#6B6B6B',
-              fontSize: fontSize(14),
-              lineHeight: hp(18),
-              fontFamily: fontFamily.poppins400,
-            }}>
-            Pink, blue & gold toned yoke design Kurta with{'\n'}Trousers with
-            dupatta
-          </Text>
-
           <View style={{marginTop: hp(16)}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
+            <RenderHTML
+              contentWidth={width}
+              source={{html: htmlContent || ''}}
+              tagsStyles={{
+                p: {
                   color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>Ethnic motifs yoke design</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
+                  fontSize: fontSize(14),
+                  lineHeight: hp(22),
+                  marginTop: 0,
+                  marginBottom: hp(3),
+                },
+                ul: {
+                  paddingLeft: wp(15),
+                  marginBottom: hp(8),
+                },
+                strong: {
+                  fontFamily: fontFamily.poppins700,
+                  color: '#000',
+                  fontSize: fontSize(14),
+                },
+                li: {
                   color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>Straight shape</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>Regular style</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>
-                Round neck, three-quarter regular sleeves
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>Gotta patti detail</Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>
-                Calf length length with straight hem
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginTop: hp(3),
-                marginLeft: wp(7),
-              }}>
-              <Text
-                style={{
-                  fontSize: fontSize(10),
-                  color: '#6B6B6B',
-                  marginRight: wp(10),
-                }}>
-                ●
-              </Text>
-              <Text style={{color: '#6B6B6B'}}>
-                Cotton blend machine weave fabric
-              </Text>
-            </View>
+                  fontSize: fontSize(14),
+                  lineHeight: hp(22),
+                  marginBottom: hp(5),
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                },
+              }}
+              renderersProps={{
+                ul: {
+                  markerTextStyle: {
+                    fontSize: fontSize(13),
+                    lineHeight: hp(23),
+                  },
+                },
+              }}
+            />
           </View>
 
           <Text
@@ -669,220 +658,76 @@ const ProductFullDetailsScreen = () => {
           </Text>
 
           <View style={{marginTop: hp(23)}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-              }}>
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Back
-                </Text>
+            {Array.from(
+              {length: Math.ceil(specifications.length / 2)},
+              (_, index) => {
+                const left = specifications[index * 2];
+                const right = specifications[index * 2 + 1];
 
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Regular
-                </Text>
-              </View>
+                return (
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      marginTop: index === 0 ? 0 : hp(25),
+                    }}>
+                    {/* Left Column */}
+                    <View style={{width: '50%'}}>
+                      <Text
+                        style={{
+                          color: '#6B6B6B',
+                          fontSize: fontSize(12),
+                          lineHeight: hp(16),
+                          fontFamily: fontFamily.poppins400,
+                        }}>
+                        {left?.key?.replace(/_/g, ' ')}
+                      </Text>
 
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Center front open
-                </Text>
+                      <Text
+                        style={{
+                          fontSize: fontSize(14),
+                          lineHeight: hp(18),
+                          fontFamily: fontFamily.poppins400,
+                          color: colors.pureBlack,
+                          marginTop: hp(2),
+                        }}>
+                        {left?.value}
+                      </Text>
+                    </View>
 
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  No
-                </Text>
-              </View>
-            </View>
+                    {/* Right Column */}
+                    <View style={{width: '50%'}}>
+                      {right && (
+                        <>
+                          <Text
+                            style={{
+                              color: '#6B6B6B',
+                              fontSize: fontSize(12),
+                              lineHeight: hp(16),
+                              fontFamily: fontFamily.poppins400,
+                            }}>
+                            {right?.key?.replace(/_/g, ' ')}
+                          </Text>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                marginTop: hp(25),
-              }}>
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Closure
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Back Closure
-                </Text>
-              </View>
-
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Coverage
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Medium Coverage
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                marginTop: hp(25),
-              }}>
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Fabrics
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Cotton, Elastane
-                </Text>
-              </View>
-
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Features
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  All Day Comfort
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                marginTop: hp(25),
-              }}>
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Knit or Woven
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Knitted
-                </Text>
-              </View>
-
-              <View style={{width: '50%'}}>
-                <Text
-                  style={{
-                    color: '#6B6B6B',
-                    fontSize: fontSize(12),
-                    lineHeight: hp(16),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Multipack Set
-                </Text>
-
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                    marginTop: hp(2),
-                  }}>
-                  Single
-                </Text>
-              </View>
-            </View>
+                          <Text
+                            style={{
+                              fontSize: fontSize(14),
+                              lineHeight: hp(18),
+                              fontFamily: fontFamily.poppins400,
+                              color: colors.pureBlack,
+                              marginTop: hp(2),
+                            }}>
+                            {right?.value}
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                  </View>
+                );
+              },
+            )}
           </View>
 
           <TouchableOpacity style={{marginTop: hp(27)}}>

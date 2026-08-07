@@ -80,7 +80,7 @@ const HomeScreen = () => {
                 fontFamily: fontFamily.poppins600,
                 color: colors.black,
               }}>
-              {businessInitials || 'N'}
+              {businessInitials || 'NA'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -109,7 +109,7 @@ const HomeScreen = () => {
                 fontSize: fontSize(14),
                 color: '#000000',
               }}>
-              {sellerData?.data?.seller?.name || 'User'}
+              {sellerData?.data?.seller?.name || 'N/A'}
             </Text>
           </View>
         </View>

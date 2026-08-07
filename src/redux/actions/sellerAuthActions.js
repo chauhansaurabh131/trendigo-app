@@ -25,6 +25,8 @@ export const SELLER_RESET_PASSWORD_SUCCESS = 'SELLER_RESET_PASSWORD_SUCCESS';
 
 export const SELLER_RESET_PASSWORD_FAILURE = 'SELLER_RESET_PASSWORD_FAILURE';
 
+export const LOGOUT = 'LOGOUT';
+
 export const sellerLoginRequest = payload => ({
   type: SELLER_LOGIN_REQUEST,
   payload,
@@ -87,4 +89,8 @@ export const sellerResetPasswordSuccess = payload => ({
 export const sellerResetPasswordFailure = payload => ({
   type: SELLER_RESET_PASSWORD_FAILURE,
   payload,
+});
+
+export const logout = () => ({
+  type: LOGOUT,
 });

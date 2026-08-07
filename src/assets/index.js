@@ -56,9 +56,11 @@ import ShipIcon from './svgIcons/shipIcon.svg';
 import TabIcon from './svgIcons/tab_icon.svg';
 import ShareBlueIcon from './svgIcons/share_blue_icon.svg';
 import SellerProfile from './svgIcons/seller_profile.svg';
+import BlueSaveIcon from './svgIcons/blue_save_icon.svg';
 export {
   Icon,
   SellerProfile,
+  BlueSaveIcon,
   TabIcon,
   ShareBlueIcon,
   ShipIcon,

@@ -13,7 +13,7 @@ function* getProductDetailsSaga(action) {
 
     const response = yield call(
       axios.get,
-      `https://mntrendigo.mntech.website/api/v1/user/product/${productId}`,
+      `https://mntrendigo.mntech.website/api/v1/user/product/details/${productId}`,
     );
 
     console.log('PRODUCT DETAILS RESPONSE =>', response.data);

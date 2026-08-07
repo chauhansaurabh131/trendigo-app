@@ -8,6 +8,9 @@ const initialState = {
   sellerLoading: false,
   sellerProducts: [],
   error: null,
+  page: 1,
+  totalPages: 1,
+  totalResults: 0,
 };
 
 export default function sellerProductReducer(state = initialState, action) {
@@ -22,7 +25,13 @@ export default function sellerProductReducer(state = initialState, action) {
       return {
         ...state,
         sellerLoading: false,
-        sellerProducts: action.payload,
+        sellerProducts:
+          action.payload.page === 1
+            ? action.payload.data
+            : [...state.sellerProducts, ...action.payload.data],
+        page: action.payload.page,
+        totalPages: action.payload.totalPages,
+        totalResults: action.payload.totalResults,
       };
 
     case GET_SELLER_PRODUCTS_FAILURE:

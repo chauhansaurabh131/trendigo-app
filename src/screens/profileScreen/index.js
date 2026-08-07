@@ -47,7 +47,10 @@ const ProfileScreen = () => {
 
   const onLogoutPress = async () => {
     await AsyncStorage.clear();
-
+    // add session
+    await AsyncStorage.removeItem('userSession');
+    await AsyncStorage.removeItem('authToken');
+    await AsyncStorage.removeItem('refreshToken');
     dispatch(logout());
     dispatch({type: 'RESET_WISHLIST'});
     dispatch({type: 'CLEAR_CHAT'});
