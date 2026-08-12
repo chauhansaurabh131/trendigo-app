@@ -26,6 +26,8 @@ import HomeScreen from '../SellerScreens/HomeScreen.js';
 import SellerMainTabNavigator from './SellerMainTabNavigation.js';
 import ProductFullDetailsScreen from '../SellerScreens/ProductFullDetailsScreen/index.js';
 import SellerProfileScreen from '../SellerScreens/SellerProfileScreen/index.js';
+import SellerChatMessagesscreen from '../SellerScreens/SellerChatMessagescreen/index.js';
+import {connectSocket} from '../socket/socket.js';
 // import sellerProfileScreen from '../screens/sellerProfileScreen';
 // import SellerProfileScreen from '../screens/sellerProfileScreen';
 
@@ -85,9 +87,23 @@ const RootNavigator = () => {
     loadLoginType();
   }, []);
 
-  if (loading) return null;
-
   console.log('USER TYPE IN ROOT NAVI.. =>', userType);
+
+  useEffect(() => {
+    const initializeSocket = async () => {
+      const token = await AsyncStorage.getItem('sellerAccessToken');
+      console.log('SOCKET TOKEN =>', token);
+      const socket = connectSocket(token);
+
+      socket.on('connect', () => {
+        console.log('SOCKET CONNECTED IN ROOT');
+      });
+    };
+
+    initializeSocket();
+  }, []);
+
+  if (loading) return null;
   return (
     <Stack.Navigator
       initialRouteName={userType === 'seller' ? 'SellerMains' : 'MainTabs'}
@@ -126,8 +142,11 @@ const RootNavigator = () => {
         name="ProductFullDetailsScreen"
         component={ProductFullDetailsScreen}
       />
-
       <Stack.Screen name="SellerProfile" component={SellerProfileScreen} />
+      <Stack.Screen
+        name="SellerChatMessage"
+        component={SellerChatMessagesscreen}
+      />
     </Stack.Navigator>
   );
 };

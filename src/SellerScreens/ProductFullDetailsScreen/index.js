@@ -505,7 +505,7 @@ const ProductFullDetailsScreen = () => {
                     lineHeight: hp(26),
                     fontFamily: fontFamily.poppins400,
                   }}>
-                  {size.toUpperCase()}
+                  {size}
                 </Text>
               </TouchableOpacity>
             ))}

@@ -29,6 +29,7 @@ import {chatReducer} from './reducers/chatReducer';
 import sellerAuthReducer from './reducers/sellerAuthReducer';
 import sellerProductReducer from './reducers/SellerproductReducer';
 import sellerProductDetailsReducer from './reducers/sellerProductDetailsReducer';
+import SellerChatReducer from './reducers/sellerChatReducer';
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -61,6 +62,7 @@ const rootReducer = combineReducers({
   sellerAuth: sellerAuthReducer,
   sellerProduct: sellerProductReducer,
   sellerProductDetails: sellerProductDetailsReducer,
+  sellerChat: SellerChatReducer,
 });
 
 const store = createStore(rootReducer, applyMiddleware(sagaMiddleware));

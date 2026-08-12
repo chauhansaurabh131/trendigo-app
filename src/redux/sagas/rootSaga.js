@@ -29,6 +29,7 @@ import chatSaga from './chatSaga'; // Import the chatSaga
 import sellerAuthSaga from './sellerAuthSaga';
 import sellerProductSaga from './sellerproductSaga';
 import sellerProductDetailsSaga from './sellerProductDetailsSaga';
+import sellerChatSaga from './sellerChatSaga';
 export default function* rootSaga() {
   yield all([
     authRootSaga(),
@@ -61,5 +62,6 @@ export default function* rootSaga() {
     sellerAuthSaga(),
     sellerProductSaga(),
     sellerProductDetailsSaga(),
+    sellerChatSaga(),
   ]);
 }

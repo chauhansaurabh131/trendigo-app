@@ -793,6 +793,7 @@ const SendEquiryScreen = ({route}) => {
       setLoadingMore(false);
     });
     socket.on('message_sent', message => {
+      console.log('MESSAGE_SENT ID =>', message._id);
       console.log(' MESSAGE SENT EVENT', message);
       console.log('NEW MESSAGE =>', message);
       socket.emit('get_messages', {
@@ -810,6 +811,7 @@ const SendEquiryScreen = ({route}) => {
     });
     // New incoming message
     socket.on('receive_message', message => {
+      console.log('RECEIVE_MESSAGE ID =>', message._id);
       console.log('RECEIVE_MESSAGE EVENT FIRED');
       console.log(' NEW MESSAGE =>', message);
 

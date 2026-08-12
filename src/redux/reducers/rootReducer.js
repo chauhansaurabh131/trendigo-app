@@ -24,6 +24,7 @@ import emailAndMobile from './emailAndMobileReducer';
 import otpReducer from './otpReducer';
 import sellerAuthReducer from './sellerAuthReducer';
 import sellerProductReducer from './SellerproductReducer';
+import SellerChatReducer from './sellerChatReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -50,6 +51,7 @@ const appReducer = combineReducers({
   optVerify: otpReducer,
   sellerAuth: sellerAuthReducer,
   sellerProduct: sellerProductReducer,
+  sellerChat: SellerChatReducer,
 });
 
 const rootReducer = (state, action) => {

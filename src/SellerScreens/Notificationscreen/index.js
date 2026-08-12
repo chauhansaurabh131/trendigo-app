@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   SafeAreaView,
@@ -10,43 +11,134 @@ import {
 } from 'react-native';
 import {colors} from '../../utils/colors';
 import {images} from '../../assets';
-import {hp, wp} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
+import {useNavigation} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  getSellerConversationsRequest,
+  updateConversations,
+} from '../../redux/actions/sellerChatActions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {connectSocket, getSocket} from '../../socket/socket';
 
-const ChatItem = ({avatar, name, time, preview, online}) => {
+const ChatItem = ({avatar, name, time, preview, online, unreadCount}) => {
+  const formatUnreadCount = count => {
+    if (count > 50) {
+      return '50+';
+    }
+    return count.toString();
+  };
   return (
     <View
       style={{
         flexDirection: 'row',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingHorizontal: wp(16),
+        paddingVertical: hp(12),
       }}>
-      <Image
-        source={avatar}
-        style={{width: 44, height: 44, borderRadius: 22, marginRight: 12}}
-      />
+      {avatar ? (
+        <Image
+          source={{uri: avatar}}
+          style={{
+            width: hp(44),
+            height: hp(44),
+            borderRadius: wp(22),
+            marginRight: wp(12),
+          }}
+        />
+      ) : (
+        <View
+          style={{
+            width: hp(44),
+            height: hp(44),
+            borderRadius: wp(22),
+            marginRight: wp(12),
+            // backgroundColor: '#8225AF',
+            borderWidth: 1,
+            borderColor: '#5029F4',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text
+            style={{
+              color: '#000000',
+              fontSize: fontSize(16),
+              fontFamily: fontFamily.poppins500,
+            }}>
+            {name?.charAt(0)?.toUpperCase() || 'U'}
+          </Text>
+        </View>
+      )}
       <View style={{flex: 1}}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <Text
             style={{
               flex: 1,
-              fontSize: 15,
+              fontSize: fontSize(14),
               color: colors.pureBlack,
-              fontWeight: '600',
+              fontFamily: fontFamily.poppins600,
             }}>
             {name}
           </Text>
           {!!online && (
-            <Text style={{fontSize: 11, color: colors.primary}}>Online</Text>
+            <Text
+              style={{
+                fontSize: fontSize(11),
+                fontFamily: fontFamily.poppins400,
+                color: '#000000',
+              }}>
+              Online
+            </Text>
           )}
           {!online && (
-            <Text style={{fontSize: 11, color: '#9B9B9B'}}>{time}</Text>
+            <Text
+              style={{
+                fontSize: fontSize(11),
+                fontFamily: fontFamily.poppins400,
+                color: '#9B9B9B',
+              }}>
+              {time}
+            </Text>
           )}
         </View>
-        <Text
-          numberOfLines={1}
-          style={{marginTop: 4, fontSize: 13, color: '#6B6B6B'}}>
-          {preview}
-        </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginTop: hp(4),
+          }}>
+          <Text
+            numberOfLines={1}
+            style={{
+              flex: 1,
+              fontSize: fontSize(13),
+              color: '#6B6B6B',
+            }}>
+            {preview}
+          </Text>
+
+          {unreadCount > 0 && (
+            <View
+              style={{
+                width: hp(24),
+                height: hp(24),
+                borderRadius: hp(30),
+                backgroundColor: '#5029F4',
+                justifyContent: 'center',
+                alignItems: 'center',
+                // marginLeft: 8,
+                // paddingHorizontal: 6,
+              }}>
+              <Text
+                style={{
+                  color: '#fff',
+                  fontSize: fontSize(10),
+                  fontFamily: fontFamily.poppins500,
+                }}>
+                {unreadCount}
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -54,50 +146,100 @@ const ChatItem = ({avatar, name, time, preview, online}) => {
 
 const NotificationScreen = () => {
   const [query, setQuery] = useState('');
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
 
-  // Example chat data
-  const chatData = [
-    {
-      id: '1',
-      avatar: images.user_one,
-      name: 'Rishikesh Shah',
-      time: '1h ago',
-      preview: "Hi, I am busy, I'll drop you a message aft..",
-      online: false,
-    },
-    {
-      id: '2',
-      avatar: images.user_two,
-      name: 'Ronit Kumar',
-      preview: "Hi, I am busy, I'll drop you a message aft..",
-      online: true,
-    },
-    {
-      id: '3',
-      avatar: images.user_three,
-      name: 'Priyal Mehta',
-      time: '2h ago',
-      preview: "Hi, I am busy, I'll drop you a message aft..",
-      online: false,
-    },
-    {
-      id: '4',
-      avatar: images.user_four,
-      name: 'Rhitik Gajjar',
-      time: '2h ago',
-      preview: "Hi, I am busy, I'll drop you a message aft..",
-      online: false,
-    },
-  ];
+  useEffect(() => {
+    dispatch(getSellerConversationsRequest());
+  }, []);
 
-  const onSearchPress = () => {
-    console.log('Search:', query);
-  };
-
-  // Optional: Filter chats based on search
-  const filteredChats = chatData.filter(item =>
-    item.name.toLowerCase().includes(query.toLowerCase()),
+  const {sellerChatLoading, error, conversations} = useSelector(
+    state => state.sellerChat,
   );
+
+  // console.log('SELLER CONVERSATION =>', conversations);
+
+  console.log('REDUX CONVERSATIONS =>', conversations?.data?.[0]?.unreadCount);
+
+  const formatTime = date => {
+    return new Date(date).toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  };
+  // Optional: Filter chats based on search
+  const filteredChats = (conversations?.data || []).filter(item => {
+    const userName = item.user?.name || item.user?.email || 'Unknown User';
+
+    return userName.toLowerCase().includes(query.toLowerCase());
+  });
+
+  useEffect(() => {
+    const initializeSocket = async () => {
+      const token = await AsyncStorage.getItem('sellerAccessToken');
+
+      const socket = connectSocket(token);
+
+      socket.on('connect', () => {
+        console.log('SOCKET CONNECTED =>', socket.id);
+
+        socket.emit('get_conversations');
+
+        console.log('GET_CONVERSATIONS SENT');
+      });
+
+      // Listen for updated conversations
+      socket.on('conversations_list', data => {
+        console.log('SOCKET CONVERSATIONS =>', data);
+
+        dispatch(updateConversations(data));
+      });
+
+      socket.onAny((event, data) => {
+        console.log('EVENT NAME =>', event);
+        // console.log('EVENT DATA =>', data);
+      });
+
+      socket.on('connect_error', error => {
+        console.log('SOCKET ERROR =>', error);
+      });
+    };
+
+    initializeSocket();
+
+    return () => {
+      const socket = getSocket();
+
+      if (socket) {
+        socket.off('conversations_list');
+        socket.disconnect();
+      }
+    };
+  }, []);
+
+  if (sellerChatLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View
+          style={{
+            width: hp(40),
+            height: hp(40),
+            borderRadius: wp(25),
+            backgroundColor: '#FFFFFF',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size={'large'} color={'#5029F4'} />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
@@ -106,28 +248,42 @@ const NotificationScreen = () => {
         style={{
           paddingHorizontal: wp(16),
           paddingTop: hp(8),
-          paddingBottom: 10,
+          paddingBottom: hp(10),
         }}>
         <View
           style={{
             height: hp(44),
-            borderRadius: 12,
+            borderRadius: wp(12),
             // backgroundColor: '#F7F7F7',
             // borderWidth: 1,
             // borderColor: '#E6E6E6',
             flexDirection: 'row',
             alignItems: 'center',
-            paddingHorizontal: 12,
+            paddingHorizontal: wp(12),
           }}>
-          <TouchableOpacity
-            onPress={onSearchPress}
-            hitSlop={{top: 8, bottom: 8, left: 8, right: 8}}>
-            <Image
-              source={images.search_black_icon}
-              style={{width: 20, height: 20, tintColor: '#000'}}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
+          <Image
+            source={images.search_black_icon}
+            style={{
+              width: hp(20),
+              height: hp(20),
+              tintColor: '#000',
+            }}
+            resizeMode="contain"
+          />
+
+          <TextInput
+            placeholder="Search users..."
+            value={query}
+            onChangeText={setQuery}
+            style={{
+              flex: 1,
+              marginLeft: wp(10),
+              fontSize: fontSize(14),
+              fontFamily: fontFamily.poppins500,
+              color: '#000',
+            }}
+            placeholderTextColor="#999"
+          />
         </View>
       </View>
 
@@ -135,24 +291,36 @@ const NotificationScreen = () => {
       <View
         style={{
           width: '100%',
-          height: 1,
+          height: hp(1),
           backgroundColor: '#E2E2E2',
-          marginBottom: 5,
+          marginBottom: hp(5),
         }}
       />
 
       {/* FlatList for chats */}
       <FlatList
+        // data={conversations?.data || []}
         data={filteredChats}
-        keyExtractor={item => item.id}
+        // keyExtractor={item => item._id?.id}
+        keyExtractor={item => `${item._id?.id}-${item._id?.model}`}
         renderItem={({item}) => (
-          <ChatItem
-            avatar={item.avatar}
-            name={item.name}
-            time={item.time}
-            preview={item.preview}
-            online={item.online}
-          />
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('SellerChatMessage', {
+                receiverId: item._id.id,
+                user: item.user,
+              })
+            }>
+            <ChatItem
+              avatar={item.avatar}
+              // name={item.name}
+              name={item.user?.name || item.user?.email || 'Unknown User'}
+              time={formatTime(item.lastMessageAt)}
+              preview={item.lastMessage || 'No messages'}
+              online={false}
+              unreadCount={item.unreadCount}
+            />
+          </TouchableOpacity>
         )}
         showsVerticalScrollIndicator={false}
       />

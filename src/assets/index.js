@@ -57,12 +57,14 @@ import TabIcon from './svgIcons/tab_icon.svg';
 import ShareBlueIcon from './svgIcons/share_blue_icon.svg';
 import SellerProfile from './svgIcons/seller_profile.svg';
 import BlueSaveIcon from './svgIcons/blue_save_icon.svg';
+import ChatShareIcon from './svgIcons/chat_share_icon.svg';
 export {
   Icon,
   SellerProfile,
   BlueSaveIcon,
   TabIcon,
   ShareBlueIcon,
+  ChatShareIcon,
   ShipIcon,
   TotalSales,
   SellerAlert,
