@@ -7,6 +7,7 @@ import {
   Image,
   FlatList,
   TextInput,
+  Modal,
   ActivityIndicator,
 } from 'react-native';
 import {colors} from '../../utils/colors';
@@ -25,16 +26,25 @@ import {useDispatch, useSelector} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useState} from 'react';
 import {connectSocket} from '../../socket/socket';
+import GradientButton from '../../components/gradientButton';
+import LinearGradient from 'react-native-linear-gradient';
 import {
   CLEAR_CHAT_MESSAGES,
   getChatMessagesRequest,
   getSellerConversationsRequest,
+  uploadChatImageRequest,
 } from '../../redux/actions/sellerChatActions';
 import {useEffect} from 'react';
 import {getSocket} from '../../socket/socket';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {ToastAndroid} from 'react-native';
+
 useSelector;
 const SellerChatMessagesscreen = ({route}) => {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [textMessage, setTextMessage] = useState();
   const dispatch = useDispatch();
   const socket = getSocket();
@@ -67,9 +77,9 @@ const SellerChatMessagesscreen = ({route}) => {
   // console.log('CHAT MESSAGES =>', chatMessages);
   // const messages = chatMessages?.data?.results || [];
   const messages = chatMessages?.results || [];
-  console.log('MESSAGES =>', messages);
-  console.log('MESSAGES LENGTH =>', messages.length);
-  console.log('FIRST MESSAGE =>', messages[0]);
+  // console.log('MESSAGES =>', messages);
+  // console.log('MESSAGES LENGTH =>', messages.length);
+  // console.log('FIRST MESSAGE =>', messages[0]);
 
   useEffect(() => {
     const initializeSocket = async () => {
@@ -159,6 +169,25 @@ const SellerChatMessagesscreen = ({route}) => {
             },
           });
         });
+        socket.on('message_deleted', data => {
+          console.log('MESSAGE DELETED =>', data);
+
+          dispatch({
+            type: 'DELETE_MESSAGE',
+            payload: data.messageId,
+          });
+
+          ToastAndroid.show('Message deleted successfully', ToastAndroid.SHORT);
+        });
+
+        socket.on('error', error => {
+          console.log('DELETE ERROR =>', error);
+
+          ToastAndroid.show(
+            error?.error || error?.message || 'Failed to delete message',
+            ToastAndroid.SHORT,
+          );
+        });
 
         socket.on('connect_error', error => {
           console.log('SOCKET CONNECT ERROR =>', error);
@@ -211,11 +240,11 @@ const SellerChatMessagesscreen = ({route}) => {
     setTextMessage('');
   };
   const loadMoreMessages = () => {
-    console.log('LOAD MORE CALLED');
+    // console.log('LOAD MORE CALLED');
 
-    console.log('CURRENT PAGE =>', page);
-    console.log('HAS NEXT PAGE =>', chatMessages?.hasNextPage);
-    console.log('LOADING MORE =>', loadingMore);
+    // console.log('CURRENT PAGE =>', page);
+    // console.log('HAS NEXT PAGE =>', chatMessages?.hasNextPage);
+    // console.log('LOADING MORE =>', loadingMore);
 
     if (loadingMore || !chatMessages?.hasNextPage) {
       console.log('LOAD MORE STOPPED');
@@ -224,7 +253,7 @@ const SellerChatMessagesscreen = ({route}) => {
 
     const nextPage = page + 1;
 
-    console.log('REQUESTING PAGE =>', nextPage);
+    // console.log('REQUESTING PAGE =>', nextPage);
 
     setPage(nextPage);
     setLoadingMore(true);
@@ -243,14 +272,118 @@ const SellerChatMessagesscreen = ({route}) => {
       hour12: true,
     });
   };
+  const {uploadImageLoading, uploadedImageData, error} = useSelector(
+    state => state.sellerChat,
+  );
+  useEffect(() => {
+    console.log('UPLOAD IMAGE DATA CHANGED =>', uploadedImageData);
+  }, [uploadedImageData]);
 
+  const {uploadedS3ImageUrl} = useSelector(state => state.sellerChat);
+  console.log(uploadedS3ImageUrl, 'UPLOAD S3 IMAGE ');
+
+  const openGallery = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+      },
+      response => {
+        console.log('GALLERY RESPONSE =>', response);
+
+        if (response.assets?.length) {
+          const image = response.assets[0];
+
+          // console.log('========== IMAGE SELECTED ==========');
+          // console.log('FULL IMAGE OBJECT =>', image);
+          // console.log('FILE NAME =>', image.fileName);
+          // console.log('FILE TYPE =>', image.type);
+          // console.log('FILE SIZE =>', image.fileSize);
+          // console.log('IMAGE URI =>', image.uri);
+          // console.log('IMAGE WIDTH =>', image.width);
+          // console.log('IMAGE HEIGHT =>', image.height);
+
+          setSelectedImage(image);
+
+          // console.log('SELECTED IMAGE STORED IN STATE');
+
+          const payload = {
+            fileName: image.fileName,
+            fileType: image.type,
+          };
+
+          console.log('UPLOAD REQUEST PAYLOAD =>', payload);
+
+          dispatch(uploadChatImageRequest(payload));
+
+          // console.log('UPLOAD_CHAT_IMAGE_REQUEST DISPATCHED');
+        }
+      },
+    );
+  };
+  useEffect(() => {
+    if (uploadedImageData && selectedImage) {
+      console.log('STARTING S3 UPLOAD');
+
+      dispatch({
+        type: 'UPLOAD_IMAGE_TO_S3_REQUEST',
+        payload: {
+          uploadUrl: uploadedImageData.uploadUrl,
+          fileUrl: uploadedImageData.fileUrl,
+          imageUri: selectedImage.uri,
+          fileType: selectedImage.type,
+        },
+      });
+    }
+  }, [uploadedImageData]);
+
+  // console.log(uploadedImageData?.fileUrl, 'FINAL S3 IMAGE URL');
+
+  useEffect(() => {
+    // console.log('IMAGE SEND EFFECT RUNNING');
+
+    if (uploadedS3ImageUrl) {
+      // console.log('FOUND IMAGE URL =>', uploadedS3ImageUrl);
+
+      const socket = getSocket();
+
+      console.log('SOCKET ID =>', socket?.id);
+
+      const payload = {
+        receiverId,
+        receiverModel: 'User',
+        message: 'Sending a photo!',
+        fileUrl: uploadedS3ImageUrl,
+      };
+
+      console.log('EMITTING IMAGE MESSAGE =>', payload);
+
+      socket?.emit('send_message', payload);
+      dispatch({
+        type: 'CLEAR_UPLOADED_S3_IMAGE',
+      });
+    }
+  }, [uploadedS3ImageUrl]);
+  useEffect(() => {
+    dispatch({
+      type: 'CLEAR_UPLOADED_S3_IMAGE',
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log('IMAGE EFFECT RUNNING =>', uploadedS3ImageUrl);
+
+    if (uploadedS3ImageUrl) {
+      console.log('SENDING IMAGE MESSAGE...');
+    }
+  }, [uploadedS3ImageUrl]);
   if (chatMessagesLoading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator color="#5029F4" size="large" />
       </View>
     );
   }
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
@@ -347,12 +480,13 @@ const SellerChatMessagesscreen = ({route}) => {
         keyExtractor={(item, index) => `${item._id}-${index}`}
         onEndReached={loadMoreMessages}
         onEndReachedThreshold={0.3}
-        renderItem={({item}) => {
+        renderItem={({item, index}) => {
           // console.log('ITEM =>', item);
-
+          // console.log('MESSAGE ITEM =>', item);
           const firstVariant = item.product?.variants?.[0];
           // console.log('FIRST VARIANTS', firstVariant);
           // console.log('PRODUCT =>', item.product);
+
           return (
             <View>
               {item.product && (
@@ -450,42 +584,88 @@ const SellerChatMessagesscreen = ({route}) => {
                   </View>
                 </View>
               )}
-              <TouchableOpacity
-                style={{
-                  alignSelf:
-                    item.senderModel === 'SellerUser'
-                      ? 'flex-end'
-                      : 'flex-start',
-                  backgroundColor:
-                    item.senderModel === 'SellerUser' ? '#FBF4FF' : '#EDF4FF',
-                  borderRadius: wp(18),
-                  paddingHorizontal: wp(17),
-                  paddingVertical: hp(12),
-                  marginHorizontal: wp(17),
-                  marginVertical: hp(6),
-                  // maxWidth: '75%',
-                  marginTop: hp(18),
-                  // marginBottom: hp(18),
-                }}>
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    fontFamily: fontFamily.poppins400,
-                    color: '#000000',
-                  }}>
-                  {item.message}
-                </Text>
 
-                <Text
+              {item.fileUrl && (
+                <View
                   style={{
-                    fontSize: fontSize(10),
-                    fontFamily: fontFamily.poppins400,
-                    color: '#000000',
-                    marginTop: hp(4),
+                    alignSelf:
+                      item.senderModel === 'SellerUser'
+                        ? 'flex-end'
+                        : 'flex-start',
+                    marginHorizontal: wp(15),
+                    marginVertical: hp(6),
+                    backgroundColor:
+                      item.senderModel === 'SellerUser' ? '#FBF4FF' : '#EDF4FF',
+                    borderRadius: wp(16),
+                    padding: hp(6),
+                    // maxWidth: hp(220),
                   }}>
-                  {formatTime(item.createdAt)}
-                </Text>
-              </TouchableOpacity>
+                  <Image
+                    source={{uri: item.fileUrl}}
+                    style={{
+                      width: hp(200),
+                      height: hp(200),
+                      borderRadius: wp(12),
+                    }}
+                    resizeMode="cover"
+                  />
+
+                  <Text
+                    style={{
+                      alignSelf: 'flex-end',
+                      fontSize: fontSize(11),
+                      fontFamily: fontFamily.poppins400,
+                      color: '#000000',
+                      marginTop: hp(10),
+                    }}>
+                    {formatTime(item.createdAt)}
+                  </Text>
+                </View>
+              )}
+              {(!item.fileUrl || item.message !== 'Sending a photo!') && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedMessageId(item._id);
+                    console.log('SELECTED MESSAGE =>', item._id);
+
+                    setModalVisible(true);
+                  }}
+                  style={{
+                    alignSelf:
+                      item.senderModel === 'SellerUser'
+                        ? 'flex-end'
+                        : 'flex-start',
+                    backgroundColor:
+                      item.senderModel === 'SellerUser' ? '#FBF4FF' : '#EDF4FF',
+                    borderRadius: wp(18),
+                    paddingHorizontal: wp(17),
+                    paddingVertical: hp(12),
+                    marginHorizontal: wp(17),
+                    marginVertical: hp(6),
+                    // maxWidth: '75%',
+                    marginTop: hp(18),
+                    // marginBottom: hp(18),
+                  }}>
+                  <Text
+                    style={{
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins400,
+                      color: '#000000',
+                    }}>
+                    {item.message}
+                  </Text>
+
+                  <Text
+                    style={{
+                      fontSize: fontSize(10),
+                      fontFamily: fontFamily.poppins400,
+                      color: '#000000',
+                      marginTop: hp(4),
+                    }}>
+                    {formatTime(item.createdAt)}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           );
         }}
@@ -514,7 +694,8 @@ const SellerChatMessagesscreen = ({route}) => {
 
             backgroundColor: '#FFFFFF',
           }}>
-          <View
+          <TouchableOpacity
+            onPress={openGallery}
             style={{
               width: hp(34),
               height: hp(34),
@@ -524,7 +705,7 @@ const SellerChatMessagesscreen = ({route}) => {
               justifyContent: 'center',
             }}>
             <ChatShareIcon />
-          </View>
+          </TouchableOpacity>
           <TextInput
             value={textMessage}
             onChangeText={setTextMessage}
@@ -554,6 +735,95 @@ const SellerChatMessagesscreen = ({route}) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal visible={modalVisible} transparent={true} animationType="slide">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}>
+          <View
+            style={{
+              width: wp(340),
+              // height: hp(206),
+              backgroundColor: '#FFFFFF',
+              borderRadius: 18,
+            }}>
+            <View style={{marginHorizontal: wp(68), marginTop: hp(40)}}>
+              <Text
+                style={{
+                  fontSize: fontSize(18),
+                  fontFamily: fontFamily.poppins500,
+                  color: '#000000',
+                  textAlign: 'center',
+                }}>
+                Sure want to Delete this Message?
+              </Text>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: hp(26),
+                marginHorizontal: wp(28),
+                marginBottom: hp(36),
+              }}>
+              <LinearGradient
+                colors={['#0F52BA', '#8225AF']}
+                style={{
+                  width: wp(112),
+                  height: hp(50),
+                  borderRadius: wp(30),
+                  padding: 1,
+                }}>
+                <TouchableOpacity
+                  activeOpacity={0.5}
+                  style={{
+                    flex: 1,
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: 30,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onPress={() => {
+                    setModalVisible(false);
+                  }}>
+                  <Text
+                    style={{
+                      color: '#000000',
+                      fontSize: fontSize(16),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </LinearGradient>
+
+              <GradientButton
+                buttonStyle={{
+                  width: wp(146),
+                  height: hp(50),
+                }}
+                title={'Yes, Delete'}
+                onPress={() => {
+                  const socket = getSocket();
+
+                  console.log('SELECTED MESSAGE ID =>', selectedMessageId);
+
+                  socket?.emit('delete_message', {
+                    messageId: selectedMessageId,
+                  });
+
+                  setModalVisible(false);
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

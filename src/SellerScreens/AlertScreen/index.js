@@ -23,6 +23,14 @@ const AlertScreen = () => {
           All Notifications
         </Text>
       </View>
+
+      <View
+        style={{
+          width: '100%',
+          height: hp(1),
+          backgroundColor: '#E2E2E2',
+        }}
+      />
     </SafeAreaView>
   );
 };

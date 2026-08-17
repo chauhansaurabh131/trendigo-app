@@ -20,6 +20,7 @@ import {
 } from '../../redux/actions/sellerChatActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connectSocket, getSocket} from '../../socket/socket';
+import AdminScreen from '../AdminScreen';
 
 const ChatItem = ({avatar, name, time, preview, online, unreadCount}) => {
   const formatUnreadCount = count => {
@@ -148,6 +149,7 @@ const NotificationScreen = () => {
   const [query, setQuery] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [selectedTab, setSelectedTab] = useState('customer');
 
   useEffect(() => {
     dispatch(getSellerConversationsRequest());
@@ -159,7 +161,7 @@ const NotificationScreen = () => {
 
   // console.log('SELLER CONVERSATION =>', conversations);
 
-  console.log('REDUX CONVERSATIONS =>', conversations?.data?.[0]?.unreadCount);
+  // console.log('REDUX CONVERSATIONS =>', conversations?.data?.[0]?.unreadCount);
 
   const formatTime = date => {
     return new Date(date).toLocaleTimeString('en-IN', {
@@ -169,18 +171,35 @@ const NotificationScreen = () => {
     });
   };
   // Optional: Filter chats based on search
+  // const filteredChats = (conversations?.data || []).filter(item => {
+  //   const userName = item.user?.name || item.user?.email || 'Unknown User';
+
+  //   return userName.toLowerCase().includes(query.toLowerCase());
+  // });
+
   const filteredChats = (conversations?.data || []).filter(item => {
-    const userName = item.user?.name || item.user?.email || 'Unknown User';
-
-    return userName.toLowerCase().includes(query.toLowerCase());
+    return (
+      item._id?.model === 'User' &&
+      (item.user?.name || item.user?.email || '')
+        .toLowerCase()
+        .includes(query.toLowerCase())
+    );
   });
+  // console.log(JSON.stringify(filteredChats, null, 2), 'Filter chat');
+  const customerChats = (conversations?.data || []).filter(
+    item => item._id?.model === 'User' && !item.isAdmin && !item.user?.isAdmin,
+  );
 
+  // console.log('CUSTOMER CHATS =>', JSON.stringify(customerChats, null, 2));
   useEffect(() => {
     const initializeSocket = async () => {
       const token = await AsyncStorage.getItem('sellerAccessToken');
 
       const socket = connectSocket(token);
-
+      if (!token) {
+        console.log('NO TOKEN FOUND');
+        return;
+      }
       socket.on('connect', () => {
         console.log('SOCKET CONNECTED =>', socket.id);
 
@@ -191,7 +210,8 @@ const NotificationScreen = () => {
 
       // Listen for updated conversations
       socket.on('conversations_list', data => {
-        console.log('SOCKET CONVERSATIONS =>', data);
+        // console.log('SOCKET CONVERSATIONS =>', data);
+        // console.log('SOCKET CONVERSATIONS =>', JSON.stringify(data, null, 2));
 
         dispatch(updateConversations(data));
       });
@@ -218,6 +238,11 @@ const NotificationScreen = () => {
     };
   }, []);
 
+  if (selectedTab === 'admin') {
+    return (
+      <AdminScreen selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
+    );
+  }
   if (sellerChatLoading) {
     return (
       <View
@@ -246,10 +271,68 @@ const NotificationScreen = () => {
       {/* Search Bar */}
       <View
         style={{
-          paddingHorizontal: wp(16),
-          paddingTop: hp(8),
+          // paddingHorizontal: wp(16),
+          paddingTop: hp(13),
           paddingBottom: hp(10),
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginRight: wp(19),
+          // justifyContent: 'space-between',
         }}>
+        <View style={{alignItems: 'center', flex: 1}}>
+          <View
+            style={{
+              width: wp(187),
+              height: hp(30),
+              borderWidth: 1,
+              borderRadius: wp(25),
+              borderColor: '#EBEBEB',
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => setSelectedTab('customer')}
+              style={{
+                width: wp(94),
+                height: hp(30),
+                borderRadius: wp(25),
+                backgroundColor:
+                  selectedTab === 'customer' ? '#5029F4' : 'transparent',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  color: selectedTab === 'customer' ? '#FFF' : '#000',
+                  fontFamily: fontFamily.poppins400,
+                  fontSize: fontSize(12),
+                }}>
+                Customers
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setSelectedTab('admin')}
+              style={{
+                width: wp(94),
+                height: hp(30),
+                borderRadius: wp(25),
+                backgroundColor:
+                  selectedTab === 'admin' ? '#5029F4' : 'transparent',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text
+                style={{
+                  color: selectedTab === 'admin' ? '#FFF' : '#000',
+                  fontFamily: fontFamily.poppins400,
+                  fontSize: fontSize(12),
+                }}>
+                Admin
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <View
           style={{
             height: hp(44),
@@ -259,7 +342,7 @@ const NotificationScreen = () => {
             // borderColor: '#E6E6E6',
             flexDirection: 'row',
             alignItems: 'center',
-            paddingHorizontal: wp(12),
+            // paddingHorizontal: wp(12),
           }}>
           <Image
             source={images.search_black_icon}
@@ -271,19 +354,19 @@ const NotificationScreen = () => {
             resizeMode="contain"
           />
 
-          <TextInput
+          {/* <TextInput
             placeholder="Search users..."
             value={query}
             onChangeText={setQuery}
             style={{
-              flex: 1,
-              marginLeft: wp(10),
+              // flex: 1,
+              // marginLeft: wp(10),
               fontSize: fontSize(14),
               fontFamily: fontFamily.poppins500,
               color: '#000',
             }}
             placeholderTextColor="#999"
-          />
+          /> */}
         </View>
       </View>
 
@@ -300,7 +383,8 @@ const NotificationScreen = () => {
       {/* FlatList for chats */}
       <FlatList
         // data={conversations?.data || []}
-        data={filteredChats}
+        // data={filteredChats}
+        data={customerChats}
         // keyExtractor={item => item._id?.id}
         keyExtractor={item => `${item._id?.id}-${item._id?.model}`}
         renderItem={({item}) => (

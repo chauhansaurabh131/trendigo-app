@@ -18,6 +18,19 @@ export const GET_CHAT_MESSAGES_FAILURE = 'GET_CHAT_MESSAGES_FAILURE';
 export const CLEAR_CHAT_MESSAGES = 'CLEAR_CHAT_MESSAGES';
 
 export const ADD_MESSAGE = 'ADD_MESSAGE';
+
+export const UPLOAD_CHAT_IMAGE_REQUEST = 'UPLOAD_CHAT_IMAGE_REQUEST';
+
+export const UPLOAD_CHAT_IMAGE_SUCCESS = 'UPLOAD_CHAT_IMAGE_SUCCESS';
+
+export const UPLOAD_CHAT_IMAGE_FAILURE = 'UPLOAD_CHAT_IMAGE_FAILURE';
+
+export const UPLOAD_IMAGE_TO_S3_REQUEST = 'UPLOAD_IMAGE_TO_S3_REQUEST';
+
+export const UPLOAD_IMAGE_TO_S3_SUCCESS = 'UPLOAD_IMAGE_TO_S3_SUCCESS';
+
+export const UPLOAD_IMAGE_TO_S3_FAILURE = 'UPLOAD_IMAGE_TO_S3_FAILURE';
+
 export const getSellerConversationsRequest = () => ({
   type: GET_SELLER_CONVERSATIONS_REQUEST,
 });
@@ -49,4 +62,24 @@ export const getChatMessagesSuccess = payload => ({
 export const getChatMessagesFailure = error => ({
   type: GET_CHAT_MESSAGES_FAILURE,
   payload: error,
+});
+
+export const uploadChatImageRequest = payload => ({
+  type: UPLOAD_CHAT_IMAGE_REQUEST,
+  payload,
+});
+
+export const uploadChatImageSuccess = payload => ({
+  type: UPLOAD_CHAT_IMAGE_SUCCESS,
+  payload,
+});
+
+export const uploadChatImageFailure = payload => ({
+  type: UPLOAD_CHAT_IMAGE_FAILURE,
+  payload,
+});
+
+export const uploadImageToS3Request = payload => ({
+  type: UPLOAD_IMAGE_TO_S3_REQUEST,
+  payload,
 });

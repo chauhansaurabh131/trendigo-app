@@ -28,6 +28,7 @@ import ProductFullDetailsScreen from '../SellerScreens/ProductFullDetailsScreen/
 import SellerProfileScreen from '../SellerScreens/SellerProfileScreen/index.js';
 import SellerChatMessagesscreen from '../SellerScreens/SellerChatMessagescreen/index.js';
 import {connectSocket} from '../socket/socket.js';
+import AdminMessageScreen from '../SellerScreens/AdminMessageScreen/index.js';
 // import sellerProfileScreen from '../screens/sellerProfileScreen';
 // import SellerProfileScreen from '../screens/sellerProfileScreen';
 
@@ -146,6 +147,10 @@ const RootNavigator = () => {
       <Stack.Screen
         name="SellerChatMessage"
         component={SellerChatMessagesscreen}
+      />
+      <Stack.Screen
+        name="Admin Message Screen"
+        component={AdminMessageScreen}
       />
     </Stack.Navigator>
   );
