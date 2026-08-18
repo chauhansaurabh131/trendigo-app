@@ -2,6 +2,12 @@ import {
   GET_CHAT_LIST_REQUEST,
   GET_CHAT_LIST_SUCCESS,
   GET_CHAT_LIST_FAILURE,
+  UPLOAD_CUSTOMER_CHAT_IMAGE_FAILURE,
+  UPLOAD_CUSTOMER_CHAT_IMAGE_REQUEST,
+  UPLOAD_CUSTOMER_CHAT_IMAGE_SUCCESS,
+  UPLOAD_CUSTOMER_IMAGE_TO_S3_FAILURE,
+  UPLOAD_CUSTOMER_IMAGE_TO_S3_REQUEST,
+  UPLOAD_CUSTOMER_IMAGE_TO_S3_SUCCESS,
 } from '../actions/chatAction';
 
 const initialState = {
@@ -10,6 +16,13 @@ const initialState = {
   error: null,
   messages: [],
   product: null,
+  uploadImageLoading: false,
+  uploadedImageData: null,
+  uploadingImageError: null,
+
+  uploadCustomerToS3Loading: false,
+  uploadedCustomerS3Image: null,
+  uploadedCustomerS3ImageError: null,
 };
 
 export const chatReducer = (state = initialState, action) => {
@@ -72,11 +85,58 @@ export const chatReducer = (state = initialState, action) => {
         ...state,
         messages: [...state.messages, ...action.payload],
       };
+
     case 'CLEAR_CHAT':
       return {
         ...state,
         conversations: [],
         messages: [],
+      };
+    case UPLOAD_CUSTOMER_CHAT_IMAGE_REQUEST:
+      return {
+        ...state,
+        uploadImageLoading: true,
+      };
+
+    case UPLOAD_CUSTOMER_CHAT_IMAGE_SUCCESS:
+      return {
+        ...state,
+        uploadImageLoading: false,
+        uploadedImageData: action.payload,
+      };
+
+    case UPLOAD_CUSTOMER_CHAT_IMAGE_FAILURE:
+      return {
+        ...state,
+        uploadImageLoading: false,
+        error: action.payload,
+      };
+
+    case UPLOAD_CUSTOMER_IMAGE_TO_S3_REQUEST:
+      return {
+        ...state,
+        uploadCustomerToS3Loading: true,
+      };
+
+    case UPLOAD_CUSTOMER_IMAGE_TO_S3_SUCCESS:
+      console.log('UPLOAD_IMAGE_TO_S3_SUCCESS =>', action.payload);
+      return {
+        ...state,
+        uploadCustomerToS3Loading: false,
+        uploadedCustomerS3Image: action.payload,
+      };
+
+    case UPLOAD_CUSTOMER_IMAGE_TO_S3_FAILURE:
+      return {
+        ...state,
+        uploadCustomerToS3Loading: false,
+        uploadedCustomerS3ImageError: action.payload,
+      };
+    case 'CLEAR_UPLOADED_IMAGE':
+      return {
+        ...state,
+        uploadedCustomerS3Image: null,
+        uploadedImageData: null,
       };
     default:
       return state;

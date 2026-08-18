@@ -58,6 +58,7 @@ import ShareBlueIcon from './svgIcons/share_blue_icon.svg';
 import SellerProfile from './svgIcons/seller_profile.svg';
 import BlueSaveIcon from './svgIcons/blue_save_icon.svg';
 import ChatShareIcon from './svgIcons/chat_share_icon.svg';
+import SavedFiledIcon from './svgIcons/save_filed_icon.svg';
 export {
   Icon,
   SellerProfile,
@@ -66,6 +67,7 @@ export {
   ShareBlueIcon,
   ChatShareIcon,
   ShipIcon,
+  SavedFiledIcon,
   TotalSales,
   SellerAlert,
   TotalOrder,

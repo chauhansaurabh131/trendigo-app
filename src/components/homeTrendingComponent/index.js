@@ -15,6 +15,8 @@ import {
   StarIcon,
   GradientLikeIcon,
   GradientFullFillLike,
+  BlueSaveIcon,
+  SavedFiledIcon,
 } from '../../assets'; // Add your heart icon, star icon, etc.
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {colors} from '../../utils/colors';
@@ -147,7 +149,111 @@ const HomeTrendingComponent = () => {
                 source={imageUrl ? {uri: imageUrl} : images.trending_one}
                 style={styles.image}
               />
+              {/* <TouchableOpacity
+                onPress={() => console.log('Save Icon Click')}
+                style={{
+                  position: 'absolute',
+                  borderRadius: wp(25),
+                  right: wp(10),
+                  top: hp(10),
+                  width: hp(22),
+                  height: hp(22),
+                  backgroundColor: '#FFFFFF',
+                  justifyContent: 'center',
+                }}>
+                <View style={{alignItems: 'center'}}>
+                  <BlueSaveIcon />
+                </View>
+              </TouchableOpacity> */}
 
+              <TouchableOpacity
+                style={styles.heartButton}
+                onPress={() => {
+                  if (!token) {
+                    console.log(
+                      'User not authenticated → Redirect to StartingScreen',
+                    );
+                    navigation.navigate('StartingScreen');
+                    return;
+                  }
+
+                  console.log(' CLICK:', item._id);
+
+                  const alreadyExists = isWishlisted;
+
+                  console.log(' BEFORE LOCAL WISHLIST:', localWishlist);
+                  console.log(' ALREADY EXISTS:', alreadyExists);
+
+                  if (alreadyExists) {
+                    //  find wishlist item
+                    const wishlistItem = localWishlist.find(w => {
+                      const pid = w.productId?.id || w.productId?._id;
+                      return String(pid) === String(item._id);
+                    });
+
+                    console.log(' FOUND ITEM FOR REMOVE:', wishlistItem);
+
+                    if (!wishlistItem?.id) {
+                      console.log(' REMOVE FAILED: Wishlist ID not found');
+                      ToastAndroid.show('Remove failed', ToastAndroid.SHORT);
+                      return;
+                    }
+
+                    //  UI instant update
+                    setLocalWishlist(prev =>
+                      prev.filter(
+                        w => (w.productId?.id || w.productId?._id) !== item._id,
+                      ),
+                    );
+
+                    console.log('UI UPDATED (REMOVED)');
+
+                    //  API call
+                    dispatch({
+                      type: REMOVE_WISHLIST_REQUEST,
+                      payload: wishlistItem.id,
+                    });
+
+                    console.log(' REMOVE API CALLED:', wishlistItem.id);
+
+                    // Toast
+                    ToastAndroid.show(
+                      'Removed from Wishlist',
+                      ToastAndroid.SHORT,
+                    );
+                  } else {
+                    console.log(' ADD FLOW START');
+
+                    // UI instant update
+                    setLocalWishlist(prev => [
+                      ...prev,
+                      {productId: {id: item._id}},
+                    ]);
+
+                    console.log(' UI UPDATED (ADDED)');
+
+                    //  API call
+                    dispatch({
+                      type: WISHLIST_REQUEST,
+                      payload: {productId: item._id},
+                    });
+
+                    console.log(' ADD API CALLED');
+
+                    //  Toast
+                    ToastAndroid.show('Added to Wishlist', ToastAndroid.SHORT);
+                  }
+
+                  console.log(' AFTER LOCAL WISHLIST:', localWishlist);
+                }}>
+                <View style={{alignItems: 'center'}}>
+                  {isWishlisted ? (
+                    <SavedFiledIcon fill={''} />
+                  ) : (
+                    <BlueSaveIcon />
+                  )}
+                </View>
+              </TouchableOpacity>
               <View style={styles.content}>
                 <Text
                   numberOfLines={1}
@@ -182,101 +288,6 @@ const HomeTrendingComponent = () => {
                   <Text style={styles.reviews}>
                     {item.totalReviews ? `(${item.totalReviews})` : '(00)'}
                   </Text>
-
-                  <TouchableOpacity
-                    style={styles.heartButton}
-                    onPress={() => {
-                      if (!token) {
-                        console.log(
-                          'User not authenticated → Redirect to StartingScreen',
-                        );
-                        navigation.navigate('StartingScreen');
-                        return;
-                      }
-
-                      console.log(' CLICK:', item._id);
-
-                      const alreadyExists = isWishlisted;
-
-                      console.log(' BEFORE LOCAL WISHLIST:', localWishlist);
-                      console.log(' ALREADY EXISTS:', alreadyExists);
-
-                      if (alreadyExists) {
-                        //  find wishlist item
-                        const wishlistItem = localWishlist.find(w => {
-                          const pid = w.productId?.id || w.productId?._id;
-                          return String(pid) === String(item._id);
-                        });
-
-                        console.log(' FOUND ITEM FOR REMOVE:', wishlistItem);
-
-                        if (!wishlistItem?.id) {
-                          console.log(' REMOVE FAILED: Wishlist ID not found');
-                          ToastAndroid.show(
-                            'Remove failed',
-                            ToastAndroid.SHORT,
-                          );
-                          return;
-                        }
-
-                        //  UI instant update
-                        setLocalWishlist(prev =>
-                          prev.filter(
-                            w =>
-                              (w.productId?.id || w.productId?._id) !==
-                              item._id,
-                          ),
-                        );
-
-                        console.log('UI UPDATED (REMOVED)');
-
-                        //  API call
-                        dispatch({
-                          type: REMOVE_WISHLIST_REQUEST,
-                          payload: wishlistItem.id,
-                        });
-
-                        console.log(' REMOVE API CALLED:', wishlistItem.id);
-
-                        // Toast
-                        ToastAndroid.show(
-                          'Removed from Wishlist',
-                          ToastAndroid.SHORT,
-                        );
-                      } else {
-                        console.log(' ADD FLOW START');
-
-                        // UI instant update
-                        setLocalWishlist(prev => [
-                          ...prev,
-                          {productId: {id: item._id}},
-                        ]);
-
-                        console.log(' UI UPDATED (ADDED)');
-
-                        //  API call
-                        dispatch({
-                          type: WISHLIST_REQUEST,
-                          payload: {productId: item._id},
-                        });
-
-                        console.log(' ADD API CALLED');
-
-                        //  Toast
-                        ToastAndroid.show(
-                          'Added to Wishlist',
-                          ToastAndroid.SHORT,
-                        );
-                      }
-
-                      console.log(' AFTER LOCAL WISHLIST:', localWishlist);
-                    }}>
-                    {isWishlisted ? (
-                      <GradientFullFillLike fill={''} />
-                    ) : (
-                      <GradientLikeIcon />
-                    )}
-                  </TouchableOpacity>
                 </View>
               </View>
             </TouchableOpacity>
@@ -305,7 +316,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: hp(170),
+    height: hp(277),
     resizeMode: 'cover',
     borderBottomLeftRadius: wp(14),
     borderBottomRightRadius: wp(14),
@@ -374,7 +385,14 @@ const styles = StyleSheet.create({
     marginLeft: hp(12),
   },
   heartButton: {
-    marginLeft: 'auto',
+    position: 'absolute',
+    borderRadius: wp(25),
+    right: wp(10),
+    top: hp(10),
+    width: hp(22),
+    height: hp(22),
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
   },
 });
 

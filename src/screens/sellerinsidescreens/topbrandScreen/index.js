@@ -17,9 +17,11 @@ import {hp} from '../../../utils/helpers';
 
 import {
   BackIcon,
+  BlueSaveIcon,
   GradientFullFillLike,
   GradientLikeIcon,
   images,
+  SavedFiledIcon,
   StarIcon,
 } from '../../../assets';
 import {useNavigation} from '@react-navigation/native';
@@ -144,14 +146,108 @@ const TopbrandScreen = ({storeId}) => {
                 source={{uri: getMainImage(item)}}
                 style={{
                   width: '100%',
-                  height: hp(170),
+                  height: hp(277),
                   resizeMode: 'cover',
                   borderBottomLeftRadius: wp(14),
                   borderBottomRightRadius: wp(14),
                 }}
               />
 
-              <View style={{padding: 10}}>
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  borderRadius: wp(25),
+                  right: wp(10),
+                  top: hp(10),
+                  width: hp(22),
+                  height: hp(22),
+                  backgroundColor: '#FFFFFF',
+                  justifyContent: 'center',
+                }}
+                onPress={() => {
+                  if (!token) {
+                    console.log(
+                      'User not authenticated → Redirect to StartingScreen',
+                    );
+                    navigation.navigate('StartingScreen');
+                    return;
+                  }
+
+                  console.log(' CLICK:', item._id);
+
+                  const alreadyExists = isWishlisted;
+
+                  console.log(' BEFORE LOCAL WISHLIST:', localWishlist);
+                  console.log(' ALREADY EXISTS:', alreadyExists);
+
+                  if (alreadyExists) {
+                    // find wishlist item
+                    const wishlistItem = localWishlist.find(w => {
+                      const pid = w.productId?.id || w.productId?._id;
+                      return String(pid) === String(item._id);
+                    });
+
+                    console.log(' FOUND ITEM FOR REMOVE:', wishlistItem);
+
+                    if (!wishlistItem?.id) {
+                      console.log(' REMOVE FAILED: Wishlist ID not found');
+                      ToastAndroid.show('Remove failed', ToastAndroid.SHORT);
+                      return;
+                    }
+
+                    //  UI instant update
+                    setLocalWishlist(prev =>
+                      prev.filter(
+                        w => (w.productId?.id || w.productId?._id) !== item._id,
+                      ),
+                    );
+
+                    console.log('UI UPDATED (REMOVED)');
+
+                    //  API call
+                    dispatch({
+                      type: REMOVE_WISHLIST_REQUEST,
+                      payload: wishlistItem.id,
+                    });
+
+                    console.log(' REMOVE API CALLED:', wishlistItem.id);
+
+                    // Toast
+                    ToastAndroid.show(
+                      'Removed from Wishlist',
+                      ToastAndroid.SHORT,
+                    );
+                  } else {
+                    console.log(' ADD FLOW START');
+
+                    // UI instant update
+                    setLocalWishlist(prev => [
+                      ...prev,
+                      {productId: {id: item._id}},
+                    ]);
+
+                    console.log(' UI UPDATED (ADDED)');
+
+                    //  API call
+                    dispatch({
+                      type: WISHLIST_REQUEST,
+                      payload: {productId: item._id},
+                    });
+
+                    console.log(' ADD API CALLED');
+
+                    //  Toast
+                    ToastAndroid.show('Added to Wishlist', ToastAndroid.SHORT);
+                  }
+
+                  console.log(' AFTER LOCAL WISHLIST:', localWishlist);
+                }}>
+                <View style={{alignItems: 'center'}}>
+                  {isWishlisted ? <SavedFiledIcon /> : <BlueSaveIcon />}
+                </View>
+              </TouchableOpacity>
+
+              <View style={{padding: hp(10)}}>
                 <Text
                   numberOfLines={1}
                   ellipsizeMode="tail"
@@ -241,101 +337,6 @@ const TopbrandScreen = ({storeId}) => {
                     }}>
                     ({item.totalReviews})
                   </Text>
-
-                  <TouchableOpacity
-                    style={{marginLeft: 'auto'}}
-                    onPress={() => {
-                      if (!token) {
-                        console.log(
-                          'User not authenticated → Redirect to StartingScreen',
-                        );
-                        navigation.navigate('StartingScreen');
-                        return;
-                      }
-
-                      console.log(' CLICK:', item._id);
-
-                      const alreadyExists = isWishlisted;
-
-                      console.log(' BEFORE LOCAL WISHLIST:', localWishlist);
-                      console.log(' ALREADY EXISTS:', alreadyExists);
-
-                      if (alreadyExists) {
-                        // find wishlist item
-                        const wishlistItem = localWishlist.find(w => {
-                          const pid = w.productId?.id || w.productId?._id;
-                          return String(pid) === String(item._id);
-                        });
-
-                        console.log(' FOUND ITEM FOR REMOVE:', wishlistItem);
-
-                        if (!wishlistItem?.id) {
-                          console.log(' REMOVE FAILED: Wishlist ID not found');
-                          ToastAndroid.show(
-                            'Remove failed',
-                            ToastAndroid.SHORT,
-                          );
-                          return;
-                        }
-
-                        //  UI instant update
-                        setLocalWishlist(prev =>
-                          prev.filter(
-                            w =>
-                              (w.productId?.id || w.productId?._id) !==
-                              item._id,
-                          ),
-                        );
-
-                        console.log('UI UPDATED (REMOVED)');
-
-                        //  API call
-                        dispatch({
-                          type: REMOVE_WISHLIST_REQUEST,
-                          payload: wishlistItem.id,
-                        });
-
-                        console.log(' REMOVE API CALLED:', wishlistItem.id);
-
-                        // Toast
-                        ToastAndroid.show(
-                          'Removed from Wishlist',
-                          ToastAndroid.SHORT,
-                        );
-                      } else {
-                        console.log(' ADD FLOW START');
-
-                        // UI instant update
-                        setLocalWishlist(prev => [
-                          ...prev,
-                          {productId: {id: item._id}},
-                        ]);
-
-                        console.log(' UI UPDATED (ADDED)');
-
-                        //  API call
-                        dispatch({
-                          type: WISHLIST_REQUEST,
-                          payload: {productId: item._id},
-                        });
-
-                        console.log(' ADD API CALLED');
-
-                        //  Toast
-                        ToastAndroid.show(
-                          'Added to Wishlist',
-                          ToastAndroid.SHORT,
-                        );
-                      }
-
-                      console.log(' AFTER LOCAL WISHLIST:', localWishlist);
-                    }}>
-                    {isWishlisted ? (
-                      <GradientFullFillLike />
-                    ) : (
-                      <GradientLikeIcon />
-                    )}
-                  </TouchableOpacity>
                 </View>
               </View>
             </TouchableOpacity>
