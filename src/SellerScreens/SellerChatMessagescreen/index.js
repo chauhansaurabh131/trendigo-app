@@ -168,10 +168,16 @@ const SellerChatMessagesscreen = ({route}) => {
               createdAt: new Date().toISOString(),
             },
           });
+
+          setSelectedImage(null);
+
+          dispatch({
+            type: 'CLEAR_UPLOADED_S3_IMAGE',
+          });
         });
         socket.on('message_deleted', data => {
           console.log('MESSAGE DELETED =>', data);
-
+          console.log('SELLER SCREEN DELETE');
           dispatch({
             type: 'DELETE_MESSAGE',
             payload: data.messageId,
@@ -218,24 +224,48 @@ const SellerChatMessagesscreen = ({route}) => {
       }
     };
   }, [receiverId]);
+  // const handleSendMessage = () => {
+
+  //   const socket = getSocket();
+
+  //   console.log('CURRENT SOCKET =>', socket?.id);
+
+  //   if (!textMessage?.trim()) {
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     receiverId,
+  //     receiverModel: 'User',
+  //     message: textMessage.trim(),
+  //     // productId: messages?.[0]?.product?._id,
+  //   };
+
+  //   socket?.emit('send_message', payload);
+  //   console.log('send message=====>', payload);
+
+  //   setTextMessage('');
+  // };
+
   const handleSendMessage = () => {
     const socket = getSocket();
 
     console.log('CURRENT SOCKET =>', socket?.id);
 
-    if (!textMessage?.trim()) {
+    if (!textMessage?.trim() && !uploadedS3ImageUrl) {
       return;
     }
 
     const payload = {
       receiverId,
       receiverModel: 'User',
-      message: textMessage.trim(),
-      // productId: messages?.[0]?.product?._id,
+      message: textMessage?.trim() || 'Sending a photo!',
+      fileUrl: uploadedS3ImageUrl || null,
     };
 
+    console.log('SEND_MESSAGE PAYLOAD =>', JSON.stringify(payload, null, 2));
+
     socket?.emit('send_message', payload);
-    console.log('send message=====>', payload);
 
     setTextMessage('');
   };
@@ -272,55 +302,60 @@ const SellerChatMessagesscreen = ({route}) => {
       hour12: true,
     });
   };
-  const {uploadImageLoading, uploadedImageData, error} = useSelector(
+
+  const {uploadedImageData, uploadedS3ImageUrl} = useSelector(
     state => state.sellerChat,
   );
-  useEffect(() => {
-    console.log('UPLOAD IMAGE DATA CHANGED =>', uploadedImageData);
-  }, [uploadedImageData]);
-
-  const {uploadedS3ImageUrl} = useSelector(state => state.sellerChat);
-  console.log(uploadedS3ImageUrl, 'UPLOAD S3 IMAGE ');
+  console.log('UPLOADED IMAGE DATA =>', uploadedImageData);
+  console.log('UPLOADED IMAGE DATA =>', uploadedS3ImageUrl);
 
   const openGallery = () => {
     launchImageLibrary(
       {
         mediaType: 'photo',
+        selectionLimit: 1,
       },
       response => {
         console.log('GALLERY RESPONSE =>', response);
 
-        if (response.assets?.length) {
+        if (response.didCancel) {
+          console.log('USER CANCELLED IMAGE PICKER');
+          return;
+        }
+
+        if (response.assets?.length > 0) {
           const image = response.assets[0];
 
           // console.log('========== IMAGE SELECTED ==========');
-          // console.log('FULL IMAGE OBJECT =>', image);
+          // console.log('FULL IMAGE =>', image);
           // console.log('FILE NAME =>', image.fileName);
           // console.log('FILE TYPE =>', image.type);
-          // console.log('FILE SIZE =>', image.fileSize);
-          // console.log('IMAGE URI =>', image.uri);
-          // console.log('IMAGE WIDTH =>', image.width);
-          // console.log('IMAGE HEIGHT =>', image.height);
+          // console.log('URI =>', image.uri);
 
           setSelectedImage(image);
-
-          // console.log('SELECTED IMAGE STORED IN STATE');
 
           const payload = {
             fileName: image.fileName,
             fileType: image.type,
           };
 
-          console.log('UPLOAD REQUEST PAYLOAD =>', payload);
+          console.log('DISPATCHING UPLOAD_CHAT_IMAGE_REQUEST');
+          console.log('PAYLOAD =>', JSON.stringify(payload, null, 2));
 
-          dispatch(uploadChatImageRequest(payload));
+          dispatch({
+            type: 'UPLOAD_CHAT_IMAGE_REQUEST',
+            payload,
+          });
 
-          // console.log('UPLOAD_CHAT_IMAGE_REQUEST DISPATCHED');
+          console.log('UPLOAD_CHAT_IMAGE_REQUEST DISPATCHED');
         }
       },
     );
   };
+
   useEffect(() => {
+    console.log('UPLOADED IMAGE DATA =>', uploadedImageData);
+
     if (uploadedImageData && selectedImage) {
       console.log('STARTING S3 UPLOAD');
 
@@ -335,47 +370,6 @@ const SellerChatMessagesscreen = ({route}) => {
       });
     }
   }, [uploadedImageData]);
-
-  // console.log(uploadedImageData?.fileUrl, 'FINAL S3 IMAGE URL');
-
-  useEffect(() => {
-    // console.log('IMAGE SEND EFFECT RUNNING');
-
-    if (uploadedS3ImageUrl) {
-      // console.log('FOUND IMAGE URL =>', uploadedS3ImageUrl);
-
-      const socket = getSocket();
-
-      console.log('SOCKET ID =>', socket?.id);
-
-      const payload = {
-        receiverId,
-        receiverModel: 'User',
-        message: 'Sending a photo!',
-        fileUrl: uploadedS3ImageUrl,
-      };
-
-      console.log('EMITTING IMAGE MESSAGE =>', payload);
-
-      socket?.emit('send_message', payload);
-      dispatch({
-        type: 'CLEAR_UPLOADED_S3_IMAGE',
-      });
-    }
-  }, [uploadedS3ImageUrl]);
-  useEffect(() => {
-    dispatch({
-      type: 'CLEAR_UPLOADED_S3_IMAGE',
-    });
-  }, []);
-
-  useEffect(() => {
-    console.log('IMAGE EFFECT RUNNING =>', uploadedS3ImageUrl);
-
-    if (uploadedS3ImageUrl) {
-      console.log('SENDING IMAGE MESSAGE...');
-    }
-  }, [uploadedS3ImageUrl]);
   if (chatMessagesLoading) {
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
@@ -585,92 +579,112 @@ const SellerChatMessagesscreen = ({route}) => {
                 </View>
               )}
 
-              {item.fileUrl && (
-                <View
-                  style={{
-                    alignSelf:
-                      item.senderModel === 'SellerUser'
-                        ? 'flex-end'
-                        : 'flex-start',
-                    marginHorizontal: wp(15),
-                    marginVertical: hp(6),
-                    backgroundColor:
-                      item.senderModel === 'SellerUser' ? '#FBF4FF' : '#EDF4FF',
-                    borderRadius: wp(16),
-                    padding: hp(6),
-                    // maxWidth: hp(220),
-                  }}>
+              <TouchableOpacity
+                onPress={() => {
+                  // setSelectedMessageId(item._id);
+                  // console.log('SELECTED MESSAGE =>', item._id);
+                  setSelectedMessageId(item._id || item.id);
+                  console.log('SELECTED MESSAGE =>', item._id || item.id);
+                  setModalVisible(true);
+                }}
+                style={{
+                  alignSelf:
+                    item.senderModel === 'SellerUser'
+                      ? 'flex-end'
+                      : 'flex-start',
+                  backgroundColor:
+                    item.senderModel === 'SellerUser' ? '#FBF4FF' : '#EDF4FF',
+                  borderRadius: wp(18),
+                  paddingHorizontal: wp(17),
+                  paddingVertical: hp(12),
+                  marginHorizontal: wp(17),
+                  marginVertical: hp(6),
+                  // maxWidth: '75%',
+                  marginTop: hp(18),
+                  // marginBottom: hp(18),
+                }}>
+                {item.fileUrl ? (
                   <Image
                     source={{uri: item.fileUrl}}
                     style={{
                       width: hp(200),
                       height: hp(200),
-                      borderRadius: wp(12),
+                      borderRadius: wp(10),
+                      marginBottom: hp(8),
                     }}
                     resizeMode="cover"
                   />
-
-                  <Text
-                    style={{
-                      alignSelf: 'flex-end',
-                      fontSize: fontSize(11),
-                      fontFamily: fontFamily.poppins400,
-                      color: '#000000',
-                      marginTop: hp(10),
-                    }}>
-                    {formatTime(item.createdAt)}
-                  </Text>
-                </View>
-              )}
-              {(!item.fileUrl || item.message !== 'Sending a photo!') && (
-                <TouchableOpacity
-                  onPress={() => {
-                    setSelectedMessageId(item._id);
-                    console.log('SELECTED MESSAGE =>', item._id);
-
-                    setModalVisible(true);
-                  }}
+                ) : null}
+                <Text
                   style={{
-                    alignSelf:
-                      item.senderModel === 'SellerUser'
-                        ? 'flex-end'
-                        : 'flex-start',
-                    backgroundColor:
-                      item.senderModel === 'SellerUser' ? '#FBF4FF' : '#EDF4FF',
-                    borderRadius: wp(18),
-                    paddingHorizontal: wp(17),
-                    paddingVertical: hp(12),
-                    marginHorizontal: wp(17),
-                    marginVertical: hp(6),
-                    // maxWidth: '75%',
-                    marginTop: hp(18),
-                    // marginBottom: hp(18),
+                    fontSize: fontSize(14),
+                    fontFamily: fontFamily.poppins400,
+                    color: '#000000',
                   }}>
-                  <Text
-                    style={{
-                      fontSize: fontSize(14),
-                      fontFamily: fontFamily.poppins400,
-                      color: '#000000',
-                    }}>
-                    {item.message}
-                  </Text>
+                  {item.message}
+                </Text>
 
-                  <Text
-                    style={{
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
-                      color: '#000000',
-                      marginTop: hp(4),
-                    }}>
-                    {formatTime(item.createdAt)}
-                  </Text>
-                </TouchableOpacity>
-              )}
+                <Text
+                  style={{
+                    fontSize: fontSize(10),
+                    fontFamily: fontFamily.poppins400,
+                    color: '#000000',
+                    marginTop: hp(4),
+                  }}>
+                  {formatTime(item.createdAt)}
+                </Text>
+              </TouchableOpacity>
             </View>
           );
         }}
       />
+      {selectedImage && (
+        <View
+          style={{
+            paddingHorizontal: wp(20),
+            marginBottom: hp(10),
+          }}>
+          <View
+            style={{
+              width: hp(90),
+              height: hp(90),
+              borderRadius: wp(12),
+              overflow: 'hidden',
+            }}>
+            <Image
+              source={{uri: selectedImage.uri}}
+              style={{
+                width: '100%',
+                height: '100%',
+              }}
+              resizeMode="cover"
+            />
 
+            <TouchableOpacity
+              onPress={() => setSelectedImage(null)}
+              style={{
+                position: 'absolute',
+                top: wp(5),
+                right: wp(5),
+                width: hp(20),
+                height: hp(20),
+                borderRadius: wp(10),
+                backgroundColor: '#000',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  color: '#fff',
+                  fontFamily: fontFamily.poppins400,
+                  fontSize: fontSize(12),
+                }}>
+                ✕
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
       <View
         style={{
           flexDirection: 'row',
