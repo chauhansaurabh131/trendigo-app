@@ -9,6 +9,7 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import ProductImageComponent from '../../components/productImageComponent';
@@ -39,6 +40,7 @@ import {useDispatch} from 'react-redux';
 import ProductFullImageComponets from '../../SellerComponents/ProductFullImageComponents';
 import SellerReviewRatingComponent from '../../SellerComponents/SellerReviewRatingComponent';
 import {getProductDetailsRequest} from '../../redux/actions/sellerProductDetailsActions';
+import {GET_CUSTOMER_REVIEWS_REQUEST} from '../../redux/actions/sellerReviewAction';
 export const CustomStarIcon = ({
   width = 24,
   height = 24,
@@ -196,7 +198,272 @@ const ProductFullDetailsScreen = () => {
     ?.replace(/<\/p>\s*<\/li>/g, '</li>')
     ?.replace(/<p><\/p>/g, '')
     ?.replace(/<\/ul>\s*<ul>/g, '');
+  const {userReviews, userLoading, userError} = useSelector(
+    state => state.sellerReview,
+  );
 
+  console.log('USER REVIEWS =>', JSON.stringify(userReviews, null, 2));
+
+  useEffect(() => {
+    console.log('USER REVIEWS =>', userReviews);
+    console.log('IS ARRAY =>', Array.isArray(userReviews));
+    console.log('LENGTH =>', userReviews?.length);
+  }, [userReviews]);
+  useEffect(() => {
+    if (productId) {
+      dispatch({
+        type: GET_CUSTOMER_REVIEWS_REQUEST,
+        payload: productId,
+      });
+    }
+  }, [productId]);
+
+  //Helper Function (Initials name show)
+  const getInitials = name => {
+    if (!name || typeof name !== 'string') return 'NN';
+
+    const words = name.trim().split(' ').filter(Boolean);
+
+    // Only one word (e.g., "Dax")
+    if (words.length === 1) {
+      return words[0][0].toUpperCase();
+    }
+
+    // Multiple words (e.g., "Riya Shah")
+    return words[0][0].toUpperCase() + words[words.length - 1][0].toUpperCase();
+  };
+
+  const ReviewItem = ({item}) => {
+    useEffect(() => {
+      // console.log('REVIEW IMAGES ', item.productImages);
+      // console.log('FULL ITEM ', item);
+      // console.log('USER DATA ', item.user);
+      // console.log('Review item:', item);
+    }, [item]);
+    return (
+      <View style={{marginTop: hp(24)}}>
+        {/* Review Title */}
+        <Text
+          style={{
+            color: colors.pureBlack,
+            fontSize: fontSize(14),
+            lineHeight: hp(24),
+            fontFamily: fontFamily.poppins700,
+            marginHorizontal: wp(17),
+          }}>
+          {item?.title || 'No title'}
+        </Text>
+
+        {/* Review Description */}
+        <Text
+          style={{
+            color: colors.pureBlack,
+            fontSize: fontSize(14),
+            lineHeight: hp(24),
+            fontFamily: fontFamily.poppins400,
+            marginTop: hp(25),
+            marginHorizontal: 17,
+          }}>
+          {item?.description ||
+            item?.review ||
+            item?.comment ||
+            item?.reviewText ||
+            'No description yet.'}
+        </Text>
+        {/* Review Images (if any) */}
+        {item?.productImages && item.productImages.length > 0 ? (
+          <View
+            style={{
+              marginTop: hp(20),
+              marginHorizontal: wp(17),
+              flexDirection: 'row',
+            }}>
+            {item.productImages.map((img, index) => (
+              <Image
+                key={index}
+                source={{uri: img}}
+                style={{
+                  width: wp(60),
+                  height: hp(80),
+                  borderRadius: wp(14),
+                  marginRight: wp(11),
+                }}
+              />
+            ))}
+          </View>
+        ) : (
+          <Text
+            style={{
+              marginTop: hp(20),
+              fontSize: fontSize(12),
+              color: '#999',
+              fontFamily: fontFamily.poppins400,
+              marginHorizontal: wp(17),
+            }}>
+            No images added in this review
+          </Text>
+        )}
+
+        {/* User + Rating */}
+        <View
+          style={{
+            marginTop: hp(27),
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(17),
+          }}>
+          {/* User info */}
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {item?.user?.profilePic ? (
+              <Image
+                source={{uri: item.user.profilePic}}
+                style={{width: hp(34), height: hp(34), borderRadius: 50}}
+              />
+            ) : (
+              <View
+                style={{
+                  width: hp(34),
+                  height: hp(34),
+                  borderRadius: wp(50),
+                  backgroundColor: '#F7E7FF',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    color: '#000000',
+                    fontFamily: fontFamily.poppins500,
+                    fontSize: fontSize(15),
+                  }}>
+                  {getInitials(item?.user?.name || 'No Name')}
+                </Text>
+              </View>
+            )}
+            <Text
+              style={{
+                marginLeft: wp(11),
+                color: colors.pureBlack,
+                fontSize: fontSize(14),
+                lineHeight: hp(18),
+                fontFamily: fontFamily.poppins700,
+              }}>
+              {item?.user?.name || 'No Name'}
+            </Text>
+
+            <Text
+              style={{
+                marginLeft: wp(12),
+                fontSize: fontSize(10),
+                lineHeight: hp(24),
+                fontFamily: fontFamily.poppins400,
+                color: '#C1C1C1',
+                top: hp(1),
+              }}>
+              {item?.createdAt ? new Date(item.createdAt).toDateString() : ''}
+            </Text>
+          </View>
+
+          {/* Rating */}
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <CustomStarIcon
+              width={hp(15)}
+              height={hp(14)}
+              fill="#8225AF"
+              style={{marginRight: wp(10)}}
+            />
+            <Text
+              style={{
+                fontSize: fontSize(14),
+                lineHeight: hp(24),
+                fontFamily: fontFamily.poppins700,
+                // color: '#8225AF',
+                color: '#5029F3',
+                top: hp(2),
+              }}>
+              {item?.rating || 0}
+            </Text>
+          </View>
+        </View>
+        {item?.replies?.length > 0 && (
+          <View
+            style={{
+              marginTop: hp(16),
+              // marginLeft: wp(50),
+              marginHorizontal: wp(17),
+              // padding: wp(12),
+              backgroundColor: '#fff',
+              borderRadius: wp(12),
+            }}>
+            {item.replies.map((reply, index) => (
+              <View key={reply._id}>
+                <Text
+                  style={{
+                    fontSize: fontSize(14),
+                    fontFamily: fontFamily.poppins600,
+                    color: '#5029F3',
+                  }}>
+                  replies
+                </Text>
+
+                <Text
+                  style={{
+                    marginTop: hp(6),
+                    fontSize: fontSize(13),
+                    fontFamily: fontFamily.poppins500,
+                    color: '#000',
+                  }}>
+                  {reply?.seller?.name}
+                </Text>
+
+                <Text
+                  style={{
+                    marginTop: hp(6),
+                    fontSize: fontSize(13),
+                    lineHeight: hp(20),
+                    fontFamily: fontFamily.poppins400,
+                    color: '#444',
+                  }}>
+                  {reply?.message}
+                </Text>
+
+                <Text
+                  style={{
+                    marginTop: hp(10),
+                    // marginBottom: hp(10),
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins400,
+                    color: '#999',
+                  }}>
+                  {new Date(reply.createdAt).toDateString()}
+                </Text>
+
+                {/* Border between replies */}
+                {index !== item.replies.length - 1 && (
+                  <View
+                    style={{
+                      height: hp(1),
+                      backgroundColor: '#D9D9D9',
+                      marginVertical: hp(10),
+                    }}
+                  />
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+        <View
+          style={{
+            width: '100%',
+            // borderWidth: 0.7,
+            borderWidth: 0.5,
+            marginTop: hp(26),
+            borderColor: '#E7E7E7',
+          }}
+        />
+      </View>
+    );
+  };
   //when get productDetailsLoading is true, show a loading indicator
   if (sellerProductDetailsLoading) {
     return (
@@ -874,7 +1141,7 @@ const ProductFullDetailsScreen = () => {
                   fontFamily: fontFamily.poppins700,
                   color: 'black',
                 }}>
-                4.2
+                {averageRating?.toFixed(1) || '00'}
               </Text>
             }>
             <LinearGradient
@@ -891,13 +1158,13 @@ const ProductFullDetailsScreen = () => {
                   fontFamily: fontFamily.poppins700,
                   opacity: 0,
                 }}>
-                4.2
+                {averageRating?.toFixed(1) || '00'}
               </Text>
             </LinearGradient>
           </MaskedView>
 
           <View style={{top: hp(-20)}}>
-            <SellerReviewRatingComponent />
+            <SellerReviewRatingComponent reviewData={userReviews} />
           </View>
         </View>
 
@@ -910,112 +1177,20 @@ const ProductFullDetailsScreen = () => {
           }}
         />
 
-        <View style={{marginHorizontal: wp(17), marginTop: hp(24)}}>
-          <Text
-            style={{
-              color: colors.pureBlack,
-              fontSize: fontSize(14),
-              lineHeight: hp(24),
-              fontFamily: fontFamily.poppins700,
-            }}>
-            Great Product
-          </Text>
-
-          <Text
-            style={{
-              color: colors.pureBlack,
-              fontSize: fontSize(14),
-              lineHeight: hp(24),
-              fontFamily: fontFamily.poppins400,
-              marginTop: hp(25),
-            }}>
-            Great Product I love this kurta set from Libas. The fitting is nice
-            too but in the top it's a little too accurate, if this shrunk in the
-            wash it won't fit me. I hope it doesn't shrink. The kurta and
-            Palazzo have dark grey floral print going on it.
-          </Text>
-
-          <View style={{marginTop: hp(20), flexDirection: 'row'}}>
-            <Image
-              source={images.productImageFive}
-              style={{width: wp(60), height: hp(80), borderRadius: 14}}
-            />
-            <Image
-              source={images.productImageFive}
-              style={{
-                width: wp(60),
-                height: hp(80),
-                borderRadius: 14,
-                marginLeft: wp(11),
-              }}
-            />
-          </View>
-
-          <View
-            style={{
-              marginTop: hp(27),
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <Image
-                source={images.image_two}
-                style={{width: hp(34), height: hp(34), borderRadius: 50}}
-              />
-              <Text
-                style={{
-                  marginLeft: wp(11),
-                  color: colors.pureBlack,
-                  fontSize: fontSize(14),
-                  lineHeight: hp(18),
-                  fontFamily: fontFamily.poppins700,
-                }}>
-                Riya Shah
-              </Text>
-
-              <Text
-                style={{
-                  marginLeft: wp(12),
-                  fontSize: fontSize(10),
-                  lineHeight: hp(24),
-                  fontFamily: fontFamily.poppins400,
-                  color: '#C1C1C1',
-                  top: hp(1),
-                }}>
-                21 May 2024
-              </Text>
-            </View>
-
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <CustomStarIcon
-                width={hp(15)}
-                height={hp(14)}
-                fill="#5029F4"
-                style={{marginRight: wp(10)}}
-              />
-              <Text
-                style={{
-                  fontSize: fontSize(14),
-                  lineHeight: hp(24),
-                  fontFamily: fontFamily.poppins700,
-                  color: '#5029F4',
-                  top: hp(2),
-                }}>
-                4.2
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <View
+        <FlatList
+          data={userReviews || []}
+          keyExtractor={item => item._id}
+          renderItem={({item}) => <ReviewItem item={item} />}
+          scrollEnabled={false}
+        />
+        {/* <View
           style={{
             width: '100%',
             height: hp(1),
             backgroundColor: '#E7E7E7',
             marginTop: hp(26),
           }}
-        />
+        /> */}
 
         <Touchable>
           <Text

@@ -30,6 +30,7 @@ import sellerAuthSaga from './sellerAuthSaga';
 import sellerProductSaga from './sellerproductSaga';
 import sellerProductDetailsSaga from './sellerProductDetailsSaga';
 import sellerChatSaga from './sellerChatSaga';
+import {sellerReviewSaga} from './sellerReviewSaga';
 export default function* rootSaga() {
   yield all([
     authRootSaga(),
@@ -63,5 +64,6 @@ export default function* rootSaga() {
     sellerProductSaga(),
     sellerProductDetailsSaga(),
     sellerChatSaga(),
+    sellerReviewSaga(),
   ]);
 }

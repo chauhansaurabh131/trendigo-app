@@ -31,7 +31,9 @@ import {connectSocket} from '../socket/socket.js';
 import AdminMessageScreen from '../SellerScreens/AdminMessageScreen/index.js';
 // import sellerProfileScreen from '../screens/sellerProfileScreen';
 // import SellerProfileScreen from '../screens/sellerProfileScreen';
-
+import messaging from '@react-native-firebase/messaging';
+import {PermissionsAndroid} from 'react-native';
+import notifee, {AndroidImportance} from '@notifee/react-native';
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
@@ -104,6 +106,78 @@ const RootNavigator = () => {
     initializeSocket();
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('FOREGROUND MESSAGE =>', remoteMessage);
+
+      await notifee.displayNotification({
+        title: remoteMessage.notification?.title,
+        body: remoteMessage.notification?.body,
+        android: {
+          channelId: 'default',
+        },
+      });
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // useEffect(() => {
+  //   console.log('REGISTERING FCM LISTENER');
+
+  //   const unsubscribe = messaging().onMessage(async remoteMessage => {
+  //     console.log('FOREGROUND MESSAGE =>', remoteMessage);
+  //   });
+
+  //   return unsubscribe;
+  // }, []);
+  // app ask to firebase  this device give me FCM token
+  // and firebase retun token
+  useEffect(() => {
+    const getFCMToken = async () => {
+      try {
+        await messaging().requestPermission();
+
+        await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+        );
+        //fcm token
+        const token = await messaging().getToken();
+
+        console.log('FCM TOKEN =>', token);
+      } catch (error) {
+        console.log('FCM ERROR =>', error);
+      }
+    };
+
+    getFCMToken();
+  }, []);
+
+  useEffect(() => {
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log('NOTIFICATION OPENED =>', remoteMessage);
+    });
+
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          console.log('OPENED FROM KILLED STATE =>', remoteMessage);
+        }
+      });
+  }, []);
+
+  useEffect(() => {
+    async function createChannel() {
+      await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+        importance: AndroidImportance.HIGH,
+      });
+    }
+
+    createChannel();
+  }, []);
   if (loading) return null;
   return (
     <Stack.Navigator

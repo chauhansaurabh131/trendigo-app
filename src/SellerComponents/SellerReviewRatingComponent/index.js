@@ -3,28 +3,35 @@ import {SafeAreaView, View, Text, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {colors} from '../../utils/colors';
+const SellerReviewRatingComponent = ({reviewData = []}) => {
+  // Calculate rating counts from review array
+  const ratingsData = [5, 4, 3, 2, 1].map(rating => ({
+    rating,
+    count: reviewData.filter(item => item?.rating === rating).length,
+  }));
 
-const ratingsData = [
-  {rating: 5, count: 50},
-  {rating: 4, count: 60},
-  {rating: 3, count: 45},
-  {rating: 2, count: 10},
-  {rating: 1, count: 80},
-];
+  // Total reviews
+  const totalReviews = reviewData.length;
 
-const MAX_COUNT = 100;
+  console.log('TOTAL REVIEWS =>', totalReviews);
+  console.log('RATING BREAKDOWN =>', ratingsData);
 
-const totalCount = ratingsData.reduce((sum, item) => sum + item.count, 0);
-
-const SellerReviewRatingComponent = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.totalCountText}>
-        {totalCount} <Text style={{color: '#8F8F8F'}}>Verified Buyers</Text>
+        {totalReviews}{' '}
+        <Text
+          style={{
+            color: '#8F8F8F',
+            fontFamily: fontFamily.poppins400,
+            fontSize: fontSize(14),
+          }}>
+          Verified Buyers
+        </Text>
       </Text>
 
       {ratingsData.map(({rating, count}) => {
-        const barWidth = (count / MAX_COUNT) * 100;
+        const barWidth = count > 0 ? (rating / 5) * 100 : 0;
         return (
           <View key={rating} style={styles.row}>
             <Text style={styles.ratingText}>{rating}</Text>

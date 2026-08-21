@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: hp(277),
+    height: hp(198),
     resizeMode: 'cover',
     borderBottomLeftRadius: wp(14),
     borderBottomRightRadius: wp(14),

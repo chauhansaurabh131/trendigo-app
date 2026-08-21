@@ -25,6 +25,7 @@ import otpReducer from './otpReducer';
 import sellerAuthReducer from './sellerAuthReducer';
 import sellerProductReducer from './SellerproductReducer';
 import SellerChatReducer from './sellerChatReducer';
+import sellerReviewReducer from './sellerReviewReducer';
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -52,6 +53,7 @@ const appReducer = combineReducers({
   sellerAuth: sellerAuthReducer,
   sellerProduct: sellerProductReducer,
   sellerChat: SellerChatReducer,
+  sellerReview: sellerReviewReducer,
 });
 
 const rootReducer = (state, action) => {

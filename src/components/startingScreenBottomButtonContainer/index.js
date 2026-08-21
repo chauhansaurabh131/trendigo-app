@@ -26,6 +26,7 @@ import {
 } from '../../redux/actions/authActions';
 import {set} from 'mongoose';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getMessaging} from '@react-native-firebase/messaging';
 
 // Platform-specific TouchableOpacity
 const Touchable =
@@ -93,6 +94,18 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
     const seconds = timer % 60;
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds} Sec`;
   };
+
+  // get fcm Token
+  const [fcmToken, setFcmToken] = useState('');
+
+  useEffect(() => {
+    const getToken = async () => {
+      const token = await getMessaging().getToken();
+      setFcmToken(token);
+    };
+
+    getToken();
+  }, []);
 
   // =============================
   //  Expose open() to parent
@@ -179,7 +192,14 @@ const StartingScreenBottomButtonContainer = forwardRef((props, ref) => {
     }
 
     const payload =
-      loginType === 'email' ? {email: input, otp} : {mobileNumber: input, otp};
+      loginType === 'email'
+        ? {email: input, otp, deviceToken: fcmToken, platform: 'android'}
+        : {
+            mobileNumber: input,
+            otp,
+            deviceToken: fcmToken,
+            platform: 'android',
+          };
 
     dispatch(verifyEmailOtpRequest(payload));
     console.log('VERIFY OTP REQUEST DISPATCHED with payload:', payload);
