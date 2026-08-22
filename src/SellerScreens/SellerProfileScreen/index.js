@@ -113,13 +113,13 @@ const SellerProfileScreen = () => {
             <View style={{marginLeft: wp(15)}}>
               <Text
                 style={{
-                  fontSize: fontSize(11),
+                  fontSize: fontSize(13),
                   color: colors.black,
                   fontFamily: fontFamily.poppins400,
                 }}>
                 Your store profile and settings can only be{' '}
               </Text>
-              <Text style={{fontSize: fontSize(11), color: colors.black}}>
+              <Text style={{fontSize: fontSize(13), color: colors.black}}>
                 managed through the{' '}
                 <Text
                   style={{

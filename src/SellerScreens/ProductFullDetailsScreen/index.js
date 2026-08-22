@@ -385,73 +385,49 @@ const ProductFullDetailsScreen = () => {
             </Text>
           </View>
         </View>
-        {item?.replies?.length > 0 && (
-          <View
-            style={{
-              marginTop: hp(16),
-              // marginLeft: wp(50),
-              marginHorizontal: wp(17),
-              // padding: wp(12),
-              backgroundColor: '#fff',
-              borderRadius: wp(12),
-            }}>
-            {item.replies.map((reply, index) => (
-              <View key={reply._id}>
-                <Text
-                  style={{
-                    fontSize: fontSize(14),
-                    fontFamily: fontFamily.poppins600,
-                    color: '#5029F3',
-                  }}>
-                  replies
-                </Text>
+        {item?.replies?.length > 0 &&
+          item.replies.map(reply => (
+            <View
+              key={reply._id}
+              style={{
+                marginTop: hp(16),
+                marginHorizontal: wp(17),
+                backgroundColor: '#F7F5FF',
+                borderRadius: wp(12),
+                paddingVertical: hp(15),
+                paddingHorizontal: wp(16),
+              }}>
+              <Text
+                style={{
+                  fontSize: fontSize(13),
+                  fontFamily: fontFamily.poppins500,
+                  color: '#000',
+                }}>
+                {reply?.seller?.name}
+              </Text>
 
-                <Text
-                  style={{
-                    marginTop: hp(6),
-                    fontSize: fontSize(13),
-                    fontFamily: fontFamily.poppins500,
-                    color: '#000',
-                  }}>
-                  {reply?.seller?.name}
-                </Text>
+              <Text
+                style={{
+                  marginTop: hp(6),
+                  fontSize: fontSize(13),
+                  lineHeight: hp(20),
+                  fontFamily: fontFamily.poppins400,
+                  color: '#444',
+                }}>
+                {reply?.message}
+              </Text>
 
-                <Text
-                  style={{
-                    marginTop: hp(6),
-                    fontSize: fontSize(13),
-                    lineHeight: hp(20),
-                    fontFamily: fontFamily.poppins400,
-                    color: '#444',
-                  }}>
-                  {reply?.message}
-                </Text>
-
-                <Text
-                  style={{
-                    marginTop: hp(10),
-                    // marginBottom: hp(10),
-                    fontSize: fontSize(11),
-                    fontFamily: fontFamily.poppins400,
-                    color: '#999',
-                  }}>
-                  {new Date(reply.createdAt).toDateString()}
-                </Text>
-
-                {/* Border between replies */}
-                {index !== item.replies.length - 1 && (
-                  <View
-                    style={{
-                      height: hp(1),
-                      backgroundColor: '#D9D9D9',
-                      marginVertical: hp(10),
-                    }}
-                  />
-                )}
-              </View>
-            ))}
-          </View>
-        )}
+              <Text
+                style={{
+                  marginTop: hp(10),
+                  fontSize: fontSize(11),
+                  fontFamily: fontFamily.poppins400,
+                  color: '#999',
+                }}>
+                {new Date(reply.createdAt).toDateString()}
+              </Text>
+            </View>
+          ))}
         <View
           style={{
             width: '100%',

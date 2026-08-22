@@ -1,9 +1,18 @@
 import React from 'react';
-import {Image, SafeAreaView, Text, View, FlatList} from 'react-native';
+import {
+  Image,
+  SafeAreaView,
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
 import {fontFamily, fontSize, hp, wp} from '../../../utils/helpers';
 import {images, TabIcon} from '../../../assets';
+import {useNavigation} from '@react-navigation/native';
 
 const DeliveredScreen = () => {
+  const navigation = useNavigation();
   const data = [1, 2, 3, 4, 5];
   const renderItem = () => (
     <View
@@ -126,7 +135,8 @@ const DeliveredScreen = () => {
           </Text>
         </View>
 
-        <View
+        <TouchableOpacity
+          onPress={() => navigation.navigate('DeliverdOrderScreen')}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -140,10 +150,10 @@ const DeliveredScreen = () => {
             }}>
             View Order
           </Text>
-          <View style={{marginLeft: wp(16)}}>
-            <TabIcon />
-          </View>
-        </View>
+          {/* <View style={{marginLeft: wp(16)}}> */}
+          <TabIcon marginLeft={16} />
+          {/* </View> */}
+        </TouchableOpacity>
       </View>
     </View>
   );

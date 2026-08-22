@@ -34,6 +34,10 @@ import AdminMessageScreen from '../SellerScreens/AdminMessageScreen/index.js';
 import messaging from '@react-native-firebase/messaging';
 import {PermissionsAndroid} from 'react-native';
 import notifee, {AndroidImportance} from '@notifee/react-native';
+import NewOrderDetailsScreen from '../SellerScreens/NewOrderDetailsScreen/index.js';
+import DeliveredOrderScreen from '../SellerScreens/DeliveredOrderScreen/index.js';
+import ReturnOrderDetailsScreen from '../SellerScreens/ReturnOrderDetailsScreen/index.js';
+import CancelOrderDetailsScreen from '../SellerScreens/CancelOrderDetailsScreen/index.js';
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
@@ -122,15 +126,15 @@ const RootNavigator = () => {
     return unsubscribe;
   }, []);
 
-  // useEffect(() => {
-  //   console.log('REGISTERING FCM LISTENER');
+  useEffect(() => {
+    console.log('REGISTERING FCM LISTENER');
 
-  //   const unsubscribe = messaging().onMessage(async remoteMessage => {
-  //     console.log('FOREGROUND MESSAGE =>', remoteMessage);
-  //   });
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      console.log('FOREGROUND MESSAGE =>', remoteMessage);
+    });
 
-  //   return unsubscribe;
-  // }, []);
+    return unsubscribe;
+  }, []);
   // app ask to firebase  this device give me FCM token
   // and firebase retun token
   useEffect(() => {
@@ -225,6 +229,19 @@ const RootNavigator = () => {
       <Stack.Screen
         name="Admin Message Screen"
         component={AdminMessageScreen}
+      />
+      <Stack.Screen name="NewOrderDetails" component={NewOrderDetailsScreen} />
+      <Stack.Screen
+        name="DeliverdOrderScreen"
+        component={DeliveredOrderScreen}
+      />
+      <Stack.Screen
+        name="ReturnOrderDetails"
+        component={ReturnOrderDetailsScreen}
+      />
+      <Stack.Screen
+        name="CancelOrderDetails"
+        component={CancelOrderDetailsScreen}
       />
     </Stack.Navigator>
   );
