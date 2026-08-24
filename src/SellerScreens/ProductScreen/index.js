@@ -81,6 +81,11 @@ const ProductScreen = () => {
     dispatch(getSellerProductsRequest(payload));
   };
   // console.log('SELLER PRODUCTS =>', sellerProducts);
+  useEffect(() => {
+    if (!sellerLoading) {
+      setLoadingMore(false);
+    }
+  }, [sellerLoading]);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
@@ -113,7 +118,7 @@ const ProductScreen = () => {
         }}
       />
 
-      {sellerLoading ? (
+      {/* {sellerLoading ? (
         <View
           style={{
             flex: 1,
@@ -122,121 +127,138 @@ const ProductScreen = () => {
           }}>
           <ActivityIndicator size="large" color="#5029F4" />
         </View>
-      ) : (
-        <FlatList
-          data={sellerProducts}
-          keyExtractor={(item, index) =>
-            item._id?.toString() || index.toString()
-          }
-          numColumns={2}
-          contentContainerStyle={styles.container}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            loadingMore ? (
-              <ActivityIndicator size="small" color="#5029F4" />
-            ) : null
-          }
-          ListEmptyComponent={
+      ) : ( */}
+      <FlatList
+        data={sellerProducts}
+        keyExtractor={(item, index) => item._id?.toString() || index.toString()}
+        numColumns={2}
+        contentContainerStyle={styles.container}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMore ? (
             <View
               style={{
                 flex: 1,
-                justifyContent: 'center',
                 alignItems: 'center',
+                justifyContent: 'center',
+                paddingBottom: hp(20),
               }}>
-              <Text
+              <View
                 style={{
-                  fontSize: fontSize(16),
-                  fontFamily: fontFamily.poppins500,
-                  color: 'grey',
+                  width: hp(24),
+                  height: hp(24),
+                  borderRadius: wp(25),
+                  // backgroundColor: 'pink',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: '#FFFFFF',
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB',
                 }}>
-                No Products Found
-              </Text>
+                <ActivityIndicator size={'small'} color={'#5029F4'} />
+              </View>
             </View>
-          }
-          renderItem={({item}) => {
-            console.log('PRODUCT ITEM =>', item);
-            const firstVariant = item?.variants?.[0];
-            // console.log('FIRST VARIANT =>', firstVariant);
+          ) : null
+        }
+        ListEmptyComponent={
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <Text
+              style={{
+                fontSize: fontSize(16),
+                fontFamily: fontFamily.poppins500,
+                color: 'grey',
+              }}>
+              No Products Found
+            </Text>
+          </View>
+        }
+        renderItem={({item}) => {
+          console.log('PRODUCT ITEM =>', item);
+          const firstVariant = item?.variants?.[0];
+          // console.log('FIRST VARIANT =>', firstVariant);
 
-            const price = firstVariant?.price || 0;
-            // console.log('PRICE =>', price);
+          const price = firstVariant?.price || 0;
+          // console.log('PRICE =>', price);
 
-            const discount = firstVariant?.discount || 0;
-            // console.log('DISCOUNT =>', discount);
+          const discount = firstVariant?.discount || 0;
+          // console.log('DISCOUNT =>', discount);
 
-            const mainImage = firstVariant?.images?.find(
-              image => image.isSelectedForMainScreen,
-            );
-            // console.log('MAIN IMAGE =>', mainImage);
+          const mainImage = firstVariant?.images?.find(
+            image => image.isSelectedForMainScreen,
+          );
+          // console.log('MAIN IMAGE =>', mainImage);
 
-            return (
-              <TouchableOpacity
-                style={styles.card}
-                activeOpacity={0.6}
-                onPress={() => {
-                  navigation.navigate('ProductFullDetailsScreen', {
-                    productId: item.id,
-                  });
-                }}>
-                <View style={{position: 'relative'}}>
-                  <Image
-                    source={{
-                      uri: mainImage?.imageUrl,
-                    }}
-                    style={styles.image}
-                  />
-                  <TouchableOpacity
-                    onPress={() => console.log('Save Icon Click')}
-                    style={{
-                      position: 'absolute',
-                      borderRadius: wp(25),
-                      right: wp(10),
-                      top: hp(10),
-                      width: hp(22),
-                      height: hp(22),
-                      backgroundColor: '#FFFFFF',
-                      justifyContent: 'center',
-                    }}>
-                    <View style={{alignItems: 'center'}}>
-                      <BlueSaveIcon />
-                    </View>
-                  </TouchableOpacity>
+          return (
+            <TouchableOpacity
+              style={styles.card}
+              activeOpacity={0.6}
+              onPress={() => {
+                navigation.navigate('ProductFullDetailsScreen', {
+                  productId: item.id,
+                });
+              }}>
+              <View style={{position: 'relative'}}>
+                <Image
+                  source={{
+                    uri: mainImage?.imageUrl,
+                  }}
+                  style={styles.image}
+                />
+                <TouchableOpacity
+                  onPress={() => console.log('Save Icon Click')}
+                  style={{
+                    position: 'absolute',
+                    borderRadius: wp(25),
+                    right: wp(10),
+                    top: hp(10),
+                    width: hp(22),
+                    height: hp(22),
+                    backgroundColor: '#FFFFFF',
+                    justifyContent: 'center',
+                  }}>
+                  <View style={{alignItems: 'center'}}>
+                    <BlueSaveIcon />
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.content}>
+                <Text numberOfLines={1} style={styles.title}>
+                  {item.title}
+                </Text>
+
+                <View style={styles.priceRow}>
+                  <Text style={styles.price}>Rs. {price}</Text>
+                  <Text style={styles.mrp}>MRP {price}</Text>
+                  <Text style={styles.discount}>{discount}% Off</Text>
                 </View>
-                <View style={styles.content}>
-                  <Text numberOfLines={1} style={styles.title}>
-                    {item.title}
+
+                <View style={styles.ratingRow}>
+                  <View style={styles.ratingBox}>
+                    <Text style={styles.ratingText}>
+                      {item.averageRating?.toFixed(1) || '0.0'}
+                    </Text>
+                    <StarIcon style={{top: -1, width: hp(9), height: hp(8)}} />
+                  </View>
+                  <Text style={styles.reviews}>
+                    ({item.totalReviews || '00'})
                   </Text>
 
-                  <View style={styles.priceRow}>
-                    <Text style={styles.price}>Rs. {price}</Text>
-                    <Text style={styles.mrp}>MRP {price}</Text>
-                    <Text style={styles.discount}>{discount}% Off</Text>
-                  </View>
-
-                  <View style={styles.ratingRow}>
-                    <View style={styles.ratingBox}>
-                      <Text style={styles.ratingText}>
-                        {item.averageRating?.toFixed(1) || '0.0'}
-                      </Text>
-                      <StarIcon
-                        style={{top: -1, width: hp(9), height: hp(8)}}
-                      />
-                    </View>
-                    <Text style={styles.reviews}>
-                      ({item.totalReviews || '00'})
-                    </Text>
-
-                    {/* <TouchableOpacity style={styles.heartButton}>
+                  {/* <TouchableOpacity style={styles.heartButton}>
                       <GradientLikeIcon />
                     </TouchableOpacity> */}
-                  </View>
                 </View>
-              </TouchableOpacity>
-            );
-          }}
-        />
-      )}
+              </View>
+            </TouchableOpacity>
+          );
+        }}
+      />
+      {/* )} */}
     </SafeAreaView>
   );
 };

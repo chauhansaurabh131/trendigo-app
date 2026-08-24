@@ -707,6 +707,18 @@ const BagScreen = () => {
       <View style={{width: '100%', borderWidth: 1, borderColor: '#F2F2F2'}} />
 
       <ScrollView contentContainerStyle={{paddingBottom: hp(120)}}>
+        <View style={{marginHorizontal: wp(16), marginTop: hp(17)}}>
+          <Text
+            style={{
+              // color: '#9333EA',
+              color: '#94A3B8',
+              fontSize: fontSize(14),
+              lineHeight: hp(14),
+              fontFamily: fontFamily.poppins600,
+            }}>
+            Delivery Address
+          </Text>
+        </View>
         <Touchable
           style={{
             backgroundColor: '#F8FAFC',
@@ -715,23 +727,19 @@ const BagScreen = () => {
             marginTop: hp(16),
             // height: hp(120),
             paddingVertical: hp(16),
+            alignItems: 'center',
+            flexDirection: 'row',
           }}
           activeOpacity={0.5}
           onPress={() => sheetRef1.current?.open()}>
           <View style={{marginHorizontal: wp(16), marginTop: hp(0)}}>
-            <Text
-              style={{
-                // color: '#9333EA',
-                color: '#5029F3',
-                fontSize: fontSize(10),
-                lineHeight: hp(14),
-                fontFamily: fontFamily.poppins700,
-              }}>
-              Delivery Address
-            </Text>
             {defaultAddress ? (
               <>
-                <View style={{marginTop: hp(6), flexDirection: 'row'}}>
+                <View
+                  style={{
+                    marginTop: hp(6),
+                    flexDirection: 'row',
+                  }}>
                   <Text
                     style={{
                       color: colors.pureBlack,
@@ -775,18 +783,20 @@ const BagScreen = () => {
               </>
             ) : (
               <View
-                style={{
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: hp(13),
-                }}>
+                style={
+                  {
+                    // alignItems: 'center',
+                    // justifyContent: 'center',
+                    // marginTop: hp(13),
+                  }
+                }>
                 <Text
                   style={{
                     color: '#64748B',
                     fontFamily: fontFamily.poppins500,
-                    fontSize: fontSize(15),
+                    fontSize: fontSize(14),
                   }}>
-                  No delivery address added
+                  Add Delivery Address
                 </Text>
               </View>
             )}
@@ -795,8 +805,8 @@ const BagScreen = () => {
           <View
             style={{
               position: 'absolute',
-              right: wp(25),
-              top: hp(50),
+              right: wp(16),
+              // top: hp(50),
             }}>
             <NavigationArrowIcon stroke="#64748B" />
           </View>

@@ -1,5 +1,11 @@
-import React from 'react';
-import {SafeAreaView, ScrollView, Text, TouchableOpacity} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
 import {View} from 'react-native';
 import {
   ProfileIcon,
@@ -14,9 +20,14 @@ import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import DashboardComponent from '../../SellerComponents/DashboardComponent';
 import HomeProductComponent from '../../SellerComponents/HomeProductComponent';
 import {useNavigation} from '@react-navigation/native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+import RBSheet from 'react-native-raw-bottom-sheet';
+import GradientButton from '../../components/gradientButton';
+import {sellerLoginReset} from '../../redux/actions/sellerAuthActions';
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const notificationSheetRef = useRef();
+  const dispatch = useDispatch();
   const {loading, sellerData, error} = useSelector(state => state.sellerAuth);
   console.log('SELLER DATA =>', sellerData);
 
@@ -42,7 +53,19 @@ const HomeScreen = () => {
     .map(word => word[0].toUpperCase())
     .slice(0, 2)
     .join('');
+  const setupSteps = [
+    'Store information',
+    'Business details',
+    'Bank account',
+    'Shipping settings',
+    'Policies',
+    'Product listings',
+  ];
+  const [showNoticeModal, setShowNoticeModal] = useState(false);
 
+  useEffect(() => {
+    setShowNoticeModal(true);
+  }, []);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
@@ -159,6 +182,215 @@ const HomeScreen = () => {
           <HomeProductComponent />
         </View>
       </ScrollView>
+
+      {/* notification sheet */}
+      {/* <RBSheet
+        ref={notificationSheetRef}
+        height={hp(424)}
+        openDuration={250}
+        customStyles={{
+          container: {
+            borderTopLeftRadius: wp(18),
+            borderTopRightRadius: wp(18),
+          },
+        }}>
+        <View style={{marginHorizontal: wp(28), marginTop: hp(26)}}>
+          <View>
+            <Text
+              style={{
+                fontSize: fontSize(16),
+                fontFamily: fontFamily.poppins500,
+                color: '#000000',
+              }}>
+              Store Management Notice
+            </Text>
+          </View>
+
+          <View style={{width: wp(289), marginTop: hp(18)}}>
+            <Text
+              style={{
+                fontSize: fontSize(13),
+                color: '#000000',
+              }}>
+              <Text
+                style={{
+                  fontFamily: fontFamily.poppins400,
+                }}>
+                Your store profile can only be managed from the{' '}
+              </Text>
+              <Text
+                style={{
+                  fontFamily: fontFamily.poppins600,
+                  lineHeight: hp(19),
+                }}>
+                the Trulybag Seller Web Portal.
+              </Text>
+            </Text>
+          </View>
+
+          <View style={{width: wp(289), marginTop: hp(18)}}>
+            <Text
+              style={{
+                fontSize: fontSize(13),
+                color: '#000000',
+                fontFamily: fontFamily.poppins400,
+                lineHeight: hp(19),
+              }}>
+              You can use the mobile app to receive and manage orders, chat with
+              customers, and track your business, but to edit your:
+            </Text>
+          </View>
+
+          <View style={{width: wp(289), marginTop: hp(18)}}>
+            {setupSteps.map((item, index) => (
+              <View
+                key={index}
+                style={{
+                  flexDirection: 'row',
+                  marginBottom: hp(1),
+                }}>
+                <Text
+                  style={{
+                    fontSize: fontSize(13),
+                    fontFamily: fontFamily.poppins400,
+                    marginRight: wp(8),
+                    color: '#000000',
+                  }}>
+                  •
+                </Text>
+
+                <Text
+                  style={{
+                    fontSize: fontSize(13),
+                    color: '#000000',
+                    fontFamily: fontFamily.poppins400,
+                  }}>
+                  {item}
+                </Text>
+              </View>
+            ))}
+          </View>
+          <View style={{marginTop: hp(23)}}>
+            <GradientButton
+              title={'Okay'}
+              onPress={() => {
+                notificationSheetRef.current?.close();
+
+                dispatch(sellerLoginReset()); // reset sellerData
+              }}
+            />
+          </View>
+        </View>
+      </RBSheet> */}
+
+      <Modal visible={showNoticeModal} transparent={true} animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              width: wp(340),
+              backgroundColor: '#FFFFFF',
+              borderRadius: wp(18),
+              // paddingHorizontal: wp(28),
+              // paddingTop: hp(26),
+              paddingBottom: hp(24),
+            }}>
+            <View style={{marginHorizontal: wp(28), marginTop: hp(26)}}>
+              <View>
+                <Text
+                  style={{
+                    fontSize: fontSize(16),
+                    fontFamily: fontFamily.poppins500,
+                    color: '#000000',
+                  }}>
+                  Store Management Notice
+                </Text>
+              </View>
+
+              <View style={{width: wp(289), marginTop: hp(18)}}>
+                <Text
+                  style={{
+                    fontSize: fontSize(13),
+                    color: '#000000',
+                  }}>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    Your store profile can only be managed from the{' '}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.poppins600,
+                      lineHeight: hp(19),
+                    }}>
+                    the Trulybag Seller Web Portal.
+                  </Text>
+                </Text>
+              </View>
+
+              <View style={{width: wp(289), marginTop: hp(18)}}>
+                <Text
+                  style={{
+                    fontSize: fontSize(13),
+                    color: '#000000',
+                    fontFamily: fontFamily.poppins400,
+                    lineHeight: hp(19),
+                  }}>
+                  You can use the mobile app to receive and manage orders, chat
+                  with customers, and track your business, but to edit your:
+                </Text>
+              </View>
+
+              <View style={{width: wp(289), marginTop: hp(18)}}>
+                {setupSteps.map((item, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: 'row',
+                      marginBottom: hp(1),
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: fontSize(13),
+                        fontFamily: fontFamily.poppins400,
+                        marginRight: wp(8),
+                        color: '#000000',
+                      }}>
+                      •
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontSize: fontSize(13),
+                        color: '#000000',
+                        fontFamily: fontFamily.poppins400,
+                      }}>
+                      {item}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              <View style={{marginTop: hp(23)}}>
+                <GradientButton
+                  title={'Okay'}
+                  onPress={() => {
+                    // notificationSheetRef.current?.close();
+                    setShowNoticeModal(false);
+
+                    dispatch(sellerLoginReset()); // reset sellerData
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
