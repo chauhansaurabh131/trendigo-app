@@ -1941,7 +1941,7 @@ const ProductDetailsScreen = () => {
 
   // REVIEW
   const userReviews = useSelector(state => state.review.userReviews);
-  console.log('USER REVIEWS FROM REDUX ', userReviews);
+  console.log('USER REVIEWS FROM REDUX ', JSON.stringify(userReviews, null, 2));
   const reviewData = useSelector(state => state.review.userReviews);
   const reviews = reviewData?.reviews || [];
   const averageRating = reviewData?.averageRating || 0;
@@ -2115,7 +2115,22 @@ const ProductDetailsScreen = () => {
     console.log('REMOVE_CART_REQUEST DISPATCHED');
   };
 
+  // const handleCartAction = () => {
+  //   if (isAddedToCart) {
+  //     handleRemoveFromCart();
+  //   } else {
+  //     handleAddToCart();
+  //   }
+  // };
+
   const handleCartAction = () => {
+    if (!token) {
+      navigation.navigate('StartingScreen', {
+        redirectTo: 'BagStack',
+      });
+      return;
+    }
+
     if (isAddedToCart) {
       handleRemoveFromCart();
     } else {
@@ -2440,6 +2455,50 @@ const ProductDetailsScreen = () => {
             </Text>
           </View>
         </View>
+        {item?.replies?.length > 0 &&
+          item.replies.map(reply => (
+            <View
+              key={reply._id}
+              style={{
+                marginTop: hp(16),
+                marginHorizontal: wp(17),
+                backgroundColor: '#F7F5FF',
+                borderRadius: wp(12),
+                paddingVertical: hp(15),
+                paddingHorizontal: wp(16),
+              }}>
+              <Text
+                style={{
+                  fontSize: fontSize(13),
+                  fontFamily: fontFamily.poppins500,
+                  color: '#000',
+                }}>
+                {reply?.seller?.name}
+              </Text>
+
+              <Text
+                style={{
+                  marginTop: hp(6),
+                  fontSize: fontSize(13),
+                  lineHeight: hp(20),
+                  fontFamily: fontFamily.poppins400,
+                  color: '#444',
+                }}>
+                {reply?.message}
+              </Text>
+
+              <Text
+                style={{
+                  marginTop: hp(10),
+                  fontSize: fontSize(11),
+                  fontFamily: fontFamily.poppins400,
+                  color: '#999',
+                }}>
+                {new Date(reply.createdAt).toDateString()}
+              </Text>
+            </View>
+          ))}
+
         <View
           style={{
             width: '100%',

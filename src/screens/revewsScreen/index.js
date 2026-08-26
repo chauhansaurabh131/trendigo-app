@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import {ActivityIndicator, Text, View} from 'react-native';
 import {Image, SafeAreaView, TouchableOpacity} from 'react-native';
 import {FlatList} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
@@ -17,80 +17,41 @@ import {
 const RevewsScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const {reviewByUserData} = useSelector(state => state.reviewByUserId);
+  const {reviewByUserData, loading} = useSelector(
+    state => state.reviewByUserId,
+  );
+  console.log(
+    'REVIEW USER DATA====>',
+    JSON.stringify(reviewByUserData, null, 2),
+  );
   const token = useSelector(state => state.auth.token);
-  const user = useSelector(state => state.auth.user);
+  console.log('TOKEN', token);
+  const {user} = useSelector(state => state.user);
+  console.log('USER====> ', user);
   const userId = user?.id || user?._id;
+  console.log('USER ID', userId);
+  console.log('USER ID =>', user?.id);
+
   useEffect(() => {
     if (userId && token) {
       dispatch(ReviewUserIdAction(userId, token));
     }
   }, [userId, token]);
-  console.log('USER ID ===>', userId);
-  console.log('TOKEN ===>', token);
+
   const [deleteReview, setDeleteReview] = useState(false);
   const reviews = reviewByUserData?.data?.reviews || [];
-  // const reviews = [
-  //   {
-  //     _id: '1',
-  //     createdAt: '02 Feb, 2026',
-  //     productName: 'Designer Traditional Dress',
-  //     title: 'Great Product',
-  //     rating: 4.2,
-  //     description:
-  //       "I love this kurta set from Libas. The fitting is nice too but in the top it's a little too accurate.",
-  //     images: [images.reviews_image, images.reviews_image],
-  //   },
-  //   {
-  //     _id: '2',
-  //     createdAt: '02 Feb, 2026',
-  //     productName: 'Designer Traditional Dress',
-  //     title: 'Great Product',
-  //     rating: 4.2,
-  //     description:
-  //       "I love this kurta set from Libas. The fitting is nice too but in the top it's a little too accurate.",
-  //     images: [images.reviews_image, images.reviews_image],
-  //   },
-  // ];
-  return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
-      <View
-        style={{
-          marginTop: hp(19),
-          marginHorizontal: wp(18),
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Image
-            source={arrow_back}
-            style={{
-              width: 18,
-              height: 18,
-              resizeMode: 'contain',
-            }}
-          />
-        </TouchableOpacity>
 
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <Text
-            style={{
-              fontSize: fontSize(18),
-              color: '#000',
-              fontFamily: fontFamily.poppins500,
-            }}>
-            My Reviews (1)
-          </Text>
-        </View>
-      </View>
-      <View
-        style={{
-          width: '100%',
-          borderColor: '#F2F2F2',
-          borderWidth: 1,
-          marginTop: hp(17),
-        }}
-      />
+  const renderReviewItem = ({item}) => {
+    console.log('PRODUCT IMAGES =>', item?.product?.images);
+    const formattedDate = new Date(item?.createdAt).toLocaleDateString(
+      'en-GB',
+      {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      },
+    );
+    return (
       <View
         style={{
           // width: '100%',
@@ -109,7 +70,7 @@ const RevewsScreen = () => {
               color: '#000',
               fontFamily: fontFamily.poppins400,
             }}>
-            Submitted on 02 Feb, 2026
+            Submitted on {formattedDate}
           </Text>
           <View
             style={{
@@ -128,10 +89,35 @@ const RevewsScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <Image
-            source={images.my_review}
-            style={{width: wp(50), height: hp(58)}}
-          />
+          {item?.product?.images?.[0]?.imageUrl ? (
+            <Image
+              source={{
+                uri: item?.product?.images?.[0]?.imageUrl,
+              }}
+              style={{width: wp(50), height: hp(58)}}
+            />
+          ) : (
+            <View
+              style={{
+                width: wp(50),
+                height: hp(58),
+                borderWidth: 1,
+                borderColor: '#E8E8E8',
+                borderRadius: 6,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Text
+                style={{
+                  fontSize: fontSize(10),
+                  color: '#000000',
+                  fontFamily: fontFamily.poppins500,
+                  textAlign: 'center',
+                }}>
+                N/A
+              </Text>
+            </View>
+          )}
           <Text
             style={{
               color: '#000',
@@ -139,7 +125,7 @@ const RevewsScreen = () => {
               fontSize: fontSize(13),
               fontFamily: fontFamily.poppins500,
             }}>
-            Designer Traditional Dress
+            {item?.product?.title}
           </Text>
         </View>
         <View
@@ -157,7 +143,7 @@ const RevewsScreen = () => {
               textAlignVertical: 'center',
               includeFontPadding: false,
             }}>
-            Great Product
+            {item?.title}
           </Text>
 
           <View
@@ -184,7 +170,7 @@ const RevewsScreen = () => {
                 textAlignVertical: 'center',
                 includeFontPadding: false,
               }}>
-              4.2
+              {item?.rating}
             </Text>
           </View>
         </View>
@@ -194,10 +180,9 @@ const RevewsScreen = () => {
               color: '#000',
               fontFamily: fontFamily.poppins400,
               fontSize: fontSize(12),
+              lineHeight: hp(20),
             }}>
-            I love this kurta set from Libas. The fitting is nice too{'\n'}but
-            in the top it's a little too accurate, if this shrunk {'\n'}in the
-            wash it won't fit me.
+            {item?.description}
           </Text>
         </View>
         <View
@@ -207,20 +192,18 @@ const RevewsScreen = () => {
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <Image
-            source={images.reviews_image}
-            style={{width: wp(50), height: hp(67), borderRadius: 10}}
-          />
-
-          <Image
-            source={images.reviews_image}
-            style={{
-              width: wp(50),
-              height: hp(67),
-              borderRadius: 10,
-              marginLeft: wp(15),
-            }}
-          />
+          {item?.images?.map((img, index) => (
+            <Image
+              key={index}
+              source={{uri: img}}
+              style={{
+                width: wp(50),
+                height: hp(67),
+                borderRadius: 10,
+                marginRight: wp(15),
+              }}
+            />
+          ))}
         </View>
         <View
           style={{
@@ -240,14 +223,16 @@ const RevewsScreen = () => {
             marginTop: hp(16),
             marginBottom: hp(16),
           }}>
-          <Text
-            style={{
-              color: '#8225AF',
-              fontSize: fontSize(13),
-              fontFamily: fontFamily.poppins400,
-            }}>
-            Edit Review
-          </Text>
+          <TouchableOpacity>
+            <Text
+              style={{
+                color: '#8225AF',
+                fontSize: fontSize(13),
+                fontFamily: fontFamily.poppins400,
+              }}>
+              Edit Review
+            </Text>
+          </TouchableOpacity>
           <View
             style={{
               width: 1,
@@ -268,6 +253,88 @@ const RevewsScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+    );
+  };
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <ActivityIndicator size="large" color={'#5029F3'} />
+      </View>
+    );
+  }
+  return (
+    <SafeAreaView style={{flex: 1, backgroundColor: '#fff'}}>
+      <View
+        style={{
+          marginTop: hp(19),
+          marginHorizontal: wp(18),
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Image
+            source={arrow_back}
+            style={{
+              width: hp(18),
+              height: hp(18),
+              resizeMode: 'contain',
+            }}
+          />
+        </TouchableOpacity>
+
+        <View style={{flex: 1, alignItems: 'center'}}>
+          <Text
+            style={{
+              fontSize: fontSize(16),
+              color: '#000',
+              fontFamily: fontFamily.poppins500,
+            }}>
+            My Reviews ({reviews.length})
+          </Text>
+        </View>
+      </View>
+      <View
+        style={{
+          width: '100%',
+          borderColor: '#F2F2F2',
+          borderWidth: 1,
+          marginTop: hp(17),
+        }}
+      />
+
+      <FlatList
+        data={reviews}
+        keyExtractor={(item, index) =>
+          item?._id?.toString() || index.toString()
+        }
+        renderItem={renderReviewItem}
+        contentContainerStyle={{flex: 1}}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              // marginTop: hp(100),
+            }}>
+            <Text
+              style={{
+                color: 'grey',
+                fontSize: fontSize(17),
+                fontFamily: fontFamily.poppins500,
+              }}>
+              No Reviews Found
+            </Text>
+          </View>
+        }
+      />
       <Modal
         visible={deleteReview}
         transparent
