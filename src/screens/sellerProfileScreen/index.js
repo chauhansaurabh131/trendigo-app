@@ -136,7 +136,9 @@ const SellerProfileScreen = ({route}) => {
               color: '#000',
             }}>
             {/* Galaxy Fashion Hub */}
-            {store?.name?.charAt(0)?.toUpperCase() + store.name.slice(1) ||
+            {/* {store?.name?.charAt(0)?.toUpperCase() + store.name.slice(1) ||
+              'No Name of store'} */}
+            {store?.name?.charAt(0)?.toUpperCase() + store?.name?.slice(1) ||
               'No Name of store'}
           </Text>
         </View>

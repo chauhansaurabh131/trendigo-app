@@ -10,17 +10,50 @@ import {
 import {SafeAreaView} from 'react-native';
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {images} from '../../assets';
-const ViralTrendyComponet = () => {
+import {navigate} from '../../navigations/NavigationService';
+import {useNavigation} from '@react-navigation/native';
+const ViralTrendyComponet = ({data}) => {
+  const navigation = useNavigation();
   const viralData = [
-    {id: '1', image: images.viral_trendy},
-    {id: '2', image: images.viral_trendy},
-    {id: '3', image: images.viral_trendy},
+    {
+      id: '1',
+      category: 'Men',
+      videoUrl:
+        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      image: images.viral_image1,
+      views: '12.4K',
+      likes: '4.4K',
+      title: 'Men Summary Outfit',
+      description: 'Men',
+    },
+    {
+      id: '2',
+      category: 'Women',
+      image: images.viral_trendy,
+      videoUrl:
+        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      views: '8.2K',
+      likes: '3.1K',
+      title: 'Summer Collection',
+      description: 'Women',
+    },
+    {
+      id: '3',
+      category: 'Kids',
+      image: images.viral_image1,
+      videoUrl:
+        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      views: '8.2K',
+      likes: '3.1K',
+      title: 'Kids Collection',
+      description: 'Kids',
+    },
   ];
 
   const renderItem = ({item}) => (
     <View
       style={{
-        width: wp(195.55),
+        width: hp(195.55),
         height: hp(286),
         marginRight: wp(18),
       }}>
@@ -30,6 +63,7 @@ const ViralTrendyComponet = () => {
           width: '100%',
           height: '100%',
           resizeMode: 'contain',
+          borderRadius: wp(14),
         }}
       />
 
@@ -45,20 +79,34 @@ const ViralTrendyComponet = () => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Image
-          source={images.video_play}
-          style={{
-            width: hp(38.22),
-            height: hp(38.22),
-          }}
-        />
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('ReelsScreen', {
+              videos: viralData,
+              selectedId: item.id,
+            })
+          }>
+          <Image
+            source={images.video_play}
+            style={{
+              width: hp(38.22),
+              height: hp(38.22),
+            }}
+          />
+        </TouchableOpacity>
       </View>
       {/* </TouchableOpacity> */}
     </View>
   );
   return (
     <SafeAreaView>
-      <View style={{marginLeft: wp(17)}}>
+      <View
+        style={{
+          marginHorizontal: wp(17),
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
         <Text
           style={{
             color: '#000',
@@ -67,6 +115,27 @@ const ViralTrendyComponet = () => {
           }}>
           Viral Trends
         </Text>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ViralTrends')}
+          style={{
+            borderColor: '#E5E5E5',
+            borderWidth: 1,
+            width: hp(68),
+            height: hp(28),
+            borderRadius: wp(10),
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <Text
+            style={{
+              color: '#000',
+              fontFamily: fontFamily.poppins400,
+              fontSize: fontSize(12),
+            }}>
+            All Reels
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <FlatList

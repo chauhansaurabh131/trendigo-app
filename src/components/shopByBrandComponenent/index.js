@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View} from 'react-native';
+import {FlatList, Text, TouchableOpacity, View} from 'react-native';
 import {SafeAreaView} from 'react-native';
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {
@@ -10,10 +10,47 @@ import {
   PullBearIcon,
   UniIcon,
 } from '../../assets';
+import {useNavigation} from '@react-navigation/native';
 const ShopByBrandsComponent = () => {
+  const navigation = useNavigation();
+  const brands = [
+    {id: '1', icon: PullBearIcon},
+    {id: '2', icon: BossIcon},
+    {id: '3', icon: UniIcon},
+    {id: '4', icon: Adidas},
+    {id: '5', icon: CalvinIcon},
+    {id: '6', icon: LevisIcon},
+  ];
+
+  const renderItem = ({item}) => {
+    const IconComponent = item.icon;
+
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('BrandsScreen')}
+        style={{
+          width: hp(105.68),
+          height: hp(65.08),
+          borderRadius: wp(14),
+          backgroundColor: '#F8F8F8',
+          alignItems: 'center',
+          justifyContent: 'center',
+          // marginBottom: hp(13),
+        }}>
+        <IconComponent />
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <SafeAreaView>
-      <View style={{marginLeft: wp(17)}}>
+      <View
+        style={{
+          marginHorizontal: wp(17),
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
         <Text
           style={{
             color: '#000',
@@ -22,98 +59,39 @@ const ShopByBrandsComponent = () => {
           }}>
           Shop by Brands
         </Text>
-      </View>
 
-      <View
-        style={{
-          marginHorizontal: wp(17),
-          marginTop: hp(24.66),
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <View
+        <TouchableOpacity
+          onPress={() => navigation.navigate('BrandsScreen')}
           style={{
-            width: wp(105.58),
-            height: hp(65.08),
-            borderRadius: 14,
-            backgroundColor: '#F8F8F8',
+            borderColor: '#E5E5E5',
+            borderWidth: 1,
+            width: hp(68),
+            height: hp(28),
+            borderRadius: wp(10),
             alignItems: 'center',
             justifyContent: 'center',
-            // borderWidth: 1,
           }}>
-          <PullBearIcon />
-        </View>
-        <View
-          style={{
-            width: wp(105.68),
-            height: hp(65.08),
-            borderRadius: 14,
-            backgroundColor: '#F8F8F8',
-            alignItems: 'center',
-            justifyContent: 'center',
-            // borderWidth: 1,
-          }}>
-          <BossIcon />
-        </View>
-        <View
-          style={{
-            width: wp(105.68),
-            height: hp(65.08),
-            borderRadius: 14,
-            backgroundColor: '#F8F8F8',
-            alignItems: 'center',
-            justifyContent: 'center',
-            // borderWidth: 1,
-          }}>
-          <UniIcon />
-        </View>
+          <Text
+            style={{
+              color: '#000',
+              fontFamily: fontFamily.poppins400,
+              fontSize: fontSize(12),
+            }}>
+            View All
+          </Text>
+        </TouchableOpacity>
       </View>
-      <View
-        style={{
-          marginHorizontal: wp(17),
-          marginTop: wp(13.02),
-          flexDirection: 'row',
-          alignItems: 'center',
+      <FlatList
+        data={brands}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        numColumns={3}
+        columnWrapperStyle={{
           justifyContent: 'space-between',
-        }}>
-        <View
-          style={{
-            width: wp(105.68),
-            height: hp(65.08),
-            borderRadius: 14,
-            backgroundColor: '#F8F8F8',
-            alignItems: 'center',
-            justifyContent: 'center',
-            // borderWidth: 1,
-          }}>
-          <Adidas />
-        </View>
-        <View
-          style={{
-            width: wp(105.68),
-            height: hp(65.08),
-            borderRadius: 14,
-            backgroundColor: '#F8F8F8',
-            alignItems: 'center',
-            justifyContent: 'center',
-            // borderWidth: 1,
-          }}>
-          <CalvinIcon />
-        </View>
-        <View
-          style={{
-            width: wp(105.68),
-            height: hp(65.08),
-            borderRadius: 14,
-            backgroundColor: '#F8F8F8',
-            alignItems: 'center',
-            justifyContent: 'center',
-            // borderWidth: 1,
-          }}>
-          <LevisIcon />
-        </View>
-      </View>
+          marginHorizontal: wp(17),
+          marginTop: hp(24),
+        }}
+      />
     </SafeAreaView>
   );
 };

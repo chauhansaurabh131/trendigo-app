@@ -38,6 +38,9 @@ import NewOrderDetailsScreen from '../SellerScreens/NewOrderDetailsScreen/index.
 import DeliveredOrderScreen from '../SellerScreens/DeliveredOrderScreen/index.js';
 import ReturnOrderDetailsScreen from '../SellerScreens/ReturnOrderDetailsScreen/index.js';
 import CancelOrderDetailsScreen from '../SellerScreens/CancelOrderDetailsScreen/index.js';
+import ViralTrendsScreen from '../screens/ViralTrendsScreen/index.js';
+import ReelsVideoScreen from '../screens/ReelsVideoScreen/index.js';
+import BrandsScreen from '../screens/brandsScreen/index.js';
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
@@ -213,6 +216,9 @@ const RootNavigator = () => {
       <Stack.Screen name="ReviewsScreen" component={RevewsScreen} />
       <Stack.Screen name="SearchResultScreen" component={SearchResultScreen} />
       <Stack.Screen name="SendEquiryScreen" component={SendEquiryScreen} />
+      <Stack.Screen name="ViralTrends" component={ViralTrendsScreen} />
+      <Stack.Screen name="ReelsScreen" component={ReelsVideoScreen} />
+      <Stack.Screen name="BrandsScreen" component={BrandsScreen} />
 
       {/* Seller Screens */}
       <Stack.Screen name="HomeScreen" component={HomeScreen} />

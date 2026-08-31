@@ -19,6 +19,7 @@ import GET_CHAT_LIST_REQUEST, {
 } from '../../redux/actions/chatAction';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import {fontFamily, fontSize, hp} from '../../utils/helpers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const ChatItem = ({avatar, name, time, preview, online, unreadCount}) => {
   return (
     <View
@@ -181,32 +182,40 @@ const ChatScreen = () => {
   // Connect to the socket server when the component mounts and disconnect when it unmounts
 
   useEffect(() => {
-    if (!token) {
-      return;
-    }
+    // if (!token) {
+    //   return;
+    // }
 
-    const socket = connectSocket(token);
+    // const socket = connectSocket(token);
 
-    socket.on('connect', () => {
-      console.log('Connected');
-      console.log('Socket ID:', socket.id);
-      //
-      socket.emit('get_conversations');
-      // Request the list of conversations from the server
-    });
-    socket.on('conversations_list', response => {
-      // Handle the received conversations list from the server
-      console.log('CONVERSATIONS LIST =>', response);
+    const initializeSocket = async () => {
+      const latestToken = await AsyncStorage.getItem('authToken');
 
-      dispatch({
-        type: 'GET_CHAT_LIST_SUCCESS',
-        payload: response,
+      console.log('LATEST TOKEN CHAT =>', latestToken);
+
+      const socket = connectSocket(latestToken);
+      socket.on('connect', () => {
+        console.log('Connected');
+        console.log('Socket ID:', socket.id);
+        //
+        socket.emit('get_conversations');
+        // Request the list of conversations from the server
       });
-    });
+      socket.on('conversations_list', response => {
+        // Handle the received conversations list from the server
+        console.log('CONVERSATIONS LIST =>', response);
 
-    return () => {
-      socket.off('conversations_list');
+        dispatch({
+          type: 'GET_CHAT_LIST_SUCCESS',
+          payload: response,
+        });
+      });
+
+      return () => {
+        socket.off('conversations_list');
+      };
     };
+    initializeSocket();
   }, [token]);
 
   const filteredChats = chatList.filter(item =>

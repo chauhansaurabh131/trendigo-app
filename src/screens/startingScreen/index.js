@@ -12,6 +12,7 @@ import {
 import {
   ImageBackGround,
   images,
+  NewBigLogo,
   RightSideArrow,
   TrulyBag,
   WhiteTrendiGo,
@@ -85,7 +86,9 @@ const StartingScreen = () => {
             height: '100%',
           }}>
           <View style={{marginTop: Platform.OS === 'ios' ? 100 : 30}}>
-            <TrulyBag />
+            {/* <TrulyBag />
+             */}
+            <NewBigLogo />
           </View>
           <View style={{marginHorizontal: wp(66), marginTop: hp(38)}}>
             <Text
@@ -149,7 +152,7 @@ const StartingScreen = () => {
                 <Text
                   style={{
                     color: '#F2EEFD',
-                    fontSize: fontSize(15),
+                    fontSize: fontSize(17),
                     lineHeight: hp(24),
                     fontFamily: fontFamily.poppins700,
                   }}>
@@ -190,7 +193,7 @@ const StartingScreen = () => {
             <Text
               style={{
                 color: '#5029F4',
-                fontSize: fontSize(15),
+                fontSize: fontSize(17),
                 fontFamily: fontFamily.poppins700,
                 lineHeight: hp(24),
               }}>
@@ -269,8 +272,8 @@ const StartingScreen = () => {
             <Text
               style={{
                 color: '#5029F4',
-                fontSize: fontSize(14),
-                fontFamily: fontFamily.poppins400,
+                fontSize: fontSize(17),
+                fontFamily: fontFamily.poppins700,
               }}>
               Seller Login
             </Text>

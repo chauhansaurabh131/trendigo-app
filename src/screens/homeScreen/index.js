@@ -4,6 +4,7 @@ import {colors} from '../../utils/colors';
 import {
   ColorTrendiGo,
   GradientColorSearchIcon,
+  NewLogo,
   ProfileIcon,
   SmallTrulyBag,
   TrulyBag,
@@ -31,7 +32,7 @@ const HomeScreen = () => {
   console.log('PROFILE PIC ', user?.profilePic);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
-      {/* 🔒 Non-scrollable header */}
+      {/* Non-scrollable header */}
       <View
         style={{
           marginTop: hp(19),
@@ -44,7 +45,7 @@ const HomeScreen = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <SmallTrulyBag />
+          <NewLogo />
 
           <TouchableOpacity
             activeOpacity={0.6}
@@ -52,7 +53,7 @@ const HomeScreen = () => {
               navigation.navigate('ProfileScreen');
             }}>
             {user?.profilePic ? (
-              // ✅ Profile image
+              //  Profile image
               <Image
                 source={{uri: user.profilePic}}
                 style={{
@@ -62,7 +63,7 @@ const HomeScreen = () => {
                 }}
               />
             ) : user?.name || user?.email ? (
-              // ✅ First Letter
+              // First Letter
               <View
                 style={{
                   width: hp(24),
@@ -90,7 +91,7 @@ const HomeScreen = () => {
                 </Text>
               </View>
             ) : (
-              // ✅ Not Logged In
+              // Not Logged In
               <ProfileIcon />
             )}
           </TouchableOpacity>

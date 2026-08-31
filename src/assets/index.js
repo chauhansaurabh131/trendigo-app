@@ -59,8 +59,25 @@ import SellerProfile from './svgIcons/seller_profile.svg';
 import BlueSaveIcon from './svgIcons/blue_save_icon.svg';
 import ChatShareIcon from './svgIcons/chat_share_icon.svg';
 import SavedFiledIcon from './svgIcons/save_filed_icon.svg';
+import WhiteArrow from './svgIcons/white_arrow.svg';
+import EyeIcon from './svgIcons/eye_icon.svg';
+import HeartIcon from './svgIcons/herart_icon.svg';
+import BrandIcon from './svgIcons/brands_icon.svg';
+import NewLogo from './svgIcons/new_logo.svg';
+import NewBigLogo from './svgIcons/new_big_logo.svg';
+import BlueStar from './svgIcons/blue_star.svg';
+import BlueCircleImage from './svgIcons/blue_circle_image.svg';
+import Blackheart from './svgIcons/black_heart.svg';
 export {
   Icon,
+  BlueStar,
+  Blackheart,
+  BrandIcon,
+  BlueCircleImage,
+  NewBigLogo,
+  EyeIcon,
+  NewLogo,
+  HeartIcon,
   SellerProfile,
   BlueSaveIcon,
   TabIcon,
@@ -120,6 +137,7 @@ export {
   CrossIcon,
   SellerHome,
   ThreeDotsIcon,
+  WhiteArrow,
   SellerMessages,
 };
 
@@ -207,4 +225,8 @@ export const images = {
   full_image: require('./images/full_image1.png'),
   truly_bag_image: require('./images/truly_bag_image1.png'),
   blue_gradient: require('./images/blue_gradient1.png'),
+  viral_image: require('./images/viral1_image.jpg'),
+  viral_man_image: require('./images/viral_man_image1.png'),
+  viral_image1: require('./images/viral_image11.png'),
+  full_image: require('./images/full1_image.png'),
 };

@@ -14,19 +14,18 @@ import {
   REMOVE_CART_SUCCESS,
   REMOVE_CART_FAILURE,
 } from '../actions/cartActions';
+import api from '../../api/apiClient';
 
 function addToCartApi(data, token) {
-  // console.log('ADD TO CART API FUNCTION CALLED');
-  // console.log(' Add to Cart Payload going to API ', data);
   console.log('Token', token);
-  return axios.post(
-    'https://mntrendigo.mntech.website/api/v1/user/cart/',
+  return api.post(
+    'user/cart/',
     data,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
+    // {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // },
   );
 }
 
@@ -35,16 +34,15 @@ function* addToCartSaga(action) {
     console.log('ADD_TO_CART_REQUEST RECEIVED');
     console.log('Full Action ', action);
     const {payload, token} = action;
-    // console.log('Payload inside saga ', payload);
-    // console.log('Token inside saga ', token);
+
     const response = yield call(addToCartApi, payload, token);
-    console.log('Add to Cart API RESPONSE SUCCESS ==>', response.data);
+    console.log('ADD TO CART RESPONSE SUCCESS ==>', response.data);
 
     yield put({
       type: ADD_TO_CART_SUCCESS,
       payload: response.data,
     });
-    console.log('SUCCESS ACTION DISPATCHED');
+    console.log('ADD TO CART SUCCESS ACTION DISPATCHED');
     //  cart refresh
     yield put({
       type: GET_CART_REQUEST,
@@ -62,13 +60,13 @@ function* addToCartSaga(action) {
 }
 
 function getCartApi(token) {
-  return axios.get(
-    'https://mntrendigo.mntech.website/api/v1/user/cart/get-user-cart',
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
+  return api.get(
+    'user/cart/get-user-cart',
+    // {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // },
   );
 }
 
@@ -100,18 +98,18 @@ function updateCartApi(data, token) {
   console.log('Payload:', data);
   console.log('Token:', token);
 
-  return axios.put(
-    `https://mntrendigo.mntech.website/api/v1/user/cart/${data.cartItemId}`,
+  return api.put(
+    `user/cart/${data.cartItemId}`,
     {
       variants: data.variants,
       quantity: data.quantity,
     },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    },
+    // {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //     'Content-Type': 'application/json',
+    //   },
+    // },
   );
 }
 function* updateCartSaga(action) {
@@ -149,13 +147,13 @@ const removeCartApi = async (cartId, itemId, token) => {
   console.log(cartId, 'CARDID');
   console.log(itemId, 'PRODUCTID');
   console.log(token, 'token');
-  const response = await axios.delete(
-    `https://mntrendigo.mntech.website/api/v1/user/cart/${cartId}/product/${itemId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
+  const response = await api.delete(
+    `user/cart/${cartId}/product/${itemId}`,
+    // {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // },
   );
 
   return response.data;

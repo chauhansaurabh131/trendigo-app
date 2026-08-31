@@ -38,6 +38,7 @@ import {
   UPLOAD_CUSTOMER_CHAT_IMAGE_REQUEST,
   UPLOAD_CUSTOMER_IMAGE_TO_S3_REQUEST,
 } from '../../redux/actions/chatAction';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const SendEquiryScreen = ({route}) => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
@@ -83,126 +84,131 @@ const SendEquiryScreen = ({route}) => {
   const displayMessages = filteredMessages;
 
   useEffect(() => {
-    if (!token) {
-      return;
-    }
+    const initializeSocket = async () => {
+      const latestToken = await AsyncStorage.getItem('authToken');
+      console.log('LATEST TOKEN =>', latestToken);
 
-    const socket = connectSocket(token);
+      const socket = connectSocket(latestToken);
 
-    socket.on('connect', () => {
-      console.log(' SOCKET CONNECTED');
-      console.log(' SOCKET ID =>', socket.id);
+      // const socket = connectSocket(token);
+      console.log('CONNECT SOCKET TOKEN =>', latestToken);
+      socket.on('connect', () => {
+        console.log(' SOCKET CONNECTED');
+        console.log(' SOCKET ID =>', socket.id);
 
-      socket.emit('get_messages', {
-        counterpartyId: receiverId,
+        socket.emit('get_messages', {
+          counterpartyId: receiverId,
 
-        page: 1,
-        limit: 10,
-      });
-
-      console.log('GET_MESSAGES EMITTED');
-
-      socket.onAny((event, data) => {
-        console.log(' EVENT =>', event);
-        console.log(' DATA =>', data);
-      });
-    });
-
-    // Initial messages
-    socket.on('messages_list', response => {
-      console.log(
-        'MESSAGES_LIST RESPONSE =>',
-        JSON.stringify(response, null, 2),
-      );
-
-      if (response.page === 1) {
-        dispatch({
-          type: 'SET_MESSAGES',
-          payload: response.results,
+          page: 1,
+          limit: 10,
         });
-      } else {
-        dispatch({
-          type: 'APPEND_MESSAGES',
-          payload: response.results,
+
+        console.log('GET_MESSAGES EMITTED');
+
+        socket.onAny((event, data) => {
+          console.log(' EVENT =>', event);
+          console.log(' DATA =>', data);
         });
-      }
-
-      if (response.results.length < 10) {
-        setHasMore(false);
-      }
-
-      setLoading(false);
-      setLoadingMore(false);
-    });
-    socket.on('message_sent', message => {
-      console.log('MESSAGE_SENT ID =>', message.id);
-      console.log(' MESSAGE SENT EVENT', message);
-      console.log('NEW MESSAGE =>', message);
-      socket.emit('get_messages', {
-        counterpartyId: receiverId,
-        page: 1,
-        limit: 10,
       });
-      dispatch({
-        type: 'ADD_MESSAGE',
-        payload: {
-          ...message,
-          createdAt: new Date().toISOString(),
-        },
+
+      // Initial messages
+      socket.on('messages_list', response => {
+        console.log(
+          'MESSAGES_LIST RESPONSE =>',
+          JSON.stringify(response, null, 2),
+        );
+
+        if (response.page === 1) {
+          dispatch({
+            type: 'SET_MESSAGES',
+            payload: response.results,
+          });
+        } else {
+          dispatch({
+            type: 'APPEND_MESSAGES',
+            payload: response.results,
+          });
+        }
+
+        if (response.results.length < 10) {
+          setHasMore(false);
+        }
+
+        setLoading(false);
+        setLoadingMore(false);
       });
-      setSelectedImage(null);
+      socket.on('message_sent', message => {
+        console.log('MESSAGE_SENT ID =>', message.id);
+        console.log(' MESSAGE SENT EVENT', message);
+        console.log('NEW MESSAGE =>', message);
+        socket.emit('get_messages', {
+          counterpartyId: receiverId,
+          page: 1,
+          limit: 10,
+        });
+        dispatch({
+          type: 'ADD_MESSAGE',
+          payload: {
+            ...message,
+            createdAt: new Date().toISOString(),
+          },
+        });
+        setSelectedImage(null);
 
-      dispatch({
-        type: 'CLEAR_UPLOADED_IMAGE',
+        dispatch({
+          type: 'CLEAR_UPLOADED_IMAGE',
+        });
       });
-    });
-    // New incoming message
-    socket.on('receive_message', message => {
-      console.log('RECEIVE_MESSAGE ID =>', message._id);
-      console.log('RECEIVE_MESSAGE EVENT FIRED');
-      console.log(' NEW MESSAGE =>', message);
+      // New incoming message
+      socket.on('receive_message', message => {
+        console.log('RECEIVE_MESSAGE ID =>', message._id);
+        console.log('RECEIVE_MESSAGE EVENT FIRED');
+        console.log(' NEW MESSAGE =>', message);
 
-      dispatch({
-        type: 'ADD_MESSAGE',
-        payload: {
-          ...message,
-          createdAt: new Date().toISOString(),
-        },
+        dispatch({
+          type: 'ADD_MESSAGE',
+          payload: {
+            ...message,
+            createdAt: new Date().toISOString(),
+          },
+        });
       });
-    });
 
-    socket.on('message_deleted', response => {
-      console.log(' MESSAGE_DELETED EVENT RECEIVED');
-      console.log(' RESPONSE =>', response);
+      socket.on('message_deleted', response => {
+        console.log(' MESSAGE_DELETED EVENT RECEIVED');
+        console.log(' RESPONSE =>', response);
 
-      dispatch({
-        type: 'DELETE_MESSAGE',
-        payload: response.messageId,
+        dispatch({
+          type: 'DELETE_MESSAGE',
+          payload: response.messageId,
+        });
+        ToastAndroid.show('Message deleted successfully', ToastAndroid.SHORT);
       });
-      ToastAndroid.show('Message deleted successfully', ToastAndroid.SHORT);
-    });
 
-    socket.on('error', error => {
-      console.log('SOCKET ERROR EVENT =>', error);
+      socket.on('error', error => {
+        console.log('SOCKET ERROR EVENT =>', error);
 
-      ToastAndroid.show(
-        error?.error || error?.message || 'Something went wrong',
-        ToastAndroid.SHORT,
-      );
-    });
+        ToastAndroid.show(
+          error?.error || error?.message || 'Something went wrong',
+          ToastAndroid.SHORT,
+        );
+      });
 
-    socket.on('connect_error', error => {
-      console.log('SOCKET ERROR =>', error);
-    });
+      socket.on('connect_error', error => {
+        console.log('SOCKET ERROR =>', error);
+      });
 
-    return () => {
-      console.log(' CLEANUP SOCKET');
+      return () => {
+        console.log(' CLEANUP SOCKET');
 
-      socket.off('messages_list');
-      socket.off('receive_message');
-      socket.off('connect');
-      socket.off('connect_error');
+        socket.off('messages_list');
+        socket.off('receive_message');
+        socket.off('connect');
+        socket.off('connect_error');
+      };
     };
+
+    initializeSocket();
   }, [token, receiverId]);
 
   // when send to seller

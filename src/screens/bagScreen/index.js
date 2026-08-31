@@ -626,7 +626,7 @@ const BagScreen = () => {
                 dispatch(removeCartRequest(payloadData, token));
               }}>
               {removingItemId === item?._id ? (
-                <ActivityIndicator size="small" color="#8225AF" />
+                <ActivityIndicator size="small" color="#5029F4" />
               ) : (
                 <DeleteIcoon />
               )}
@@ -1379,7 +1379,7 @@ const BagScreen = () => {
             container: {
               borderTopLeftRadius: wp(16),
               borderTopRightRadius: wp(16),
-              height: hp(480),
+              // height: hp(480),
             },
           }}>
           {/* <ScrollView
@@ -1447,7 +1447,7 @@ const BagScreen = () => {
 
                       borderColor:
                         selectedColor?.toLowerCase() === color.id?.toLowerCase()
-                          ? '#8225AF'
+                          ? '#5029F4'
                           : '#E0E0E0',
                       borderRadius: wp(10),
                     }}
@@ -1476,11 +1476,7 @@ const BagScreen = () => {
                 Select Size
               </Text>
 
-              <View
-                style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                }}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {availableSizes.map(
                   (size, index) => (
                     console.log(availableSizes, 'AVAILABLE SIZES==>'),
@@ -1523,56 +1519,63 @@ const BagScreen = () => {
                     )
                   ),
                 )}
-                <View
-                  style={
-                    {
-                      // marginTop: hp(29)
-                    }
-                  }>
-                  <Text
-                    style={{
-                      color: colors.black,
-                      fontSize: fontSize(14),
-                      fontFamily: fontFamily.poppins500,
-                      // marginBottom: hp(20),
-                      marginBottom: hp(15),
-                    }}>
-                    Select Quantity
-                  </Text>
+              </ScrollView>
+              <View
+                style={
+                  {
+                    // marginTop: hp(29)
+                  }
+                }>
+                <Text
+                  style={{
+                    color: colors.black,
+                    fontSize: fontSize(14),
+                    fontFamily: fontFamily.poppins500,
+                    // marginBottom: hp(20),
+                    marginBottom: hp(15),
+                  }}>
+                  Select Quantity
+                </Text>
 
-                  <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-                    {quantityOptions.map(qty => (
-                      <TouchableOpacity
-                        key={qty}
+                <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                  {quantityOptions.map(qty => (
+                    <TouchableOpacity
+                      key={qty}
+                      style={{
+                        width: wp(48),
+                        height: wp(48),
+                        borderRadius: wp(32.5),
+                        borderWidth: 2,
+                        borderColor:
+                          selectedQuantity === qty ? '#000000' : '#E0E0E0',
+                        backgroundColor:
+                          selectedQuantity === qty ? '#F7E7FF' : colors.white,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: wp(12),
+                        marginBottom: hp(25),
+                      }}
+                      onPress={() => setSelectedQuantity(qty)}>
+                      <Text
                         style={{
-                          width: wp(48),
-                          height: wp(48),
-                          borderRadius: wp(32.5),
-                          borderWidth: 2,
-                          borderColor:
-                            selectedQuantity === qty ? '#000000' : '#E0E0E0',
-                          backgroundColor:
-                            selectedQuantity === qty ? '#F7E7FF' : colors.white,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginRight: wp(12),
-                          marginBottom: hp(25),
-                        }}
-                        onPress={() => setSelectedQuantity(qty)}>
-                        <Text
-                          style={{
-                            fontSize: fontSize(16),
-                            fontFamily: fontFamily.poppins600,
-                            color: colors.pureBlack,
-                          }}>
-                          {qty}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                          fontSize: fontSize(16),
+                          fontFamily: fontFamily.poppins600,
+                          color: colors.pureBlack,
+                        }}>
+                        {qty}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
               </View>
-
+            </View>
+            <View
+              style={{
+                position: 'absolute',
+                bottom: wp(30),
+                left: wp(18),
+                right: wp(18),
+              }}>
               <GradientButton
                 title={loading ? 'Updating...' : 'Update'}
                 onPress={() => {
@@ -1614,7 +1617,7 @@ const BagScreen = () => {
                   dispatch(updateCartRequest(data, token));
                   // ToastAndroid.show('Updated successfully', ToastAndroid.SHORT);
                 }}
-                buttonStyle={{marginBottom: hp(30)}}></GradientButton>
+                buttonStyle={{}}></GradientButton>
             </View>
           </View>
         </RBSheet>
