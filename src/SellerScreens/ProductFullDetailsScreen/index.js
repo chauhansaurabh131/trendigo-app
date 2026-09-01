@@ -366,10 +366,17 @@ const ProductFullDetailsScreen = () => {
 
           {/* Rating */}
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <CustomStarIcon
+            {/* <CustomStarIcon
               width={hp(15)}
               height={hp(14)}
               fill="#8225AF"
+              style={{marginRight: wp(10)}}
+            /> */}
+
+            <CustomStarIcon
+              width={hp(15)}
+              height={hp(14)}
+              fill="#5029F4"
               style={{marginRight: wp(10)}}
             />
             <Text
@@ -486,66 +493,6 @@ const ProductFullDetailsScreen = () => {
             }}>
             <SearchFilterIcon />
           </Touchable>
-
-          <Touchable
-            style={{
-              // marginLeft: wp(10),
-              width: wp(50),
-              height: hp(50),
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <BagIcon width={20} height={20} />
-          </Touchable>
-        </View>
-      </View>
-
-      <View
-        style={{
-          position: 'absolute',
-          zIndex: 99,
-          bottom: 0,
-          height: hp(80),
-          width: '100%',
-          backgroundColor: 'white',
-          justifyContent: 'center',
-        }}>
-        <View
-          style={{
-            marginHorizontal: wp(17),
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <GradientButton
-            title="Add to Cart"
-            onPress={handleAddToCart}
-            buttonStyle={{width: wp(285), height: hp(50)}}
-          />
-
-          <View style={{width: hp(50), height: hp(50)}}>
-            <Image
-              source={images.gradientCircleImage}
-              style={{width: '100%', height: '100%'}}
-            />
-
-            {/* Touchable Like Icon */}
-            <TouchableOpacity
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: [
-                  {translateX: -wp(23) / 2},
-                  {translateY: -hp(20) / 2},
-                ],
-              }}
-              onPress={() => console.log('Like pressed')}>
-              <Image
-                source={images.emptyLikeImage}
-                style={{width: wp(23), height: hp(20), resizeMode: 'contain'}}
-              />
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
 
@@ -764,79 +711,6 @@ const ProductFullDetailsScreen = () => {
           }}
         />
 
-        <View style={{marginHorizontal: wp(17), marginTop: hp(22)}}>
-          <Text
-            style={{
-              color: colors.pureBlack,
-              fontSize: fontSize(17),
-              lineHeight: hp(26),
-              fontFamily: fontFamily.poppins700,
-            }}>
-            Check Delivery Options
-          </Text>
-
-          <Text
-            style={{
-              fontSize: fontSize(12),
-              lineHeight: hp(18),
-              fontFamily: fontFamily.poppins400,
-              color: '#969696',
-              marginTop: hp(5),
-            }}>
-            Please enter PIN code to check delivery time & Pay on Delivery
-            Availability
-          </Text>
-
-          <View
-            style={{
-              marginTop: hp(23),
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <TextInput
-              value={pincode}
-              onChangeText={handlePincodeChange}
-              placeholder={'Enter Pincode'}
-              placeholderTextColor={'black'}
-              style={{
-                width: wp(228),
-                height: hp(44),
-                backgroundColor: '#F4F4F4',
-                borderRadius: wp(50),
-                paddingHorizontal: hp(30),
-                fontSize: fontSize(14),
-                lineHeight: hp(20),
-                fontFamily: fontFamily.poppins500,
-                color: '#000',
-              }}
-              keyboardType="numeric"
-              maxLength={6} // Limit to 6 digits
-            />
-
-            <GradientButton
-              onPress={() => {
-                console.log(' === pincode ===> ', pincode);
-              }}
-              title={'Check'}
-              buttonStyle={{
-                width: wp(99),
-                height: hp(44),
-                opacity: pincode.length === 6 ? 1 : 0.7,
-              }}
-              disabled={pincode.length !== 6} // Disable button if pincode is not exactly 6 digits
-            />
-          </View>
-        </View>
-
-        <View
-          style={{
-            width: '100%',
-            borderWidth: 4,
-            borderColor: '#F7F7F7',
-            marginTop: hp(34),
-          }}
-        />
-
         <View style={{marginHorizontal: wp(17), marginTop: hp(23)}}>
           <Text
             style={{
@@ -1037,10 +911,6 @@ const ProductFullDetailsScreen = () => {
                     {product?.storeId?.name || 'N/A'}
                   </Text>
                 </Text>
-
-                <TouchableOpacity style={{marginLeft: wp(6)}}>
-                  <ShareBlueIcon />
-                </TouchableOpacity>
               </View>
               <View>
                 <Text
@@ -1182,252 +1052,7 @@ const ProductFullDetailsScreen = () => {
           </Text>
         </Touchable>
 
-        <View style={{height: hp(85)}} />
-
         <View style={{height: hp(30)}} />
-
-        <Modal
-          transparent={true}
-          visible={modalVisible}
-          animationType="none"
-          onRequestClose={() => setModalVisible(false)}>
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: 'rgba(0,0,0,0.4)',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            <View
-              style={{
-                width: '90%',
-                backgroundColor: 'white',
-                borderRadius: 10,
-                overflow: 'visible',
-              }}>
-              <Touchable
-                onPress={() => setModalVisible(false)}
-                style={{
-                  position: 'absolute',
-                  right: 0,
-                  top: 0,
-                  height: hp(50),
-                  width: hp(50),
-                  zIndex: 10, // ✅ add zIndex for iOS
-                  // elevation: 10, // ✅ optional for Android shadow
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <CancelIcon />
-              </Touchable>
-
-              <Image
-                source={images.shopClothImage}
-                style={{
-                  width: hp(64),
-                  height: hp(64),
-                  marginTop: hp(31),
-                  alignSelf: 'center',
-                }}
-              />
-              <Text
-                style={{
-                  fontSize: fontSize(16),
-                  fontFamily: fontFamily.poppins700,
-                  marginTop: hp(22),
-                  color: colors.pureBlack,
-                  textAlign: 'center',
-                }}>
-                Galaxy Fashion Hub
-              </Text>
-
-              <View
-                style={{
-                  marginHorizontal: 34,
-                  alignItems: 'center',
-                  alignSelf: 'center',
-                  marginTop: hp(13),
-                }}>
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: fontSize(10),
-                    lineHeight: hp(14),
-                    fontFamily: fontFamily.poppins500,
-                    color: colors.pureBlack,
-                  }}>
-                  Assured Product quality at great value and Great{'\n'}shopping
-                  experience and best class services with Ruhi{'\n'}Dress
-                  Materials
-                </Text>
-              </View>
-
-              <Text
-                style={{
-                  marginTop: hp(18),
-                  fontSize: fontSize(12),
-                  lineHeight: hp(18),
-                  fontFamily: fontFamily.poppins700,
-                  color: colors.pureBlack,
-                  textAlign: 'center',
-                }}>
-                Seller since :{' '}
-                <Text
-                  style={{
-                    fontFamily: fontFamily.poppins500,
-                    fontSize: fontSize(12),
-                  }}>
-                  2 years
-                </Text>{' '}
-                {'    '}
-                FSSAI :{' '}
-                <Text
-                  style={{
-                    fontFamily: fontFamily.poppins500,
-                    fontSize: fontSize(12),
-                  }}>
-                  10021043000393
-                </Text>
-              </Text>
-
-              <View
-                style={{
-                  backgroundColor: '#FCF7FF',
-                  width: '100%',
-                  marginTop: hp(34),
-                  height: hp(190),
-                }}>
-                <View
-                  style={{
-                    marginHorizontal: 37,
-                    marginTop: hp(25),
-                    flexDirection: 'row',
-                  }}>
-                  <View style={{width: '50%'}}>
-                    <Text
-                      style={{
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins700,
-                        fontSize: fontSize(20),
-                        lineHeight: hp(30),
-                      }}>
-                      97%
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins400,
-                        fontSize: fontSize(12),
-                        lineHeight: hp(18),
-                      }}>
-                      Positive Seller Ratings
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      width: '50%',
-                      marginLeft: wp(30),
-                    }}>
-                    <Text
-                      style={{
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins700,
-                        fontSize: fontSize(20),
-                        lineHeight: hp(30),
-                      }}>
-                      41%
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins400,
-                        fontSize: fontSize(12),
-                        lineHeight: hp(18),
-                      }}>
-                      Service Quality
-                    </Text>
-                  </View>
-                </View>
-
-                <View
-                  style={{
-                    marginHorizontal: 34,
-                    marginTop: hp(29),
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <View style={{width: '50%'}}>
-                    <Text
-                      style={{
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins700,
-                        fontSize: fontSize(20),
-                        lineHeight: hp(30),
-                      }}>
-                      120
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins400,
-                        fontSize: fontSize(12),
-                        lineHeight: hp(18),
-                      }}>
-                      Total Listing
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      width: '50%',
-                      marginLeft: wp(30),
-                    }}>
-                    <Text
-                      style={{
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins700,
-                        fontSize: fontSize(20),
-                        lineHeight: hp(30),
-                      }}>
-                      4.6
-                    </Text>
-                    <Text
-                      style={{
-                        color: colors.pureBlack,
-                        fontFamily: fontFamily.poppins400,
-                        fontSize: fontSize(12),
-                        lineHeight: hp(18),
-                      }}>
-                      Delivery Services
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              {/* Add your profile content here */}
-
-              <Touchable
-                style={{
-                  width: '100%',
-                  textAlign: 'center',
-                  alignItems: 'center',
-                  height: hp(50),
-                  justifyContent: 'center',
-                }}
-                onPress={() => setModalVisible(false)}>
-                <Text
-                  style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(16),
-                    fontFamily: fontFamily.poppins400,
-                    lineHeight: hp(24),
-                  }}>
-                  Send Equiry
-                </Text>
-              </Touchable>
-            </View>
-          </View>
-        </Modal>
       </ScrollView>
     </SafeAreaView>
   );

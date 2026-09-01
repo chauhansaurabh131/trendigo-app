@@ -29,6 +29,7 @@ import {
   sellerVerifyResetOtpRequest,
 } from '../../redux/actions/sellerAuthActions';
 import {useNavigation} from '@react-navigation/native';
+import {getMessaging} from '@react-native-firebase/messaging';
 // Platform-specific TouchableOpacity
 const Touchable =
   Platform.OS === 'ios'
@@ -91,6 +92,18 @@ const SellerStartingScreenBottomButtonComponent = forwardRef((props, ref) => {
     }
     return formattedText.slice(0, 13);
   };
+
+  // get fcm Token
+  const [fcmToken, setFcmToken] = useState('');
+
+  useEffect(() => {
+    const getToken = async () => {
+      const token = await getMessaging().getToken();
+      setFcmToken(token);
+    };
+
+    getToken();
+  }, []);
   //login
   const {loading, sellerData, error} = useSelector(state => state.sellerAuth);
   // console.log('LOADING', loading);
@@ -115,12 +128,16 @@ const SellerStartingScreenBottomButtonComponent = forwardRef((props, ref) => {
       payload = {
         email: value,
         password: password.trim(),
+        deviceToken: fcmToken,
+        platform: 'android',
       };
     } else if (isValidMobile(value)) {
       payload = {
         mobileNumber: value,
         password: password.trim(),
         countryCodeId: '6957b791f4ef97291c4df2d0',
+        deviceToken: fcmToken,
+        platform: 'android',
       };
     } else {
       return;

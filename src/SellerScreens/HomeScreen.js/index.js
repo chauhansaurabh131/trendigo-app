@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import {View} from 'react-native';
 import {
+  NewLogo,
   ProfileIcon,
   SellerAlert,
   ShipIcon,
@@ -82,7 +83,7 @@ const HomeScreen = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <SmallTrulyBag />
+          <NewLogo />
           {/* <TouchableOpacity
             onPress={() => navigation.navigate('SellerProfile')}>
             <ProfileIcon />
