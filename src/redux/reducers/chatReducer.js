@@ -54,8 +54,24 @@ export const chatReducer = (state = initialState, action) => {
         product: action.payload?.[0]?.product || null,
         loading: false,
       };
+    // case 'ADD_MESSAGE':
+    //   console.log('PAYLOAD =>', action.payload);
+    // return {
+    //   ...state,
+    //   messages: [action.payload, ...state.messages],
+    // };
+
     case 'ADD_MESSAGE':
-      console.log('PAYLOAD =>', action.payload);
+      console.log('ADD_MESSAGE =>', action.payload._id || action.payload.id);
+      const exists = state.messages.some(
+        item =>
+          (item._id || item.id) === (action.payload._id || action.payload.id),
+      );
+
+      if (exists) {
+        return state;
+      }
+
       return {
         ...state,
         messages: [action.payload, ...state.messages],
@@ -72,7 +88,10 @@ export const chatReducer = (state = initialState, action) => {
     case 'DELETE_MESSAGE':
       return {
         ...state,
-        messages: state.messages.filter(item => item._id !== action.payload),
+        // messages: state.messages.filter(item => item._id !== action.payload),
+        messages: state.messages.filter(
+          item => (item._id || item.id) !== action.payload,
+        ),
       };
     // case 'APPEND_MESSAGES':
     //   return {

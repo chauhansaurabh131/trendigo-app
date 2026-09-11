@@ -87,7 +87,6 @@ function* removeWishlistSaga(action) {
 
     console.log(' REMOVE_WISHLIST SUCCESSFULLY');
 
-    // success → reducer ko id bhejo
     yield put(removeWishlistSuccess(action.payload));
     console.log(' REMOVE_WISHLIST_SUCCESS dispatched', action.payload);
   } catch (error) {

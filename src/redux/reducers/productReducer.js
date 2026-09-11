@@ -17,12 +17,6 @@ export default function productReducer(state = initialState, action) {
     case GET_PRODUCT_REQUEST:
       return {...state, loading: true};
 
-    // case GET_PRODUCT_SUCCESS:
-    //   return {
-    //     ...state,
-    //     loading: false,
-    //     products: action.payload,
-    //   };
     case GET_PRODUCT_SUCCESS:
       return {
         ...state,

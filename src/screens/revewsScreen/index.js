@@ -5,7 +5,7 @@ import {FlatList} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import arrow_back from '../../assets/images/arrow_back.png';
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
-import {images} from '../../assets';
+import {images, RevewsIcon} from '../../assets';
 import {Modal} from 'react-native';
 import GradientButton from '../../components/gradientButton';
 import LinearGradient from 'react-native-linear-gradient';
@@ -324,11 +324,15 @@ const RevewsScreen = () => {
               alignItems: 'center',
               // marginTop: hp(100),
             }}>
+            <View>
+              <RevewsIcon />
+            </View>
             <Text
               style={{
-                color: 'grey',
-                fontSize: fontSize(17),
+                color: '#000000',
+                fontSize: fontSize(16),
                 fontFamily: fontFamily.poppins500,
+                marginTop: hp(23),
               }}>
               No Reviews Found
             </Text>

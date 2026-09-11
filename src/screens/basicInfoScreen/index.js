@@ -32,7 +32,7 @@ import {
   VERIFY_UPDATE_OTP_REQUEST,
 } from '../../redux/actions/updateUserActions';
 import {colors} from '../../utils/colors';
-import {images} from '../../assets';
+import {images, UserIcon} from '../../assets';
 import {fetchUserRequest} from '../../redux/actions/userActions';
 import {SEND_OTP_REQUEST} from '../../redux/actions/otpActions';
 import {VERIFY_OTP_REQUEST} from '../../redux/actions/emailAndMobileActions';
@@ -371,7 +371,7 @@ const BasicInfoScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           style={styles.scrollArea}
-          contentContainerStyle={{paddingBottom: 40}}
+          contentContainerStyle={{paddingBottom: hp(40)}}
           showsVerticalScrollIndicator={false}>
           <TouchableOpacity
             onPress={() => {
@@ -388,16 +388,7 @@ const BasicInfoScreen = () => {
                   style={styles.profileImage}
                 />
               ) : (
-                <Text style={styles.profileInitials}>
-                  {name
-                    ? name
-                        .trim()
-                        .split(' ')
-                        .map(word => word.charAt(0).toUpperCase())
-                        .slice(0, 2)
-                        .join('')
-                    : 'NA'}
-                </Text>
+                <UserIcon />
               )}
             </View>
           </TouchableOpacity>
@@ -609,7 +600,7 @@ const BasicInfoScreen = () => {
                       fontSize: fontSize(16),
                       color: '#000',
                     }}>
-                    Verify Mobile
+                    Add Mobile
                   </Text>
                 </View>
                 <View
@@ -951,9 +942,9 @@ const styles = StyleSheet.create({
 
   profileCircle: {
     alignSelf: 'center',
-    backgroundColor: '#F7E7FF',
-    width: hp(90),
-    height: hp(90),
+    backgroundColor: '#EFEBFF',
+    width: hp(100),
+    height: hp(100),
     borderRadius: wp(50),
     alignItems: 'center',
     justifyContent: 'center',
@@ -1020,7 +1011,7 @@ const styles = StyleSheet.create({
     borderRadius: wp(10),
   },
   genderText: {
-    fontSize: 15,
+    fontSize: fontSize(15),
     fontFamily: fontFamily.poppins500,
     color: '#000000',
   },

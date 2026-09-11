@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import {colors} from '../../utils/colors';
-import {images} from '../../assets';
+import {IconChat, images} from '../../assets';
 import {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {connectSocket, getSocket} from '../../socket/socket';
@@ -358,13 +358,15 @@ const ChatScreen = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
+            <IconChat />
             <Text
               style={{
                 color: colors.pureBlack,
-                fontSize: fontSize(20),
-                fontFamily: fontFamily.poppins600,
+                fontSize: fontSize(16),
+                fontFamily: fontFamily.poppins400,
+                marginTop: hp(23),
               }}>
-              No Chats Found
+              No Chat Found
             </Text>
           </View>
         )}

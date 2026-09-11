@@ -19,7 +19,12 @@ const AllScreen = ({data}) => {
         <View>
           <Image
             source={item.image}
-            style={{width: hp(163), height: hp(240), resizeMode: 'contain'}}
+            style={{
+              width: hp(163),
+              height: hp(240),
+              resizeMode: 'contain',
+              borderRadius: wp(12),
+            }}
           />
 
           <View
@@ -30,7 +35,10 @@ const AllScreen = ({data}) => {
               left: 0,
               right: 0,
               justifyContent: 'center',
+              backgroundColor: '#84848433',
               alignItems: 'center',
+              borderRadius: wp(12),
+              overflow: 'hidden',
             }}>
             <TouchableOpacity
               onPress={() =>

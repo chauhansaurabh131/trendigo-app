@@ -19,7 +19,15 @@ import {
   Touchable,
   wp,
 } from '../../utils/helpers';
-import {BackIcon, DeleteIcoon, images, NavigationArrowIcon} from '../../assets';
+import {
+  BackIcon,
+  BlueBagIcon,
+  DeleteIcoon,
+  EmptyBag,
+  EmptyBagIcon,
+  images,
+  NavigationArrowIcon,
+} from '../../assets';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 import GradientButton from '../../components/gradientButton';
@@ -42,6 +50,7 @@ import {ActivityIndicator} from 'react-native';
 const BagScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+
   const dispatch = useDispatch();
   const [removingItemId, setRemovingItemId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -249,7 +258,12 @@ const BagScreen = () => {
     isDefaultAddress: false,
   });
   // when i click to add address Submit Handler fnction
-
+  const isFormValid =
+    form.name.trim().length > 0 &&
+    form.mobileNumber.trim().length === 10 &&
+    form.pincode.trim().length === 6 &&
+    form.addressLineOne.trim().length > 0 &&
+    form.locality.trim().length > 0;
   const handleAddAddress = () => {
     if (!userId) {
       // console.log('User ID is missing. Cannot add address.');
@@ -327,6 +341,8 @@ const BagScreen = () => {
       isDefaultAddress: false,
     });
   };
+
+  const isCartEmpty = !cartData?.productDetailList?.length;
   // console.log('Default Address show', defaultAddress);
   const renderCartItem = ({item}) => {
     const productId = item?.productId?.id;
@@ -537,7 +553,7 @@ const BagScreen = () => {
               </View>
               <Touchable
                 style={{
-                  width: hp(47),
+                  width: hp(54),
                   height: hp(22),
                   borderRadius: wp(50),
                   // borderWidth: 1,
@@ -582,7 +598,7 @@ const BagScreen = () => {
                 }}>
                 <Text
                   style={{
-                    color: colors.pureBlack,
+                    color: '#5029F4',
                     fontSize: fontSize(12),
                     fontFamily: fontFamily.poppins600,
                   }}>
@@ -705,369 +721,410 @@ const BagScreen = () => {
       </View>
 
       <View style={{width: '100%', borderWidth: 1, borderColor: '#F2F2F2'}} />
-
-      <ScrollView contentContainerStyle={{paddingBottom: hp(120)}}>
-        <View style={{marginHorizontal: wp(16), marginTop: hp(17)}}>
+      {isCartEmpty ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingHorizontal: wp(20),
+          }}>
+          <BlueBagIcon />
           <Text
             style={{
-              // color: '#9333EA',
-              color: '#94A3B8',
-              fontSize: fontSize(14),
-              lineHeight: hp(14),
-              fontFamily: fontFamily.poppins600,
+              marginTop: hp(23),
+              fontSize: fontSize(16),
+              fontFamily: fontFamily.poppins400,
+              color: '#000',
             }}>
-            Delivery Address
+            Bag is Empty
           </Text>
+          <GradientButton
+            title="Explore Collection"
+            onPress={() => navigation.navigate('StartingScreen')}
+            buttonStyle={{
+              marginTop: hp(15),
+              width: wp(225),
+            }}
+            textStyle={{fontFamily: fontFamily.poppins500}}
+          />
         </View>
-        <Touchable
-          style={{
-            backgroundColor: '#F8FAFC',
-            marginHorizontal: wp(17),
-            borderRadius: wp(16),
-            marginTop: hp(16),
-            // height: hp(120),
-            paddingVertical: hp(16),
-            alignItems: 'center',
-            flexDirection: 'row',
-          }}
-          activeOpacity={0.5}
-          onPress={() => sheetRef1.current?.open()}>
-          <View style={{marginHorizontal: wp(16), marginTop: hp(0)}}>
-            {defaultAddress ? (
-              <>
+      ) : (
+        <>
+          {/* Your current ScrollView content */}
+
+          <ScrollView contentContainerStyle={{paddingBottom: hp(120)}}>
+            <View style={{marginHorizontal: wp(16), marginTop: hp(17)}}>
+              <Text
+                style={{
+                  // color: '#9333EA',
+                  color: '#94A3B8',
+                  fontSize: fontSize(14),
+                  lineHeight: hp(14),
+                  fontFamily: fontFamily.poppins600,
+                }}>
+                Delivery Address
+              </Text>
+            </View>
+            <Touchable
+              style={{
+                backgroundColor: '#F8FAFC',
+                marginHorizontal: wp(17),
+                borderRadius: wp(16),
+                marginTop: hp(16),
+                // height: hp(120),
+                paddingVertical: hp(16),
+                alignItems: 'center',
+                flexDirection: 'row',
+              }}
+              activeOpacity={0.5}
+              // onPress={() => sheetRef1.current?.open()}>
+              onPress={() => {
+                if (addressList?.length > 0) {
+                  sheetRef1.current?.open(); // Address list show
+                } else {
+                  sheetRef2.current?.open(); // Direct Add Address screen
+                }
+              }}>
+              <View style={{marginHorizontal: wp(16), marginTop: hp(0)}}>
+                {defaultAddress ? (
+                  <>
+                    <View
+                      style={{
+                        marginTop: hp(6),
+                        flexDirection: 'row',
+                      }}>
+                      <Text
+                        style={{
+                          color: colors.pureBlack,
+                          fontSize: fontSize(16),
+                          fontFamily: fontFamily.poppins700,
+                        }}>
+                        {defaultAddress.name}
+                      </Text>
+
+                      <View
+                        style={{
+                          width: wp(2),
+                          height: hp(24),
+                          backgroundColor: '#E6E6E6',
+                          marginLeft: wp(10),
+                          marginRight: hp(10),
+                        }}
+                      />
+                      <Text
+                        style={{
+                          color: colors.pureBlack,
+                          fontSize: fontSize(14),
+                          fontFamily: fontFamily.poppins500,
+                        }}>
+                        +91 {defaultAddress.mobileNumber}
+                      </Text>
+                    </View>
+
+                    <Text
+                      style={{
+                        color: '#64748B',
+                        fontSize: fontSize(14),
+                        lineHeight: hp(18),
+                        fontFamily: fontFamily.poppins400,
+                        marginTop: hp(4),
+                      }}>
+                      {defaultAddress.addressLineOne},{' '}
+                      {defaultAddress.addressLineTwo}, {defaultAddress.city}{' '}
+                      {defaultAddress.pincode}
+                    </Text>
+                  </>
+                ) : (
+                  <View
+                    style={
+                      {
+                        // alignItems: 'center',
+                        // justifyContent: 'center',
+                        // marginTop: hp(13),
+                      }
+                    }>
+                    <Text
+                      style={{
+                        color: '#64748B',
+                        fontFamily: fontFamily.poppins500,
+                        fontSize: fontSize(14),
+                      }}>
+                      Add Delivery Address
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              <View
+                style={{
+                  position: 'absolute',
+                  right: wp(16),
+                  // top: hp(50),
+                }}>
+                <NavigationArrowIcon stroke="#64748B" />
+              </View>
+            </Touchable>
+
+            <View style={{marginHorizontal: wp(21), marginTop: hp(24)}}>
+              <View
+                style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                <Text
+                  style={{
+                    color: '#94A3B8',
+                    fontSize: fontSize(14),
+                    fontFamily: fontFamily.poppins700,
+                  }}>
+                  Selected Items
+                </Text>
+                <Text
+                  style={{
+                    color: '#94A3B8',
+                    fontSize: fontSize(12),
+                    fontFamily: fontFamily.poppins500,
+                  }}>
+                  {/* 2 Items */}
+                  {cartData?.productDetailList?.length || 0} Items
+                </Text>
+              </View>
+            </View>
+            <FlatList
+              data={cartData?.productDetailList}
+              renderItem={renderCartItem}
+              keyExtractor={item => item._id}
+              scrollEnabled={false}
+            />
+            <View
+              style={{
+                backgroundColor: '#F1F5F9',
+                height: 1,
+                marginTop: hp(24),
+                marginHorizontal: wp(18),
+              }}
+            />
+
+            <View>
+              <View
+                style={{
+                  marginHorizontal: wp(34),
+                  marginTop: hp(24),
+                }}>
+                <Text
+                  style={{
+                    color: '#0F172A',
+                    fontSize: fontSize(14),
+                    fontFamily: fontFamily.poppins700,
+                  }}>
+                  Billing Details
+                </Text>
+
                 <View
                   style={{
-                    marginTop: hp(6),
                     flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginTop: hp(24),
                   }}>
                   <Text
                     style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(16),
-                      fontFamily: fontFamily.poppins700,
+                      color: '#64748B',
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins400,
                     }}>
-                    {defaultAddress.name}
+                    Item Price
                   </Text>
-
-                  <View
-                    style={{
-                      width: wp(2),
-                      height: hp(24),
-                      backgroundColor: '#E6E6E6',
-                      marginLeft: wp(10),
-                      marginRight: hp(10),
-                    }}
-                  />
                   <Text
                     style={{
-                      color: colors.pureBlack,
+                      color: '#0F172A',
                       fontSize: fontSize(14),
-                      fontFamily: fontFamily.poppins500,
+                      fontFamily: fontFamily.poppins700,
                     }}>
-                    +91 {defaultAddress.mobileNumber}
+                    {/* Rs. 900.00 */}
+                    Rs. {cartData?.subTotal ?? '00'}
                   </Text>
                 </View>
 
-                <Text
+                <View
                   style={{
-                    color: '#64748B',
-                    fontSize: fontSize(14),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    marginTop: hp(4),
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginTop: hp(14),
                   }}>
-                  {defaultAddress.addressLineOne},{' '}
-                  {defaultAddress.addressLineTwo}, {defaultAddress.city}{' '}
-                  {defaultAddress.pincode}
-                </Text>
-              </>
-            ) : (
+                  <Text
+                    style={{
+                      color: '#64748B',
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    Discount on MRP
+                  </Text>
+                  <Text
+                    style={{
+                      color: '#0F172A',
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins700,
+                    }}>
+                    Rs.{cartData?.totalDiscount ?? '00'}
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginTop: hp(14),
+                  }}>
+                  <Text
+                    style={{
+                      color: '#64748B',
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    Coupon Discount
+                  </Text>
+                  <Text
+                    style={{
+                      color: '#6366F1',
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins700,
+                    }}>
+                    Apply
+                  </Text>
+                </View>
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    marginTop: hp(14),
+                  }}>
+                  <Text
+                    style={{
+                      color: '#64748B',
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    Shipping Charges
+                  </Text>
+                  <Text
+                    style={{
+                      color: '#10B981',
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins700,
+                    }}>
+                    FREE
+                  </Text>
+                </View>
+              </View>
+
               <View
-                style={
-                  {
-                    // alignItems: 'center',
-                    // justifyContent: 'center',
-                    // marginTop: hp(13),
-                  }
-                }>
+                style={{
+                  // width: '100%',
+                  height: 1,
+                  backgroundColor: '#F1F5F9',
+                  marginTop: hp(24),
+                  marginHorizontal: wp(34),
+                }}
+              />
+
+              <View
+                style={{
+                  marginHorizontal: wp(34),
+                  marginTop: hp(24),
+                  flexDirection: 'row',
+                  marginBottom: hp(15),
+                  justifyContent: 'space-between',
+                  // backgroundColor: '#F1F5F9',
+                }}>
                 <Text
                   style={{
-                    color: '#64748B',
-                    fontFamily: fontFamily.poppins500,
-                    fontSize: fontSize(14),
+                    // color: '#9333EA',
+                    color: '#5029F3',
+                    fontSize: fontSize(18),
+                    fontFamily: fontFamily.poppins700,
                   }}>
-                  Add Delivery Address
+                  Total Payable
+                </Text>
+                <Text
+                  style={{
+                    // color: '#9333EA',
+                    color: '#5029F3',
+                    fontSize: fontSize(18),
+                    fontFamily: fontFamily.poppins700,
+                  }}>
+                  Rs. {cartData?.grandTotal ?? '00'}
                 </Text>
               </View>
-            )}
-          </View>
-
-          <View
-            style={{
-              position: 'absolute',
-              right: wp(16),
-              // top: hp(50),
-            }}>
-            <NavigationArrowIcon stroke="#64748B" />
-          </View>
-        </Touchable>
-
-        <View style={{marginHorizontal: wp(21), marginTop: hp(24)}}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <Text
-              style={{
-                color: '#94A3B8',
-                fontSize: fontSize(14),
-                fontFamily: fontFamily.poppins700,
-              }}>
-              Selected Items
-            </Text>
-            <Text
-              style={{
-                color: '#94A3B8',
-                fontSize: fontSize(12),
-                fontFamily: fontFamily.poppins500,
-              }}>
-              {/* 2 Items */}
-              {cartData?.productDetailList?.length || 0} Items
-            </Text>
-          </View>
-        </View>
-        <FlatList
-          data={cartData?.productDetailList}
-          renderItem={renderCartItem}
-          keyExtractor={item => item._id}
-          scrollEnabled={false}
-        />
-        <View
-          style={{
-            backgroundColor: '#F1F5F9',
-            height: 1,
-            marginTop: hp(24),
-            marginHorizontal: wp(18),
-          }}
-        />
-
-        <View>
-          <View
-            style={{
-              marginHorizontal: wp(34),
-              marginTop: hp(24),
-            }}>
-            <Text
-              style={{
-                color: '#0F172A',
-                fontSize: fontSize(14),
-                fontFamily: fontFamily.poppins700,
-              }}>
-              Billing Details
-            </Text>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginTop: hp(24),
-              }}>
-              <Text
-                style={{
-                  color: '#64748B',
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins400,
-                }}>
-                Item Price
-              </Text>
-              <Text
-                style={{
-                  color: '#0F172A',
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins700,
-                }}>
-                {/* Rs. 900.00 */}
-                Rs. {cartData?.subTotal ?? '00'}
-              </Text>
             </View>
 
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginTop: hp(14),
+            {/* First Bottom Sheet - Address Selection */}
+            <RBSheet
+              ref={sheetRef1}
+              height={hp(350)}
+              openDuration={250}
+              closeOnDragDown
+              closeOnPressMask
+              customStyles={{
+                wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
+                draggableIcon: {backgroundColor: '#C4C4C4'},
+                container: {
+                  borderTopLeftRadius: wp(16),
+                  borderTopRightRadius: wp(16),
+                },
               }}>
-              <Text
-                style={{
-                  color: '#64748B',
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins400,
-                }}>
-                Discount on MRP
-              </Text>
-              <Text
-                style={{
-                  color: '#0F172A',
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins700,
-                }}>
-                Rs.{cartData?.totalDiscount ?? '00'}
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginTop: hp(14),
-              }}>
-              <Text
-                style={{
-                  color: '#64748B',
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins400,
-                }}>
-                Coupon Discount
-              </Text>
-              <Text
-                style={{
-                  color: '#6366F1',
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins700,
-                }}>
-                Apply
-              </Text>
-            </View>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                marginTop: hp(14),
-              }}>
-              <Text
-                style={{
-                  color: '#64748B',
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins400,
-                }}>
-                Shipping Charges
-              </Text>
-              <Text
-                style={{
-                  color: '#10B981',
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins700,
-                }}>
-                FREE
-              </Text>
-            </View>
-          </View>
-
-          <View
-            style={{
-              // width: '100%',
-              height: 1,
-              backgroundColor: '#F1F5F9',
-              marginTop: hp(24),
-              marginHorizontal: wp(34),
-            }}
-          />
-
-          <View
-            style={{
-              marginHorizontal: wp(34),
-              marginTop: hp(24),
-              flexDirection: 'row',
-              marginBottom: hp(15),
-              justifyContent: 'space-between',
-              // backgroundColor: '#F1F5F9',
-            }}>
-            <Text
-              style={{
-                // color: '#9333EA',
-                color: '#5029F3',
-                fontSize: fontSize(18),
-                fontFamily: fontFamily.poppins700,
-              }}>
-              Total Payable
-            </Text>
-            <Text
-              style={{
-                // color: '#9333EA',
-                color: '#5029F3',
-                fontSize: fontSize(18),
-                fontFamily: fontFamily.poppins700,
-              }}>
-              Rs. {cartData?.grandTotal ?? '00'}
-            </Text>
-          </View>
-        </View>
-
-        {/* First Bottom Sheet - Address Selection */}
-        <RBSheet
-          ref={sheetRef1}
-          height={hp(350)}
-          openDuration={250}
-          closeOnDragDown
-          closeOnPressMask
-          customStyles={{
-            wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
-            draggableIcon: {backgroundColor: '#C4C4C4'},
-            container: {
-              borderTopLeftRadius: wp(16),
-              borderTopRightRadius: wp(16),
-            },
-          }}>
-          <View style={{flex: 1, backgroundColor: colors.white}}>
-            <Text
-              style={{
-                color: colors.pureBlack,
-                textAlign: 'center',
-                marginTop: hp(25),
-                marginBottom: hp(25),
-                fontSize: fontSize(14),
-                lineHeight: hp(18),
-                fontFamily: fontFamily.poppins600,
-              }}>
-              Select or Add Delivery Address
-            </Text>
-            {/* 
+              <View style={{flex: 1, backgroundColor: colors.white}}>
+                <Text
+                  style={{
+                    color: colors.pureBlack,
+                    textAlign: 'center',
+                    marginTop: hp(25),
+                    marginBottom: hp(25),
+                    fontSize: fontSize(14),
+                    lineHeight: hp(18),
+                    fontFamily: fontFamily.poppins600,
+                  }}>
+                  Select or Add Delivery Address
+                </Text>
+                {/* 
             <View
               style={{width: '100%',
                  height: 1,
                   backgroundColor: '#E3E3E3'
                 }}
             /> */}
-            <FlatList
-              data={addressList}
-              scrollEnabled={true}
-              // keyExtractor={item => item.id?.toString()}
-              keyExtractor={(item, index) =>
-                item?.id ? item.id.toString() : index.toString()
-              }
-              contentContainerStyle={{
-                // paddingBottom: hp(25)
-                paddingBottom: hp(120),
-                flexGrow: 1,
-              }}
-              renderItem={({item}) => (
-                <Touchable
-                  style={{
-                    backgroundColor: '#F8FAFC',
-                    // height: hp(120),
-                    paddingVertical: item?.isDefaultAddress ? hp(16) : hp(16),
-                    marginHorizontal: wp(18),
-                    borderRadius: wp(16),
-                    marginTop: hp(20),
+                <FlatList
+                  data={addressList}
+                  scrollEnabled={true}
+                  // keyExtractor={item => item.id?.toString()}
+                  keyExtractor={(item, index) =>
+                    item?.id ? item.id.toString() : index.toString()
+                  }
+                  contentContainerStyle={{
+                    // paddingBottom: hp(25)
+                    paddingBottom: hp(120),
+                    flexGrow: 1,
                   }}
-                  activeOpacity={0.5}
-                  onPress={() => {
-                    sheetRef1.current?.close();
-                  }}>
-                  <View
-                    style={{
-                      marginHorizontal: wp(20),
-                      // marginTop: hp(16)
-                    }}>
-                    {/* <Text
+                  renderItem={({item}) => (
+                    <Touchable
+                      style={{
+                        backgroundColor: '#F8FAFC',
+                        // height: hp(120),
+                        paddingVertical: item?.isDefaultAddress
+                          ? hp(16)
+                          : hp(16),
+                        marginHorizontal: wp(18),
+                        borderRadius: wp(16),
+                        marginTop: hp(20),
+                      }}
+                      activeOpacity={0.5}
+                      onPress={() => {
+                        sheetRef1.current?.close();
+                      }}>
+                      <View
+                        style={{
+                          marginHorizontal: wp(20),
+                          // marginTop: hp(16)
+                        }}>
+                        {/* <Text
                       style={{
                         color: '#8225AF',
                         fontSize: fontSize(12),
@@ -1078,565 +1135,586 @@ const BagScreen = () => {
                       {item?.isDefaultAddress && 'Default'}
                     </Text> */}
 
-                    {item?.isDefaultAddress && (
-                      <Text
-                        style={{
-                          color: '#8225AF',
-                          fontSize: fontSize(12),
-                          lineHeight: hp(14),
-                          fontFamily: fontFamily.poppins700,
-                        }}>
-                        Default
-                      </Text>
-                    )}
-                    <View
-                      style={{
-                        marginTop: hp(4),
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                      }}>
-                      <Text
-                        style={{
-                          color: colors.pureBlack,
-                          fontSize: fontSize(16),
-                          fontFamily: fontFamily.poppins700,
-                        }}>
-                        {item?.name ?? 'No Name'}
-                      </Text>
+                        {item?.isDefaultAddress && (
+                          <Text
+                            style={{
+                              color: '#8225AF',
+                              fontSize: fontSize(12),
+                              lineHeight: hp(14),
+                              fontFamily: fontFamily.poppins700,
+                            }}>
+                            Default
+                          </Text>
+                        )}
+                        <View
+                          style={{
+                            marginTop: hp(4),
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              color: colors.pureBlack,
+                              fontSize: fontSize(16),
+                              fontFamily: fontFamily.poppins700,
+                            }}>
+                            {item?.name ?? 'No Name'}
+                          </Text>
+                          <View
+                            style={{
+                              width: wp(2),
+                              height: hp(17),
+                              backgroundColor: '#E6E6E6',
+                              marginLeft: wp(10),
+                              marginRight: hp(10),
+                            }}
+                          />
+                          <Text
+                            style={{
+                              color: '#475569',
+                              fontSize: fontSize(14),
+                              fontFamily: fontFamily.poppins500,
+                            }}>
+                            +91 {item?.mobileNumber ?? ''}
+                          </Text>
+                        </View>
+
+                        <Text
+                          style={{
+                            color: '#64748B',
+                            fontSize: fontSize(14),
+                            lineHeight: hp(19),
+                            fontFamily: fontFamily.poppins400,
+                            marginTop: hp(4),
+                            marginBottom: hp(16),
+                          }}>
+                          {item.addressLineOne}, {item.addressLineTwo},{' '}
+                          {item.city} {item.pincode}
+                        </Text>
+                      </View>
+
                       <View
                         style={{
-                          width: wp(2),
-                          height: hp(17),
-                          backgroundColor: '#E6E6E6',
-                          marginLeft: wp(10),
-                          marginRight: hp(10),
-                        }}
-                      />
-                      <Text
-                        style={{
-                          color: '#475569',
-                          fontSize: fontSize(14),
-                          fontFamily: fontFamily.poppins500,
+                          position: 'absolute',
+                          right: wp(25),
+                          top: hp(50),
                         }}>
-                        +91 {item?.mobileNumber ?? ''}
-                      </Text>
-                    </View>
+                        <NavigationArrowIcon stroke="#94A3B8" />
+                      </View>
+                    </Touchable>
+                  )}
+                />
+              </View>
 
+              <View style={{marginHorizontal: wp(18), bottom: hp(10)}}>
+                <GradientButton
+                  title={'Add New Address'}
+                  onPress={() => {
+                    sheetRef1.current?.close();
+                    resetForm(); // clear after submit
+                    setTimeout(() => {
+                      sheetRef2.current?.open();
+                    }, 300);
+                  }}
+                />
+              </View>
+            </RBSheet>
+
+            {/* Second Bottom Sheet - Add New Address */}
+            <RBSheet
+              ref={sheetRef2}
+              height={hp(570)}
+              openDuration={250}
+              closeOnDragDown
+              closeOnPressMask
+              customStyles={{
+                wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
+                draggableIcon: {backgroundColor: '#C4C4C4'},
+                container: {
+                  borderTopLeftRadius: wp(16),
+                  borderTopRightRadius: wp(16),
+                },
+              }}>
+              <View style={{flex: 1, backgroundColor: colors.white}}>
+                <Text
+                  style={{
+                    color: colors.pureBlack,
+                    textAlign: 'center',
+                    marginTop: hp(25),
+                    marginBottom: hp(25),
+                    fontSize: fontSize(16),
+                    lineHeight: hp(18),
+                    fontFamily: fontFamily.poppins500,
+                  }}>
+                  Add New Address
+                </Text>
+
+                <View
+                  style={{
+                    width: '100%',
+                    height: hp(1),
+                    backgroundColor: '#E3E3E3',
+                  }}
+                />
+
+                <View style={{marginHorizontal: wp(18), marginTop: hp(19)}}>
+                  <TextInput
+                    placeholder="Name"
+                    placeholderTextColor="#999"
+                    value={form.name}
+                    onChangeText={text =>
+                      setForm(prev => ({
+                        ...prev,
+                        name: text,
+                      }))
+                    }
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#EAEAEA',
+                      borderRadius: wp(8),
+                      paddingHorizontal: wp(12),
+                      height: hp(45),
+                      fontSize: fontSize(13),
+                      fontFamily: fontFamily.poppins400,
+                      color: colors.pureBlack,
+                    }}
+                  />
+
+                  <TextInput
+                    placeholder="Mobile Number"
+                    placeholderTextColor="#999"
+                    keyboardType={'number-pad'}
+                    maxLength={10}
+                    value={form.mobileNumber}
+                    onChangeText={text =>
+                      setForm(prev => ({
+                        ...prev,
+                        mobileNumber: text,
+                      }))
+                    }
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#EAEAEA',
+                      borderRadius: wp(8),
+                      paddingHorizontal: hp(12),
+                      height: hp(45),
+                      fontSize: fontSize(13),
+                      fontFamily: fontFamily.poppins400,
+                      color: colors.pureBlack,
+                      marginTop: hp(13),
+                    }}
+                  />
+
+                  <View
+                    style={{
+                      marginTop: hp(23),
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
+                    <Image
+                      source={images.address_icon}
+                      style={{
+                        tintColor: '#B0B0B0',
+                        width: hp(11),
+                        height: hp(14),
+                        resizeMode: 'contain',
+                      }}
+                    />
                     <Text
                       style={{
-                        color: '#64748B',
-                        fontSize: fontSize(14),
-                        lineHeight: hp(19),
+                        marginLeft: wp(12),
+                        fontSize: fontSize(12),
+                        lineHeight: hp(18),
                         fontFamily: fontFamily.poppins400,
-                        marginTop: hp(4),
-                        marginBottom: hp(16),
+                        color: colors.pureBlack,
                       }}>
-                      {item.addressLineOne}, {item.addressLineTwo}, {item.city}{' '}
-                      {item.pincode}
+                      Delivery Address
                     </Text>
                   </View>
 
-                  <View
-                    style={{position: 'absolute', right: wp(25), top: hp(50)}}>
-                    <NavigationArrowIcon stroke="#94A3B8" />
+                  <TextInput
+                    placeholder="Pincode"
+                    placeholderTextColor="#999"
+                    keyboardType={'number-pad'}
+                    maxLength={6}
+                    value={form.pincode}
+                    onChangeText={text =>
+                      setForm(prev => ({
+                        ...prev,
+                        pincode: text,
+                      }))
+                    }
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#EAEAEA',
+                      borderRadius: wp(8),
+                      paddingHorizontal: wp(12),
+                      height: hp(45),
+                      fontSize: fontSize(13),
+                      fontFamily: fontFamily.poppins400,
+                      color: colors.pureBlack,
+                      marginTop: hp(21),
+                    }}
+                  />
+
+                  <TextInput
+                    placeholder="Address (House No, Building, Street, Area)"
+                    placeholderTextColor="#999"
+                    value={form.addressLineOne}
+                    onChangeText={text =>
+                      setForm(prev => ({
+                        ...prev,
+                        addressLineOne: text,
+                      }))
+                    }
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#EAEAEA',
+                      borderRadius: wp(8),
+                      paddingHorizontal: hp(12),
+                      height: hp(45),
+                      fontSize: fontSize(13),
+                      fontFamily: fontFamily.poppins400,
+                      color: colors.pureBlack,
+                      marginTop: hp(15),
+                    }}
+                  />
+
+                  <TextInput
+                    placeholder="Locality/Town"
+                    placeholderTextColor="#999"
+                    value={form.locality}
+                    onChangeText={val =>
+                      setForm(prev => ({
+                        ...prev,
+                        locality: val,
+                      }))
+                    }
+                    style={{
+                      borderWidth: 1,
+                      borderColor: '#EAEAEA',
+                      borderRadius: wp(8),
+                      paddingHorizontal: hp(12),
+                      height: hp(45),
+                      fontSize: fontSize(13),
+                      fontFamily: fontFamily.poppins400,
+                      color: colors.pureBlack,
+                      marginTop: hp(15),
+                    }}
+                  />
+
+                  <View style={{marginTop: hp(24)}}>
+                    <CheckBoxComponent
+                      isDefault={form.isDefaultAddress}
+                      onPress={() =>
+                        setForm(prev => ({
+                          ...prev,
+                          isDefaultAddress: !prev.isDefaultAddress,
+                        }))
+                      }
+                    />
                   </View>
-                </Touchable>
-              )}
-            />
-          </View>
 
-          <View style={{marginHorizontal: wp(18), bottom: hp(10)}}>
-            <GradientButton
-              title={'Add New Address'}
-              onPress={() => {
-                sheetRef1.current?.close();
-                resetForm(); // clear after submit
-                setTimeout(() => {
-                  sheetRef2.current?.open();
-                }, 300);
-              }}
-            />
-          </View>
-        </RBSheet>
+                  <GradientButton
+                    title={loading ? 'Saving...' : 'Save Address'}
+                    // disabled={loading}
+                    // opacity={loading ? 0.7 : 1}
+                    disabled={loading || !isFormValid}
+                    opacity={loading || !isFormValid ? 0.5 : 1}
+                    onPress={() => {
+                      console.log('Save Address Clicked');
+                      handleAddAddress();
 
-        {/* Second Bottom Sheet - Add New Address */}
-        <RBSheet
-          ref={sheetRef2}
-          height={hp(570)}
-          openDuration={250}
-          closeOnDragDown
-          closeOnPressMask
-          customStyles={{
-            wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
-            draggableIcon: {backgroundColor: '#C4C4C4'},
-            container: {
-              borderTopLeftRadius: wp(16),
-              borderTopRightRadius: wp(16),
-            },
-          }}>
-          <View style={{flex: 1, backgroundColor: colors.white}}>
-            <Text
-              style={{
-                color: colors.pureBlack,
-                textAlign: 'center',
-                marginTop: hp(25),
-                marginBottom: hp(25),
-                fontSize: fontSize(16),
-                lineHeight: hp(18),
-                fontFamily: fontFamily.poppins500,
+                      sheetRef2.current?.close();
+                    }}
+                    buttonStyle={{marginTop: hp(20)}}
+                  />
+                </View>
+              </View>
+            </RBSheet>
+
+            {/* Third Bottom Sheet - Edit Item (Color & Size) */}
+            <RBSheet
+              ref={sheetRef3}
+              height={hp(520)}
+              openDuration={250}
+              closeOnDragDown
+              closeOnPressMask
+              customStyles={{
+                wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
+                draggableIcon: {backgroundColor: '#C4C4C4'},
+                container: {
+                  borderTopLeftRadius: wp(16),
+                  borderTopRightRadius: wp(16),
+                  // height: hp(480),
+                },
               }}>
-              Add New Address
-            </Text>
-
-            <View
-              style={{width: '100%', height: hp(1), backgroundColor: '#E3E3E3'}}
-            />
-
-            <View style={{marginHorizontal: wp(18), marginTop: hp(19)}}>
-              <TextInput
-                placeholder="Name"
-                placeholderTextColor="#999"
-                value={form.name}
-                onChangeText={text =>
-                  setForm(prev => ({
-                    ...prev,
-                    name: text,
-                  }))
-                }
-                style={{
-                  borderWidth: 1,
-                  borderColor: '#EAEAEA',
-                  borderRadius: wp(8),
-                  paddingHorizontal: wp(12),
-                  height: hp(45),
-                  fontSize: fontSize(13),
-                  fontFamily: fontFamily.poppins400,
-                  color: colors.pureBlack,
-                }}
-              />
-
-              <TextInput
-                placeholder="Mobile Number"
-                placeholderTextColor="#999"
-                keyboardType={'number-pad'}
-                maxLength={10}
-                value={form.mobileNumber}
-                onChangeText={text =>
-                  setForm(prev => ({
-                    ...prev,
-                    mobileNumber: text,
-                  }))
-                }
-                style={{
-                  borderWidth: 1,
-                  borderColor: '#EAEAEA',
-                  borderRadius: wp(8),
-                  paddingHorizontal: hp(12),
-                  height: hp(45),
-                  fontSize: fontSize(13),
-                  fontFamily: fontFamily.poppins400,
-                  color: colors.pureBlack,
-                  marginTop: hp(13),
-                }}
-              />
-
-              <View
-                style={{
-                  marginTop: hp(23),
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Image
-                  source={images.address_icon}
-                  style={{
-                    tintColor: '#B0B0B0',
-                    width: hp(11),
-                    height: hp(14),
-                    resizeMode: 'contain',
-                  }}
-                />
-                <Text
-                  style={{
-                    marginLeft: wp(12),
-                    fontSize: fontSize(12),
-                    lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                    color: colors.pureBlack,
-                  }}>
-                  Delivery Address
-                </Text>
-              </View>
-
-              <TextInput
-                placeholder="Pincode"
-                placeholderTextColor="#999"
-                keyboardType={'number-pad'}
-                maxLength={6}
-                value={form.pincode}
-                onChangeText={text =>
-                  setForm(prev => ({
-                    ...prev,
-                    pincode: text,
-                  }))
-                }
-                style={{
-                  borderWidth: 1,
-                  borderColor: '#EAEAEA',
-                  borderRadius: wp(8),
-                  paddingHorizontal: wp(12),
-                  height: hp(45),
-                  fontSize: fontSize(13),
-                  fontFamily: fontFamily.poppins400,
-                  color: colors.pureBlack,
-                  marginTop: hp(21),
-                }}
-              />
-
-              <TextInput
-                placeholder="Address (House No, Building, Street, Area)"
-                placeholderTextColor="#999"
-                value={form.addressLineOne}
-                onChangeText={text =>
-                  setForm(prev => ({
-                    ...prev,
-                    addressLineOne: text,
-                  }))
-                }
-                style={{
-                  borderWidth: 1,
-                  borderColor: '#EAEAEA',
-                  borderRadius: wp(8),
-                  paddingHorizontal: hp(12),
-                  height: hp(45),
-                  fontSize: fontSize(13),
-                  fontFamily: fontFamily.poppins400,
-                  color: colors.pureBlack,
-                  marginTop: hp(15),
-                }}
-              />
-
-              <TextInput
-                placeholder="Locality/Town"
-                placeholderTextColor="#999"
-                value={form.locality}
-                onChangeText={val =>
-                  setForm(prev => ({
-                    ...prev,
-                    locality: val,
-                  }))
-                }
-                style={{
-                  borderWidth: 1,
-                  borderColor: '#EAEAEA',
-                  borderRadius: wp(8),
-                  paddingHorizontal: hp(12),
-                  height: hp(45),
-                  fontSize: fontSize(13),
-                  fontFamily: fontFamily.poppins400,
-                  color: colors.pureBlack,
-                  marginTop: hp(15),
-                }}
-              />
-
-              <View style={{marginTop: hp(24)}}>
-                <CheckBoxComponent
-                  isDefault={form.isDefaultAddress}
-                  onPress={() =>
-                    setForm(prev => ({
-                      ...prev,
-                      isDefaultAddress: !prev.isDefaultAddress,
-                    }))
-                  }
-                />
-              </View>
-
-              <GradientButton
-                title={loading ? 'Saving...' : 'Save Address'}
-                disabled={loading}
-                opacity={loading ? 0.7 : 1}
-                onPress={() => {
-                  console.log('Save Address Clicked');
-                  handleAddAddress();
-
-                  sheetRef2.current?.close();
-                }}
-                buttonStyle={{marginTop: hp(20)}}
-              />
-            </View>
-          </View>
-        </RBSheet>
-
-        {/* Third Bottom Sheet - Edit Item (Color & Size) */}
-        <RBSheet
-          ref={sheetRef3}
-          height={hp(520)}
-          openDuration={250}
-          closeOnDragDown
-          closeOnPressMask
-          customStyles={{
-            wrapper: {backgroundColor: 'rgba(0,0,0,0.35)'},
-            draggableIcon: {backgroundColor: '#C4C4C4'},
-            container: {
-              borderTopLeftRadius: wp(16),
-              borderTopRightRadius: wp(16),
-              // height: hp(480),
-            },
-          }}>
-          {/* <ScrollView
+              {/* <ScrollView
             style={{flex: 1, backgroundColor: colors.white}}
             showsVerticalScrollIndicator={false}> */}
-          <View style={{flex: 1, backgroundColor: colors.white}}>
-            <Text
-              style={{
-                color: colors.black,
-                textAlign: 'center',
-                // marginTop: hp(25),
-                marginTop: hp(20),
-                marginBottom: hp(15),
-                fontSize: fontSize(18),
-                marginRight: '75%',
-                fontFamily: fontFamily.poppins400,
-              }}>
-              Modify
-            </Text>
-
-            <View
-              style={{
-                width: '100%',
-                height: 1,
-                backgroundColor: '#E3E3E3',
-                marginBottom: hp(15),
-              }}
-            />
-            {/* {loading ? (
-              <ActivityIndicator size="large" color="#9333EA" />
-            ) : (
-              <> */}
-            {/* Change Color Section */}
-            <View style={{marginHorizontal: wp(18)}}>
-              <Text
-                style={{
-                  color: colors.black,
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins500,
-                  // marginBottom: hp(20),
-                  marginBottom: hp(15),
-                }}>
-                Change Color
-              </Text>
-
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={{
-                  // marginBottom: hp(30)
-                  marginBottom: hp(20),
-                }}
-                contentContainerStyle={{paddingRight: wp(20)}}>
-                {colorOptions.map((color, index) => (
-                  <Touchable
-                    // key={color.id}
-                    key={`${color.id}-${index}`} // unique key
-                    style={{
-                      marginRight: wp(15),
-
-                      borderWidth:
-                        selectedColor?.toLowerCase() === color.id?.toLowerCase()
-                          ? 3
-                          : 0,
-
-                      borderColor:
-                        selectedColor?.toLowerCase() === color.id?.toLowerCase()
-                          ? '#5029F4'
-                          : '#E0E0E0',
-                      borderRadius: wp(10),
-                    }}
-                    // onPress={() => setSelectedColor(color.id)}
-                    onPress={() => handleColorSelect(color.id)}>
-                    <Image
-                      source={color.image}
-                      style={{
-                        width: wp(55),
-                        height: hp(55),
-                        borderRadius: wp(8),
-                      }}
-                    />
-                  </Touchable>
-                ))}
-              </ScrollView>
-
-              {/* Select Size Section */}
-              <Text
-                style={{
-                  color: colors.black,
-                  fontSize: fontSize(14),
-                  fontFamily: fontFamily.poppins500,
-                  marginBottom: hp(15),
-                }}>
-                Select Size
-              </Text>
-
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {availableSizes.map(
-                  (size, index) => (
-                    console.log(availableSizes, 'AVAILABLE SIZES==>'),
-                    (
-                      <Touchable
-                        // key={size}
-                        key={`${size}-${index}`} // unique key
-                        style={{
-                          width: wp(48),
-                          height: wp(48),
-                          borderRadius: wp(32.5),
-                          borderWidth: 2,
-                          borderColor:
-                            selectedSize?.toLowerCase() === size?.toLowerCase()
-                              ? '#000000'
-                              : '#E0E0E0',
-
-                          backgroundColor:
-                            selectedSize?.toLowerCase() === size?.toLowerCase()
-                              ? '#F7E7FF'
-                              : colors.white,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginRight: wp(12),
-                          marginBottom: hp(20),
-                        }}
-                        onPress={() => setSelectedSize(size)}>
-                        <Text
-                          style={{
-                            fontSize: fontSize(16),
-                            fontFamily: fontFamily.poppins600,
-                            color:
-                              selectedSize === size
-                                ? colors.pureBlack
-                                : colors.pureBlack,
-                          }}>
-                          {size.toUpperCase()}
-                        </Text>
-                      </Touchable>
-                    )
-                  ),
-                )}
-              </ScrollView>
-              <View
-                style={
-                  {
-                    // marginTop: hp(29)
-                  }
-                }>
+              <View style={{flex: 1, backgroundColor: colors.white}}>
                 <Text
                   style={{
                     color: colors.black,
-                    fontSize: fontSize(14),
-                    fontFamily: fontFamily.poppins500,
-                    // marginBottom: hp(20),
+                    textAlign: 'center',
+                    // marginTop: hp(25),
+                    marginTop: hp(20),
                     marginBottom: hp(15),
+                    fontSize: fontSize(18),
+                    marginRight: '75%',
+                    fontFamily: fontFamily.poppins400,
                   }}>
-                  Select Quantity
+                  Modify
                 </Text>
 
-                <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-                  {quantityOptions.map(qty => (
-                    <TouchableOpacity
-                      key={qty}
-                      style={{
-                        width: wp(48),
-                        height: wp(48),
-                        borderRadius: wp(32.5),
-                        borderWidth: 2,
-                        borderColor:
-                          selectedQuantity === qty ? '#000000' : '#E0E0E0',
-                        backgroundColor:
-                          selectedQuantity === qty ? '#F7E7FF' : colors.white,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginRight: wp(12),
-                        marginBottom: hp(25),
-                      }}
-                      onPress={() => setSelectedQuantity(qty)}>
-                      <Text
+                <View
+                  style={{
+                    width: '100%',
+                    height: 1,
+                    backgroundColor: '#E3E3E3',
+                    marginBottom: hp(15),
+                  }}
+                />
+                {/* {loading ? (
+              <ActivityIndicator size="large" color="#9333EA" />
+            ) : (
+              <> */}
+                {/* Change Color Section */}
+                <View style={{marginHorizontal: wp(18)}}>
+                  <Text
+                    style={{
+                      color: colors.black,
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins500,
+                      // marginBottom: hp(20),
+                      marginBottom: hp(15),
+                    }}>
+                    Change Color
+                  </Text>
+
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={{
+                      // marginBottom: hp(30)
+                      marginBottom: hp(20),
+                    }}
+                    contentContainerStyle={{paddingRight: wp(20)}}>
+                    {colorOptions.map((color, index) => (
+                      <Touchable
+                        // key={color.id}
+                        key={`${color.id}-${index}`} // unique key
                         style={{
-                          fontSize: fontSize(16),
-                          fontFamily: fontFamily.poppins600,
-                          color: colors.pureBlack,
-                        }}>
-                        {qty}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                          marginRight: wp(15),
+
+                          borderWidth:
+                            selectedColor?.toLowerCase() ===
+                            color.id?.toLowerCase()
+                              ? 3
+                              : 0,
+
+                          borderColor:
+                            selectedColor?.toLowerCase() ===
+                            color.id?.toLowerCase()
+                              ? '#5029F4'
+                              : '#E0E0E0',
+                          borderRadius: wp(10),
+                        }}
+                        // onPress={() => setSelectedColor(color.id)}
+                        onPress={() => handleColorSelect(color.id)}>
+                        <Image
+                          source={color.image}
+                          style={{
+                            width: wp(55),
+                            height: hp(55),
+                            borderRadius: wp(8),
+                          }}
+                        />
+                      </Touchable>
+                    ))}
+                  </ScrollView>
+
+                  {/* Select Size Section */}
+                  <Text
+                    style={{
+                      color: colors.black,
+                      fontSize: fontSize(14),
+                      fontFamily: fontFamily.poppins500,
+                      marginBottom: hp(15),
+                    }}>
+                    Select Size
+                  </Text>
+
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {availableSizes.map(
+                      (size, index) => (
+                        console.log(availableSizes, 'AVAILABLE SIZES==>'),
+                        (
+                          <Touchable
+                            // key={size}
+                            key={`${size}-${index}`} // unique key
+                            style={{
+                              width: wp(48),
+                              height: wp(48),
+                              borderRadius: wp(32.5),
+                              borderWidth: 2,
+                              borderColor:
+                                selectedSize?.toLowerCase() ===
+                                size?.toLowerCase()
+                                  ? '#000000'
+                                  : '#E0E0E0',
+
+                              backgroundColor:
+                                selectedSize?.toLowerCase() ===
+                                size?.toLowerCase()
+                                  ? '#F7E7FF'
+                                  : colors.white,
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              marginRight: wp(12),
+                              marginBottom: hp(20),
+                            }}
+                            onPress={() => setSelectedSize(size)}>
+                            <Text
+                              style={{
+                                fontSize: fontSize(16),
+                                fontFamily: fontFamily.poppins600,
+                                color:
+                                  selectedSize === size
+                                    ? colors.pureBlack
+                                    : colors.pureBlack,
+                              }}>
+                              {size.toUpperCase()}
+                            </Text>
+                          </Touchable>
+                        )
+                      ),
+                    )}
+                  </ScrollView>
+                  <View
+                    style={
+                      {
+                        // marginTop: hp(29)
+                      }
+                    }>
+                    <Text
+                      style={{
+                        color: colors.black,
+                        fontSize: fontSize(14),
+                        fontFamily: fontFamily.poppins500,
+                        // marginBottom: hp(20),
+                        marginBottom: hp(15),
+                      }}>
+                      Select Quantity
+                    </Text>
+
+                    <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+                      {quantityOptions.map(qty => (
+                        <TouchableOpacity
+                          key={qty}
+                          style={{
+                            width: wp(48),
+                            height: wp(48),
+                            borderRadius: wp(32.5),
+                            borderWidth: 2,
+                            borderColor:
+                              selectedQuantity === qty ? '#000000' : '#E0E0E0',
+                            backgroundColor:
+                              selectedQuantity === qty
+                                ? '#F7E7FF'
+                                : colors.white,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginRight: wp(12),
+                            marginBottom: hp(25),
+                          }}
+                          onPress={() => setSelectedQuantity(qty)}>
+                          <Text
+                            style={{
+                              fontSize: fontSize(16),
+                              fontFamily: fontFamily.poppins600,
+                              color: colors.pureBlack,
+                            }}>
+                            {qty}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                </View>
+                <View
+                  style={{
+                    position: 'absolute',
+                    bottom: wp(30),
+                    left: wp(18),
+                    right: wp(18),
+                  }}>
+                  <GradientButton
+                    title={loading ? 'Updating...' : 'Update'}
+                    onPress={() => {
+                      // console.log(
+                      //   'FULL VARIANTS',
+                      //   JSON.stringify(variants, null, 2),
+                      // );
+
+                      console.log('selectedColor', selectedColor);
+                      console.log('selectedSize', selectedSize);
+                      setUpdating(true);
+                      const selectedVariant = variants.find(v => {
+                        const color = v.variants.find(
+                          i => i.key === 'color',
+                        )?.value;
+                        const size = v.variants.find(
+                          i => i.key === 'size',
+                        )?.value;
+
+                        return (
+                          color?.toLowerCase() ===
+                            selectedColor?.toLowerCase() &&
+                          size?.toLowerCase() === selectedSize?.toLowerCase()
+                        );
+                      });
+
+                      console.log('SELECTED VARIANT', selectedVariant);
+
+                      if (!selectedVariant) {
+                        console.log('Variant not found');
+                        return;
+                      }
+
+                      const data = {
+                        cartItemId: selectedItem?._id,
+                        variants: selectedVariant.id,
+                        quantity: selectedQuantity,
+                      };
+
+                      console.log('FINAL PAYLOAD', data);
+
+                      dispatch(updateCartRequest(data, token));
+                      // ToastAndroid.show('Updated successfully', ToastAndroid.SHORT);
+                    }}
+                    buttonStyle={{}}></GradientButton>
                 </View>
               </View>
-            </View>
+            </RBSheet>
+          </ScrollView>
+
+          {cartData?.productDetailList?.length > 0 && (
             <View
               style={{
                 position: 'absolute',
-                bottom: wp(30),
-                left: wp(18),
-                right: wp(18),
+                bottom: 0,
+                left: 0,
+                right: 0,
+                backgroundColor: '#fff',
+                padding: wp(15),
+                borderTopWidth: 1,
+                borderColor: '#eee',
               }}>
-              <GradientButton
-                title={loading ? 'Updating...' : 'Update'}
-                onPress={() => {
-                  // console.log(
-                  //   'FULL VARIANTS',
-                  //   JSON.stringify(variants, null, 2),
-                  // );
-
-                  console.log('selectedColor', selectedColor);
-                  console.log('selectedSize', selectedSize);
-                  setUpdating(true);
-                  const selectedVariant = variants.find(v => {
-                    const color = v.variants.find(
-                      i => i.key === 'color',
-                    )?.value;
-                    const size = v.variants.find(i => i.key === 'size')?.value;
-
-                    return (
-                      color?.toLowerCase() === selectedColor?.toLowerCase() &&
-                      size?.toLowerCase() === selectedSize?.toLowerCase()
-                    );
-                  });
-
-                  console.log('SELECTED VARIANT', selectedVariant);
-
-                  if (!selectedVariant) {
-                    console.log('Variant not found');
-                    return;
-                  }
-
-                  const data = {
-                    cartItemId: selectedItem?._id,
-                    variants: selectedVariant.id,
-                    quantity: selectedQuantity,
-                  };
-
-                  console.log('FINAL PAYLOAD', data);
-
-                  dispatch(updateCartRequest(data, token));
-                  // ToastAndroid.show('Updated successfully', ToastAndroid.SHORT);
-                }}
-                buttonStyle={{}}></GradientButton>
+              <GradientButton title="Pay Now" />
             </View>
-          </View>
-        </RBSheet>
-      </ScrollView>
-
-      {cartData?.productDetailList?.length > 0 && (
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: '#fff',
-            padding: wp(15),
-            borderTopWidth: 1,
-            borderColor: '#eee',
-          }}>
-          <GradientButton title="Pay Now" />
-        </View>
+          )}
+        </>
       )}
     </SafeAreaView>
   );

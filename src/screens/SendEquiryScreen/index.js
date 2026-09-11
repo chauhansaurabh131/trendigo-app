@@ -84,11 +84,12 @@ const SendEquiryScreen = ({route}) => {
   const displayMessages = filteredMessages;
 
   useEffect(() => {
+    let socket;
     const initializeSocket = async () => {
       const latestToken = await AsyncStorage.getItem('authToken');
       console.log('LATEST TOKEN =>', latestToken);
 
-      const socket = connectSocket(latestToken);
+      socket = connectSocket(latestToken);
 
       // const socket = connectSocket(token);
       console.log('CONNECT SOCKET TOKEN =>', latestToken);
@@ -98,11 +99,9 @@ const SendEquiryScreen = ({route}) => {
 
         socket.emit('get_messages', {
           counterpartyId: receiverId,
-
           page: 1,
           limit: 10,
         });
-
         console.log('GET_MESSAGES EMITTED');
 
         socket.onAny((event, data) => {
@@ -113,10 +112,11 @@ const SendEquiryScreen = ({route}) => {
 
       // Initial messages
       socket.on('messages_list', response => {
-        console.log(
-          'MESSAGES_LIST RESPONSE =>',
-          JSON.stringify(response, null, 2),
-        );
+        console.log(' MESSAGE LIST HITT ===>');
+        // console.log(
+        //   'MESSAGES_LIST RESPONSE =>',
+        //   JSON.stringify(response, null, 2),
+        // );
 
         if (response.page === 1) {
           dispatch({
@@ -141,6 +141,10 @@ const SendEquiryScreen = ({route}) => {
         console.log('MESSAGE_SENT ID =>', message.id);
         console.log(' MESSAGE SENT EVENT', message);
         console.log('NEW MESSAGE =>', message);
+        console.log(
+          'MESSAGE_SENT LISTENER COUNT =>',
+          socket.listeners('message_sent').length,
+        );
         socket.emit('get_messages', {
           counterpartyId: receiverId,
           page: 1,
@@ -160,10 +164,19 @@ const SendEquiryScreen = ({route}) => {
         });
       });
       // New incoming message
+
+      socket.off('receive_message');
+
       socket.on('receive_message', message => {
-        console.log('RECEIVE_MESSAGE ID =>', message._id);
+        console.log('RECEIVE_MESSAGE ID =>', message.id);
+        console.log('SOCKET ID =>', socket.id);
+        console.log('MESSAGE ID =>', message.id);
         console.log('RECEIVE_MESSAGE EVENT FIRED');
-        console.log(' NEW MESSAGE =>', message);
+        console.log(
+          'RECEIVE_MESSAGE LISTENER COUNT =>',
+          socket.listeners('receive_message').length,
+        );
+        // console.log(' NEW MESSAGE =>', message);
 
         dispatch({
           type: 'ADD_MESSAGE',
@@ -197,18 +210,23 @@ const SendEquiryScreen = ({route}) => {
       socket.on('connect_error', error => {
         console.log('SOCKET ERROR =>', error);
       });
-
-      return () => {
-        console.log(' CLEANUP SOCKET');
-
-        socket.off('messages_list');
-        socket.off('receive_message');
-        socket.off('connect');
-        socket.off('connect_error');
-      };
     };
 
     initializeSocket();
+
+    return () => {
+      console.log(' CLEANUP SOCKET');
+
+      if (socket) {
+        socket.off('messages_list');
+        socket.off('message_sent');
+        socket.off('receive_message');
+        socket.off('message_deleted');
+        socket.off('error');
+        socket.off('connect');
+        socket.off('connect_error');
+      }
+    };
   }, [token, receiverId]);
 
   // when send to seller
@@ -391,7 +409,26 @@ const SendEquiryScreen = ({route}) => {
       });
     }
   }, [uploadedImageData]);
-
+  if (loading) {
+    return (
+      <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
+        <View
+          style={{
+            width: hp(39),
+            height: hp(39),
+            borderRadius: wp(25),
+            // backgroundColor: 'pink',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#FFFFFF',
+            borderWidth: 1,
+            borderColor: '#E5E7EB',
+          }}>
+          <ActivityIndicator size={'large'} color={'blue'} />
+        </View>
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#FFFFFF'}}>
       <View
@@ -503,6 +540,13 @@ const SendEquiryScreen = ({route}) => {
           {
             // paddingBottom: hp(120),
           }
+        }
+        ListFooterComponent={
+          loadingMore ? (
+            <View style={{paddingVertical: hp(20)}}>
+              <ActivityIndicator size="small" color="blue" />
+            </View>
+          ) : null
         }
         renderItem={({item}) => {
           if (item.type === 'product') {

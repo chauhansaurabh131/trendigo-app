@@ -2,7 +2,7 @@
 
 import {call, put, takeLatest} from 'redux-saga/effects';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // ✅ make sure imported
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../api/apiClient';
 import {
   ADD_RECENTLY_VIEWED_REQUEST,

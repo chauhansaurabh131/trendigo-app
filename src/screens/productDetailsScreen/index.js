@@ -469,7 +469,11 @@ const ProductDetailsScreen = () => {
       ToastAndroid.show('Saved to Wishlist', ToastAndroid.SHORT);
     }
   };
+  const [showAll, setShowAll] = useState(false);
 
+  const visibleSpecifications = showAll
+    ? product?.specifications
+    : product?.specifications?.slice(0, 6);
   //Helper Function (Initials name show)
   const getInitials = name => {
     if (!name || typeof name !== 'string') return 'NN';
@@ -1210,7 +1214,9 @@ const ProductDetailsScreen = () => {
           </Text>
 
           <View style={{marginTop: hp(23)}}>
-            {product?.specifications?.map((item, index) => {
+            {/* {product?.specifications?.map((item, index) => {
+             */}
+            {visibleSpecifications?.map((item, index) => {
               if (index % 2 !== 0) return null;
 
               const left = product.specifications[index];
@@ -1278,18 +1284,21 @@ const ProductDetailsScreen = () => {
               );
             })}
           </View>
-
-          <TouchableOpacity style={{marginTop: hp(27)}}>
-            <Text
-              style={{
-                fontSize: fontSize(14),
-                lineHeight: hp(18),
-                fontFamily: fontFamily.poppins400,
-                color: '#5029F3',
-              }}>
-              See More
-            </Text>
-          </TouchableOpacity>
+          {product?.specifications?.length > 6 && !showAll && (
+            <TouchableOpacity
+              style={{marginTop: hp(27)}}
+              onPress={() => setShowAll(true)}>
+              <Text
+                style={{
+                  fontSize: fontSize(14),
+                  lineHeight: hp(18),
+                  fontFamily: fontFamily.poppins400,
+                  color: '#5029F3',
+                }}>
+                See More
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View

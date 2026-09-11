@@ -25,10 +25,9 @@ const ViralTrendsScreen = () => {
     {
       id: '1',
       category: 'Men',
-      videoUrl:
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      video: require('../../assets/videos/reel3.mp4'),
       image: images.viral_trendy,
-      views: '12.4K',
+      views: '1.4K',
       likes: '4.4K',
       title: 'Men Summary Outfit',
       description: 'Men',
@@ -37,8 +36,7 @@ const ViralTrendsScreen = () => {
       id: '2',
       category: 'Women',
       image: images.viral_trendy,
-      videoUrl:
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      video: require('../../assets/videos/reel2.mp4'),
       views: '8.2K',
       likes: '3.1K',
       title: 'Summer Collection',
@@ -48,8 +46,7 @@ const ViralTrendsScreen = () => {
       id: '3',
       category: 'Kids',
       image: images.viral_image1,
-      videoUrl:
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      video: require('../../assets/videos/reel1.mp4'),
       views: '8.2K',
       likes: '3.1K',
       title: 'Kids Collection',
@@ -59,9 +56,8 @@ const ViralTrendsScreen = () => {
       id: '4',
       category: 'Beauty',
       image: images.viral_trendy,
-      videoUrl:
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-      views: '12.4K',
+      video: require('../../assets/videos/reel2.mp4'),
+      views: '1.4K',
       likes: '4.4K',
       title: '5 Summary Outfit',
       description: 'Beauty',
@@ -70,9 +66,8 @@ const ViralTrendsScreen = () => {
       id: '5',
       category: 'Men',
       image: images.viral_trendy,
-      videoUrl:
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-      views: '12.4K',
+      video: require('../../assets/videos/reel3.mp4'),
+      views: '1.4K',
       likes: '4.4K',
       title: 'Men Summary Outfit',
       description: 'Men',
@@ -80,7 +75,7 @@ const ViralTrendsScreen = () => {
     {
       id: '6',
       category: 'Women',
-      videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      video: require('../../assets/videos/reel2.mp4'),
       image: images.viral_image1,
       views: '8.2K',
       likes: '3.1K',
@@ -91,7 +86,7 @@ const ViralTrendsScreen = () => {
       id: '7',
       category: 'Kids',
       image: images.viral_image1,
-      videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      video: require('../../assets/videos/reel1.mp4'),
       views: '12.4K',
       likes: '4.4K',
       title: 'Kids Summary Outfit',
@@ -101,7 +96,7 @@ const ViralTrendsScreen = () => {
       id: '8',
       category: 'Beauty',
       image: images.viral_image1,
-      videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+      video: require('../../assets/videos/reel2.mp4'),
       views: '8.2K',
       likes: '3.1K',
       title: 'Beauty Collection',
@@ -184,7 +179,7 @@ const ViralTrendsScreen = () => {
                   style={{
                     color: isActive ? colors.white : colors.black,
                     fontFamily: fontFamily.poppins400,
-                    fontSize: fontSize(12),
+                    fontSize: fontSize(14),
                   }}>
                   {tab}
                 </Text>

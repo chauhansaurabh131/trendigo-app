@@ -16,6 +16,8 @@ import {
   GradientFullFillLike,
   GradientLikeIcon,
   images,
+  SavedFiledIcon,
+  SaveIcon,
   StarIcon,
 } from '../../assets';
 import {useNavigation} from '@react-navigation/native';
@@ -101,13 +103,15 @@ const WishlistScreen = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
+            <SaveIcon />
             <Text
               style={{
-                fontSize: fontSize(18),
-                fontFamily: fontFamily.poppins500,
-                color: '#666',
+                fontSize: fontSize(16),
+                fontFamily: fontFamily.poppins400,
+                color: '#000000',
+                marginTop: hp(23),
               }}>
-              No items in wishlist
+              No Saved Products
             </Text>
           </View>
         )}
@@ -163,12 +167,29 @@ const WishlistScreen = () => {
                 }
                 style={{
                   width: '100%',
-                  height: hp(170),
+                  height: hp(198),
                   resizeMode: 'cover',
                   borderBottomLeftRadius: wp(14),
                   borderBottomRightRadius: wp(14),
                 }}
               />
+
+              <TouchableOpacity
+                style={{
+                  position: 'absolute',
+                  borderRadius: wp(25),
+                  right: wp(10),
+                  top: hp(10),
+                  width: hp(22),
+                  height: hp(22),
+                  backgroundColor: '#FFFFFF',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+                onPress={() => handleRemoveWishlist(item)}>
+                {/*<Text style={{fontSize: 18}}>♡</Text>*/}
+                <SavedFiledIcon />
+              </TouchableOpacity>
 
               <View style={{padding: wp(10)}}>
                 <Text
@@ -230,7 +251,7 @@ const WishlistScreen = () => {
                   }}>
                   <View
                     style={{
-                      backgroundColor: '#8225AF',
+                      backgroundColor: '#5029F3',
                       paddingHorizontal: wp(5),
                       borderRadius: wp(16),
                       width: hp(42),
@@ -261,13 +282,6 @@ const WishlistScreen = () => {
                     }}>
                     ({product?.rating ?? '00'})
                   </Text>
-
-                  <TouchableOpacity
-                    style={{marginLeft: 'auto'}}
-                    onPress={() => handleRemoveWishlist(item)}>
-                    {/*<Text style={{fontSize: 18}}>♡</Text>*/}
-                    <GradientFullFillLike />
-                  </TouchableOpacity>
                 </View>
               </View>
             </TouchableOpacity>

@@ -21,8 +21,6 @@ function* updateUserSaga(action) {
 
     console.log(' USER UPDATE API RESPONSE:', response.data);
 
-    console.log('USER UPDATE Data:', response.data?.data);
-
     yield put(updateUserSuccess(response.data));
 
     yield put(fetchUserRequest());

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {
   FlatList,
   Image,
@@ -7,7 +7,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {EyeIcon, HeartIcon, images, WhiteArrow} from '../../assets';
+import {
+  EyeIcon,
+  HeartIcon,
+  images,
+  WhiteArrow,
+  WhiteHeartIcon,
+} from '../../assets';
 import {colors} from '../../utils/colors';
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -15,25 +21,37 @@ import {Dimensions} from 'react-native';
 import Video from 'react-native-video';
 const ReelsVideoScreen = () => {
   const navigation = useNavigation();
+  const [liked, setLiked] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(selectedIndex);
   const route = useRoute();
+
   const {videos, selectedId} = route.params;
   console.log(videos, 'VIDEO=======>');
   const {width, height} = Dimensions.get('window');
-  const selectedIndex = videos.findIndex(item => item.id === selectedId);
-  const [paused, setPaused] = useState(false);
 
-  const renderItem = ({item}) => (
+  const selectedIndex = videos.findIndex(
+    item => String(item.id) === String(selectedId),
+  );
+  const [pausedVideoId, setPausedVideoId] = useState(null);
+
+  const onViewableItemsChanged = useRef(({viewableItems}) => {
+    if (viewableItems.length > 0) {
+      setCurrentIndex(viewableItems[0].index);
+      setPausedVideoId(null);
+    }
+  }).current;
+  const renderItem = ({item, index}) => (
     <View style={{width, height}}>
       <TouchableOpacity
         activeOpacity={1}
         style={{flex: 1}}
-        onPress={() => setPaused(!paused)}>
+        onPress={() => setPausedVideoId(item.id)}>
         <Video
-          source={{uri: item.videoUrl}}
+          source={item.video}
           style={{width, height}}
           resizeMode="cover"
           repeat
-          paused={paused}
+          paused={pausedVideoId === item.id || currentIndex !== index}
         />
       </TouchableOpacity>
 
@@ -63,6 +81,29 @@ const ReelsVideoScreen = () => {
       </View>
 
       <View style={{position: 'absolute', right: wp(29), bottom: hp(151)}}>
+        <TouchableOpacity onPress={() => setLiked(!liked)}>
+          {liked ? (
+            <HeartIcon />
+          ) : (
+            <WhiteHeartIcon /> // white heart
+          )}
+        </TouchableOpacity>
+        <View>
+          <Text
+            style={{
+              color: '#fff',
+              fontSize: fontSize(12),
+              fontFamily: fontFamily.poppins400,
+              // marginLeft: wp(30),
+              textAlign: 'center',
+              marginTop: hp(4),
+            }}>
+            {item.likes}
+          </Text>
+        </View>
+      </View>
+
+      <View style={{position: 'absolute', right: wp(29), bottom: hp(85)}}>
         <TouchableOpacity>
           <EyeIcon />
         </TouchableOpacity>
@@ -73,25 +114,10 @@ const ReelsVideoScreen = () => {
               fontSize: fontSize(12),
               fontFamily: fontFamily.poppins400,
               // marginLeft: wp(30),
+              // marginTop: hp(2),
+              textAlign: 'center',
             }}>
             {item.views}
-          </Text>
-        </View>
-      </View>
-
-      <View style={{position: 'absolute', right: wp(29), bottom: hp(85)}}>
-        <TouchableOpacity>
-          <HeartIcon />
-        </TouchableOpacity>
-        <View>
-          <Text
-            style={{
-              color: '#fff',
-              fontSize: fontSize(12),
-              fontFamily: fontFamily.poppins400,
-              // marginLeft: wp(30),
-            }}>
-            {item.likes}
           </Text>
         </View>
       </View>
@@ -127,7 +153,14 @@ const ReelsVideoScreen = () => {
         renderItem={renderItem}
         pagingEnabled
         initialScrollIndex={selectedIndex}
+        vertical
+        decelerationRate="fast"
         showsVerticalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChanged}
+        onScrollBeginDrag={() => setPausedVideoId(null)}
+        viewabilityConfig={{
+          itemVisiblePercentThreshold: 80,
+        }}
         getItemLayout={(data, index) => ({
           length: height,
           offset: height * index,
@@ -136,7 +169,7 @@ const ReelsVideoScreen = () => {
         keyExtractor={item => item.id}
       />
 
-      {paused && (
+      {pausedVideoId === videos[currentIndex]?.id && (
         <View
           style={{
             position: 'absolute',
@@ -147,7 +180,7 @@ const ReelsVideoScreen = () => {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          <TouchableOpacity onPress={() => setPaused(false)}>
+          <TouchableOpacity onPress={() => setPausedVideoId(null)}>
             <Image
               source={images.video_play}
               style={{

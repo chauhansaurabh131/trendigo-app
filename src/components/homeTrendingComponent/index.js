@@ -149,22 +149,6 @@ const HomeTrendingComponent = () => {
                 source={imageUrl ? {uri: imageUrl} : images.trending_one}
                 style={styles.image}
               />
-              {/* <TouchableOpacity
-                onPress={() => console.log('Save Icon Click')}
-                style={{
-                  position: 'absolute',
-                  borderRadius: wp(25),
-                  right: wp(10),
-                  top: hp(10),
-                  width: hp(22),
-                  height: hp(22),
-                  backgroundColor: '#FFFFFF',
-                  justifyContent: 'center',
-                }}>
-                <View style={{alignItems: 'center'}}>
-                  <BlueSaveIcon />
-                </View>
-              </TouchableOpacity> */}
 
               <TouchableOpacity
                 style={styles.heartButton}

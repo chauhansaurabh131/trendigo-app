@@ -68,10 +68,28 @@ import NewBigLogo from './svgIcons/new_big_logo.svg';
 import BlueStar from './svgIcons/blue_star.svg';
 import BlueCircleImage from './svgIcons/blue_circle_image.svg';
 import Blackheart from './svgIcons/black_heart.svg';
+import WhiteHeartIcon from './svgIcons/white_heart_icon.svg';
+import EmptyBagIcon from './svgIcons/empty_bag_icon.svg';
+import EmptyBag from './svgIcons/empty_bag.svg';
+import UserIcon from './svgIcons/user_icon.svg';
+import AddressIcon from './svgIcons/address_icon.svg';
+import BlueBagIcon from './svgIcons/blue_bag_icon.svg';
+import RevewsIcon from './svgIcons/revews_icon.svg';
+import IconChat from './svgIcons/icon_chat.svg';
+import SaveIcon from './svgIcons/save_icon.svg';
 export {
   Icon,
   BlueStar,
+  UserIcon,
+  SaveIcon,
+  IconChat,
+  RevewsIcon,
+  EmptyBagIcon,
+  EmptyBag,
   Blackheart,
+  WhiteHeartIcon,
+  AddressIcon,
+  BlueBagIcon,
   BrandIcon,
   BlueCircleImage,
   NewBigLogo,

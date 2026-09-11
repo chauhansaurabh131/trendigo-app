@@ -21,7 +21,7 @@ import check_icon from '../../assets/images/check_right_icon.png';
 import location_icon from '../../assets/images/location_address_icon.png';
 import LinearGradient from 'react-native-linear-gradient';
 import GradientButton from '../../components/gradientButton';
-import {RemoveIcon, EditIcon, MapIcon} from '../../assets';
+import {RemoveIcon, EditIcon, MapIcon, AddressIcon} from '../../assets';
 import {FlatList} from 'react-native';
 import {KeyboardAvoidingView} from 'react-native';
 // IMPORT ACTION CREATORS (ensure these exist / match names)
@@ -182,26 +182,27 @@ const AddressScreen = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <MapIcon />
-
-              <View style={{marginTop: hp(26)}}>
+              <View
+                style={{
+                  width: hp(73),
+                  height: hp(73),
+                  borderRadius: wp(40),
+                  backgroundColor: '#F2EFFF',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <AddressIcon />
+              </View>
+              <View style={{marginTop: hp(23)}}>
                 <Text
                   style={{
                     color: '#000',
-                    fontFamily: fontFamily.poppins600,
-                    fontSize: fontSize(18),
+                    fontFamily: fontFamily.poppins500,
+                    fontSize: fontSize(16),
                   }}>
                   No Address Found
                 </Text>
               </View>
-              <Text
-                style={{
-                  color: '#909090',
-                  fontFamily: fontFamily.poppins400,
-                  fontSize: fontSize(12),
-                }}>
-                Please provide an address for delivery
-              </Text>
             </View>
           }
           renderItem={({item}) => {

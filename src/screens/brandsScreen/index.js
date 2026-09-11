@@ -105,7 +105,7 @@ const BrandsScreen = () => {
                   style={{
                     color: isActive ? colors.white : colors.black,
                     fontFamily: fontFamily.poppins400,
-                    fontSize: fontSize(12),
+                    fontSize: fontSize(14),
                   }}>
                   {tab}
                 </Text>

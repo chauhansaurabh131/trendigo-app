@@ -64,7 +64,7 @@ const RecentlyViewComponent = () => {
   }, []);
 
   const token = useSelector(state => state.auth.token);
-  console.log('Recently Com. Token:', token);
+  // console.log('Recently Com. Token:', token);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>

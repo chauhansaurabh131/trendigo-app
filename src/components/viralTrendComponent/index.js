@@ -18,10 +18,9 @@ const ViralTrendyComponet = ({data}) => {
     {
       id: '1',
       category: 'Men',
-      videoUrl:
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      video: require('../../assets/videos/reel3.mp4'),
       image: images.viral_image1,
-      views: '12.4K',
+      views: '1.4K',
       likes: '4.4K',
       title: 'Men Summary Outfit',
       description: 'Men',
@@ -30,8 +29,7 @@ const ViralTrendyComponet = ({data}) => {
       id: '2',
       category: 'Women',
       image: images.viral_trendy,
-      videoUrl:
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      video: require('../../assets/videos/reel2.mp4'),
       views: '8.2K',
       likes: '3.1K',
       title: 'Summer Collection',
@@ -41,8 +39,7 @@ const ViralTrendyComponet = ({data}) => {
       id: '3',
       category: 'Kids',
       image: images.viral_image1,
-      videoUrl:
-        'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      video: require('../../assets/videos/reel1.mp4'),
       views: '8.2K',
       likes: '3.1K',
       title: 'Kids Collection',

@@ -17,7 +17,7 @@ import {useEffect} from 'react';
 import {fetchUserRequest} from '../../redux/actions/userActions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {logout} from '../../redux/actions/authActions';
-import {images} from '../../assets';
+import {images, UserIcon} from '../../assets';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -86,14 +86,14 @@ const ProfileScreen = () => {
                 style={{width: '100%', height: '100%', borderRadius: hp(25)}}
               />
             ) : (
-              <Text style={styles.avatarText}>
-                {getInitials(user?.name || user?.email)}
-              </Text>
+              // <Text style={styles.avatarText}>
+              <UserIcon width={20.08} height={20.08} />
+              // </Text>
             )}
           </View>
 
           <Text style={styles.nameText}>
-            {user?.name || user?.email || user?.mobileNumber || 'NA'}
+            {user?.name || user?.email || user?.mobileNumber || 'TrulyBag User'}
           </Text>
         </View>
 
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: wp(18),
     zIndex: 2,
-    padding: 5,
+    padding: wp(5),
   },
   profileContainer: {
     height: hp(58),
@@ -240,13 +240,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#eee',
   },
   profileText: {
-    marginRight: 30,
+    marginRight: wp(30),
     flex: 1,
     textAlign: 'center',
     fontFamily: fontFamily.poppins500,
     fontSize: wp(18),
     color: '#000',
-    marginRight: 30,
+    marginRight: wp(30),
   },
   arrowIcon: {
     width: wp(18),
@@ -261,13 +261,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: wp(16),
     height: hp(84),
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#F9F9F9',
   },
   avatar: {
-    width: hp(50),
-    height: hp(50),
-    borderRadius: hp(25),
-    backgroundColor: '#F7E7FF',
+    width: hp(60),
+    height: hp(60),
+    borderRadius: hp(35),
+    backgroundColor: '#EFEBFF',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: wp(20),
@@ -282,7 +282,6 @@ const styles = StyleSheet.create({
     fontSize: fontSize(16),
     marginLeft: wp(18),
     color: '#000',
-    fontWeight: 'bold',
   },
   blackContainer: {
     flexDirection: 'row',
@@ -296,9 +295,9 @@ const styles = StyleSheet.create({
     marginBottom: hp(16),
   },
   box: {
-    width: hp(95.2),
+    width: hp(99.2),
     height: hp(95.2),
-    borderRadius: hp(18),
+    borderRadius: wp(18),
     justifyContent: 'center',
     alignItems: 'center',
     padding: hp(8),
@@ -328,7 +327,7 @@ const styles = StyleSheet.create({
   },
   logoutContainer: {
     alignSelf: 'center',
-    width: wp(360),
+    width: hp(360),
     height: hp(50),
     borderRadius: wp(100),
     backgroundColor: '#F3F3F3',
@@ -341,8 +340,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   boxImage: {
-    width: wp(33),
-    height: wp(33),
+    width: hp(33),
+    height: hp(33),
     resizeMode: 'contain',
   },
 });

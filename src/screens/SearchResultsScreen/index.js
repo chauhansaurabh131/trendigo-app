@@ -16,6 +16,7 @@ import {fontFamily, fontSize, hp} from '../../utils/helpers';
 import {
   BackIcon,
   BlueSaveIcon,
+  CrossIcon,
   GradientColorSearchIcon,
   GradientFullFillLike,
   GradientLikeIcon,
@@ -41,13 +42,14 @@ import {useEffect} from 'react';
 import {StyleSheet} from 'react-native';
 import TopBrandComponent from '../../components/topBrandComponent';
 import {ActivityIndicator} from 'react-native';
-
+import arrow_back from '../../assets/images/arrow_back.png';
 const screenWidth = Dimensions.get('window').width;
 const cardWidth = (screenWidth - 40) / 2;
 
 const SearchResultScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+
   const dispatch = useDispatch();
   const [localWishlist, setLocalWishlist] = useState([]);
   const {products, loading, currentPage, totalPages} = useSelector(
@@ -59,7 +61,8 @@ const SearchResultScreen = () => {
   console.log('PRODUCT COUNT =>', products.length);
 
   // get search text
-  const searchText = route?.params?.search || '';
+  const [searchText, setSearchText] = useState(route?.params?.search || '');
+  console.log('GET SEARCH TEXT', searchText);
 
   const token = useSelector(state => state.auth.token);
   console.log('Auth Token in HomeTrendingComponent:', token);
@@ -103,6 +106,7 @@ const SearchResultScreen = () => {
         return null;
     }
   };
+
   const renderProduct = ({item}) => {
     const images = item?.variants?.[0]?.images || [];
 
@@ -256,6 +260,126 @@ const SearchResultScreen = () => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
+      <View
+        style={{
+          marginHorizontal: wp(18),
+          marginTop: hp(15),
+          zIndex: 1000,
+        }}>
+        <View
+          activeOpacity={0.6}
+          style={{
+            marginTop: hp(9),
+            width: '100%',
+            height: hp(40),
+            borderRadius: wp(25),
+            backgroundColor: '#F7F7F7',
+            justifyContent: 'center',
+            paddingHorizontal: hp(15),
+          }}>
+          <TouchableOpacity
+            style={{flexDirection: 'row', alignItems: 'center'}}
+            activeOpacity={0.6}
+            onPress={() => {
+              console.log('SEARCH BAR CLICKED');
+              navigation.navigate('MainTabs', {
+                screen: 'SearchStack',
+                params: {
+                  screen: 'SearchScreen',
+                },
+              });
+            }}>
+            <GradientColorSearchIcon width={hp(16)} height={hp(16)} />
+            <Text
+              style={{
+                flex: 1,
+                marginLeft: hp(11),
+                fontSize: fontSize(14),
+                lineHeight: hp(20),
+                fontFamily: fontFamily.poppins400,
+                color: '#979797',
+                textAlignVertical: 'center',
+                paddingVertical: 0,
+              }}>
+              {searchText || 'Search for Products'}
+            </Text>
+
+            {searchText.trim().length > 0 && (
+              <TouchableOpacity
+                onPress={() => {
+                  setSearchText('');
+                }}>
+                <CrossIcon />
+              </TouchableOpacity>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View>
+        {/* TABS */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: wp(17),
+            marginTop: hp(22),
+            marginBottom: hp(20),
+          }}>
+          {tabs.map((tab, index) => {
+            const isActive = activeTab === tab;
+
+            return (
+              <TouchableOpacity
+                key={index}
+                onPress={() => setActiveTab(tab)}
+                style={{marginRight: wp(12)}}>
+                {isActive ? (
+                  <LinearGradient
+                    // colors={['#8225AF', '#0F52BA']}
+                    colors={['#5029F3', '#7756FF']}
+                    start={{x: 0, y: 0}}
+                    end={{x: 1, y: 0}}
+                    style={{
+                      width: wp(94),
+                      height: hp(30),
+                      borderRadius: wp(24),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#fff',
+                        fontFamily: fontFamily.poppins400,
+                        fontSize: fontSize(13),
+                      }}>
+                      {tab}
+                    </Text>
+                  </LinearGradient>
+                ) : (
+                  <View
+                    style={{
+                      backgroundColor: '#F7F7F7',
+                      width: wp(94),
+                      height: hp(30),
+                      borderRadius: wp(24),
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <Text
+                      style={{
+                        color: '#000',
+                        fontFamily: fontFamily.poppins400,
+                        fontSize: fontSize(13),
+                      }}>
+                      {tab}
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
       <FlatList
         // data={products}
         data={products || []}
@@ -284,70 +408,6 @@ const SearchResultScreen = () => {
         }}
         ListHeaderComponent={
           <>
-            {/* TABS */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingHorizontal: wp(17),
-                marginTop: hp(30),
-                marginBottom: hp(10),
-              }}>
-              {tabs.map((tab, index) => {
-                const isActive = activeTab === tab;
-
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => setActiveTab(tab)}
-                    style={{marginRight: wp(12)}}>
-                    {isActive ? (
-                      <LinearGradient
-                        // colors={['#8225AF', '#0F52BA']}
-                        colors={['#5029F3', '#7756FF']}
-                        start={{x: 0, y: 0}}
-                        end={{x: 1, y: 0}}
-                        style={{
-                          width: wp(94),
-                          height: hp(30),
-                          borderRadius: wp(24),
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#fff',
-                            fontFamily: fontFamily.poppins400,
-                            fontSize: fontSize(13),
-                          }}>
-                          {tab}
-                        </Text>
-                      </LinearGradient>
-                    ) : (
-                      <View
-                        style={{
-                          backgroundColor: '#F7F7F7',
-                          width: wp(94),
-                          height: hp(30),
-                          borderRadius: wp(24),
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}>
-                        <Text
-                          style={{
-                            color: '#000',
-                            fontFamily: fontFamily.poppins400,
-                            fontSize: fontSize(13),
-                          }}>
-                          {tab}
-                        </Text>
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-
             {renderTabContent()}
             <View style={{height: hp(20)}} />
 

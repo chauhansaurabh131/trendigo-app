@@ -8,7 +8,7 @@ import {
   Text,
 } from 'react-native';
 import {images} from '../../assets';
-import {fontFamily, fontSize, hp, Touchable} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, wp, Touchable} from '../../utils/helpers';
 import {colors} from '../../utils/colors'; // Make sure your image paths are correct
 
 // 🔹 Each image has a title
@@ -50,7 +50,7 @@ const HomeAllProductCategoryComponent = () => {
         keyExtractor={(_, index) => index.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{paddingHorizontal: 10}}
+        contentContainerStyle={{paddingHorizontal: wp(10)}}
         renderItem={({item}) => (
           <View style={styles.imageColumn}>
             {item.map((entry, idx) => (
@@ -76,33 +76,33 @@ const HomeAllProductCategoryComponent = () => {
 
 const styles = StyleSheet.create({
   imageColumn: {
-    marginHorizontal: 10,
+    marginHorizontal: wp(13),
     justifyContent: 'space-between',
     // paddingLeft: 2,
   },
   itemContainer: {
     alignItems: 'center',
-    marginVertical: 1,
+    marginVertical: hp(1),
   },
   imageWrapper: {
     // borderWidth: 1,
     borderColor: '#ccc', // gray border
-    borderRadius: 16,
+    borderRadius: wp(16),
     // width: 102,
     // height: 102,
     // padding: 0.5, // padding around image
   },
   image: {
-    width: hp(100),
-    height: hp(100),
-    borderRadius: 12,
+    width: hp(110),
+    height: hp(110),
+    borderRadius: wp(12),
   },
   label: {
-    marginTop: 6,
+    marginTop: hp(6),
     fontSize: fontSize(14),
     color: colors.pureBlack,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: hp(10),
     fontFamily: fontFamily.poppins400,
   },
 });

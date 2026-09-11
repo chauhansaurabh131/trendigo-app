@@ -25,11 +25,14 @@ import {fetchUserRequest} from '../../redux/actions/userActions';
 const HomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+
   const {user, loading} = useSelector(state => state.user);
+
   useEffect(() => {
     dispatch(fetchUserRequest());
   }, []);
-  console.log('PROFILE PIC ', user?.profilePic);
+
+  console.log('PROFILE PIC IN HOMESCREEN', user?.profilePic);
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       {/* Non-scrollable header */}
@@ -59,37 +62,9 @@ const HomeScreen = () => {
                 style={{
                   width: hp(24),
                   height: hp(24),
-                  borderRadius: 20,
+                  borderRadius: wp(20),
                 }}
               />
-            ) : user?.name || user?.email ? (
-              // First Letter
-              <View
-                style={{
-                  width: hp(24),
-                  height: hp(24),
-                  borderRadius: 25,
-                  backgroundColor: '#F7E7FF',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <Text
-                  style={{
-                    color: '#000',
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins500,
-                  }}>
-                  {/* {(user?.name || user?.email)?.charAt(0)?.toUpperCase()} */}
-                  {user?.name
-                    ? user.name
-                        .trim()
-                        .split(' ')
-                        .map(word => word.charAt(0).toUpperCase())
-                        .slice(0, 2)
-                        .join('')
-                    : user?.email?.charAt(0)?.toUpperCase()}
-                </Text>
-              </View>
             ) : (
               // Not Logged In
               <ProfileIcon />
@@ -103,9 +78,9 @@ const HomeScreen = () => {
             marginTop: hp(23),
             width: '100%',
             height: hp(40),
-            borderRadius: 25,
+            borderRadius: wp(25),
             backgroundColor: '#F7F7F7',
-            marginBottom: 12,
+            marginBottom: hp(12),
             justifyContent: 'center',
             paddingHorizontal: hp(15),
           }}>
@@ -128,7 +103,7 @@ const HomeScreen = () => {
         </View>
       </View>
 
-      {/* 🔄 Scrollable content */}
+      {/* Scrollable content */}
       <FlatList
         data={[{}]} // dummy data
         keyExtractor={(_, index) => index.toString()}
@@ -141,17 +116,10 @@ const HomeScreen = () => {
               <HomeAllProductCategoryComponent />
             </View>
 
-            {/* <View
-              style={{
-                width: '100%',
-                borderColor: '#E7E7E7',
-                borderWidth: 0.7,
-                // marginTop: hp(10),
-              }}
-            /> */}
             <View style={{marginTop: hp(28)}}>
               <LatestTrendyComponet />
             </View>
+
             <View
               style={{
                 // marginTop: hp(18),
@@ -160,12 +128,15 @@ const HomeScreen = () => {
               }}>
               <HomeTrendingComponent />
             </View>
+
             <View style={{marginTop: hp(28)}}>
               <ViralTrendyComponet />
             </View>
+
             <View style={{marginTop: hp(47)}}>
               <ShopByBrandsComponent />
             </View>
+
             <View style={{marginTop: hp(35.17), marginHorizontal: wp(0)}}>
               <RecentlyViewComponent />
             </View>
