@@ -137,7 +137,8 @@ const ProductImageComponent = ({
               style={[
                 styles.dot,
                 {
-                  backgroundColor: activeIndex === index ? '#5029F3' : '#888',
+                  backgroundColor:
+                    activeIndex === index ? '#5029F3' : '#FFFFFF',
                 },
               ]}
             />
@@ -211,8 +212,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   thumbnail: {
-    width: hp(45),
-    height: hp(50),
+    width: hp(52),
+    height: hp(68),
     resizeMode: 'stretch',
     borderRadius: wp(10),
   },

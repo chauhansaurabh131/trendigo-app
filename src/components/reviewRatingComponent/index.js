@@ -14,12 +14,14 @@ const ReviewRatingComponent = ({ratingBreakdown, totalReviews}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.totalCountText}>
+      {/* <Text style={styles.totalCountText}>
         {totalReviews} <Text style={{color: '#8F8F8F'}}>Verified Buyers</Text>
-      </Text>
+      </Text> */}
 
       {ratingsData.map(({rating, count}) => {
-        const barWidth = (count / maxCount) * 100;
+        // const barWidth = (count / maxCount) * 100;
+
+        const barWidth = count > 0 ? (rating / 5) * 100 : 0;
 
         return (
           <View key={rating} style={styles.row}>
@@ -28,14 +30,14 @@ const ReviewRatingComponent = ({ratingBreakdown, totalReviews}) => {
             <View style={styles.barContainer}>
               <LinearGradient
                 // colors={['#0F52BA', '#8225AF']}
-                colors={['#5029F3', '#7756FF']}
+                colors={['#7147E8', '#7147E8']}
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}
                 style={[styles.barFill, {width: `${barWidth}%`}]}
               />
             </View>
 
-            <Text style={styles.countText}>{count}</Text>
+            {/* <Text style={styles.countText}>{count}</Text> */}
           </View>
         );
       })}
@@ -70,13 +72,13 @@ const styles = StyleSheet.create({
   },
   barContainer: {
     flex: 1,
-    height: hp(2),
-    backgroundColor: '#e0e0e0',
+    height: hp(5),
+    backgroundColor: '#EAE7EE',
     marginHorizontal: wp(5),
     borderRadius: wp(5),
   },
   barFill: {
-    height: hp(2),
+    height: hp(5),
     backgroundColor: '#0F52BA',
     borderRadius: wp(5),
   },

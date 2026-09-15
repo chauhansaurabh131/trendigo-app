@@ -35,6 +35,7 @@ const MenCategoryScreen = () => {
     {key: 'Topwear', label: 'Topwear', icon: topwear_icon},
     {key: 'Bottomwear', label: 'Bottomwear', icon: men_causal},
     {key: 'Footwear', label: 'Footwear', icon: formal_image},
+    {key: 'Western Wear', label: 'Western Wear', icon: formal_image},
   ];
   const {
     loading: categoryLoading,
@@ -134,12 +135,12 @@ const MenCategoryScreen = () => {
           showsHorizontalScrollIndicator={false}
           style={styles.tabRow}
           contentContainerStyle={styles.tabContentContainer}
-          marginTop={13}>
+          marginTop={28}>
           {tabs.map((tab, index) =>
             activeTab === tab.key ? (
               <LinearGradient
                 key={tab.key}
-                colors={['#5029F3', '#7756FF']}
+                colors={['#000000', '#000000']}
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 0}}
                 style={[
@@ -148,9 +149,9 @@ const MenCategoryScreen = () => {
                   index === tabs.length - 1 && styles.lastTab,
                 ]}>
                 <TouchableOpacity
-                  style={styles.tabContent}
+                  style={{alignItems: 'center'}}
                   onPress={() => setActiveTab(tab.key)}>
-                  <Image source={tab.icon} style={styles.tabIcon} />
+                  {/* <Image source={tab.icon} style={styles.tabIcon} /> */}
                   <Text style={styles.activeTabText}>{tab.label}</Text>
                 </TouchableOpacity>
               </LinearGradient>
@@ -164,7 +165,7 @@ const MenCategoryScreen = () => {
                 ]}
                 onPress={() => setActiveTab(tab.key)}>
                 <View style={styles.tabContent}>
-                  <Image source={tab.icon} style={styles.tabIcon} />
+                  {/* <Image source={tab.icon} style={styles.tabIcon} /> */}
                   <Text style={styles.tabText}>{tab.label}</Text>
                 </View>
               </TouchableOpacity>
@@ -279,45 +280,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   activeTab: {
-    borderRadius: wp(25),
+    borderRadius: wp(10),
     marginRight: wp(15),
     paddingHorizontal: wp(15),
     paddingVertical: hp(8),
+    // width: wp(100),
   },
   inactiveTab: {
-    backgroundColor: '#f2f2f2',
-    borderRadius: wp(25),
+    backgroundColor: '#F6F6F6',
+    borderRadius: wp(10),
     marginRight: wp(15),
     paddingHorizontal: wp(15),
     paddingVertical: hp(8),
+    // width: hp(100),
   },
   firstTab: {marginLeft: 0},
   lastTab: {marginRight: wp(20)},
   tabContent: {flexDirection: 'row', alignItems: 'center'},
-  tabIcon: {
-    width: wp(30),
-    height: hp(30),
-    borderRadius: wp(15),
-    resizeMode: 'contain',
-    right: wp(10),
-  },
+  tabIcon: {},
   activeTabText: {
     color: '#ffffff',
     fontFamily: fontFamily.poppins400,
     fontSize: fontSize(13),
-    marginLeft: wp(15),
-    right: wp(10),
+    // marginLeft: wp(15),
+    // right: wp(10),
   },
   tabText: {
     color: '#000000',
     fontFamily: fontFamily.poppins400,
-    fontSize: fontSize(14),
-    marginLeft: wp(8),
+    fontSize: fontSize(13),
+    // marginLeft: wp(8),
   },
   sectionTitle: {
-    fontSize: fontSize(15),
+    fontSize: fontSize(17),
     fontFamily: fontFamily.poppins500,
-    margin: wp(18),
+    marginTop: wp(27),
     color: '#000000',
     marginLeft: wp(21),
   },
@@ -335,14 +332,14 @@ const styles = StyleSheet.create({
     borderRadius: wp(10),
     alignItems: 'center',
     margin: '1.5%',
-    padding: wp(5),
+    marginTop: wp(23),
   },
   cardImage: {
     width: wp(100),
     height: hp(100),
-    marginBottom: hp(6),
+    marginBottom: hp(7),
     resizeMode: 'cover',
-    borderRadius: wp(10),
+    borderRadius: wp(14),
   },
   cardText: {
     fontFamily: fontFamily.poppins400,

@@ -74,7 +74,7 @@ const FullImage = () => {
               key={i}
               style={[
                 styles.dot,
-                {backgroundColor: isActive ? '#8225AF' : '#FFFFFF'},
+                {backgroundColor: isActive ? '#5029F3' : '#FFFFFF'},
               ]}
             />
           );

@@ -27,12 +27,15 @@ import {
   GradientFullFillLike,
   GradientLikeIcon,
   images,
+  NewBag,
   SavedFiledIcon,
   SearchFilterIcon,
   SellerShopIcon,
   SendEquiry,
   SendEquiry1,
   StarIcon,
+  StoreIcon,
+  UserIcon,
 } from '../../assets';
 import SizeChartComponent from '../../components/sizeChartComponent';
 import GradientButton from '../../components/gradientButton';
@@ -57,6 +60,7 @@ import {
   GET_CART_REQUEST,
 } from '../../redux/actions/cartActions';
 import {ActivityIndicator} from 'react-native';
+import TermAndPolicy from '../../components/termAndPolicyComponent';
 export const CustomStarIcon = ({
   width = 24,
   height = 24,
@@ -79,7 +83,7 @@ export const CustomStarIcon = ({
 const ProductDetailsScreen = () => {
   const {width} = useWindowDimensions();
   const route = useRoute();
-
+  const [showAllReviews, setShowAllReviews] = useState(false);
   const dispatch = useDispatch();
 
   const productId = route.params?.productId;
@@ -498,103 +502,33 @@ const ProductDetailsScreen = () => {
       // console.log('Review item:', item);
     }, [item]);
     return (
-      <View style={{marginTop: hp(24)}}>
-        {/* Review Title */}
-        <Text
-          style={{
-            color: colors.pureBlack,
-            fontSize: fontSize(14),
-            lineHeight: hp(24),
-            fontFamily: fontFamily.poppins700,
-            marginHorizontal: wp(17),
-          }}>
-          {item?.title || 'No title'}
-        </Text>
-
-        {/* Review Description */}
-        <Text
-          style={{
-            color: colors.pureBlack,
-            fontSize: fontSize(14),
-            lineHeight: hp(24),
-            fontFamily: fontFamily.poppins400,
-            marginTop: hp(25),
-            marginHorizontal: 17,
-          }}>
-          {item?.description ||
-            item?.review ||
-            item?.comment ||
-            item?.reviewText ||
-            'No description yet.'}
-        </Text>
-        {/* Review Images (if any) */}
-        {item?.productImages && item.productImages.length > 0 ? (
-          <View
-            style={{
-              marginTop: hp(20),
-              marginHorizontal: wp(17),
-              flexDirection: 'row',
-            }}>
-            {item.productImages.map((img, index) => (
-              <Image
-                key={index}
-                source={{uri: img}}
-                style={{
-                  width: wp(60),
-                  height: hp(80),
-                  borderRadius: wp(14),
-                  marginRight: wp(11),
-                }}
-              />
-            ))}
-          </View>
-        ) : (
-          <Text
-            style={{
-              marginTop: hp(20),
-              fontSize: fontSize(12),
-              color: '#999',
-              fontFamily: fontFamily.poppins400,
-              marginHorizontal: wp(17),
-            }}>
-            No images added in this review
-          </Text>
-        )}
-
-        {/* User + Rating */}
+      <>
         <View
           style={{
             marginTop: hp(27),
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginHorizontal: wp(17),
+            marginHorizontal: wp(20),
           }}>
           {/* User info */}
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             {item?.user?.profilePic ? (
               <Image
                 source={{uri: item.user.profilePic}}
-                style={{width: hp(34), height: hp(34), borderRadius: 50}}
+                style={{width: hp(38), height: hp(38), borderRadius: wp(50)}}
               />
             ) : (
               <View
                 style={{
-                  width: hp(34),
-                  height: hp(34),
+                  width: hp(38),
+                  height: hp(38),
                   borderRadius: wp(50),
-                  backgroundColor: '#F7E7FF',
+                  backgroundColor: '#EFEBFF',
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <Text
-                  style={{
-                    color: '#000000',
-                    fontFamily: fontFamily.poppins500,
-                    fontSize: fontSize(15),
-                  }}>
-                  {getInitials(item?.user?.name || 'No Name')}
-                </Text>
+                <UserIcon width={14} height={14} />
               </View>
             )}
             <Text
@@ -603,7 +537,7 @@ const ProductDetailsScreen = () => {
                 color: colors.pureBlack,
                 fontSize: fontSize(14),
                 lineHeight: hp(18),
-                fontFamily: fontFamily.poppins700,
+                fontFamily: fontFamily.poppins500,
               }}>
               {item?.user?.name || 'No Name'}
             </Text>
@@ -622,13 +556,11 @@ const ProductDetailsScreen = () => {
           </View>
 
           {/* Rating */}
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <CustomStarIcon
-              width={hp(15)}
-              height={hp(14)}
-              fill="#5029F3"
-              style={{marginRight: wp(10)}}
-            />
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
             <Text
               style={{
                 fontSize: fontSize(14),
@@ -640,62 +572,135 @@ const ProductDetailsScreen = () => {
               }}>
               {item?.rating || 0}
             </Text>
+            <CustomStarIcon
+              width={hp(15)}
+              height={hp(14)}
+              fill="#5029F3"
+              style={{marginLeft: wp(6)}}
+            />
           </View>
         </View>
-        {item?.replies?.length > 0 &&
-          item.replies.map(reply => (
+        <View style={{marginTop: hp(24)}}>
+          {/* Review Title */}
+          <Text
+            style={{
+              color: colors.pureBlack,
+              fontSize: fontSize(14),
+              lineHeight: hp(24),
+              fontFamily: fontFamily.poppins600,
+              marginHorizontal: wp(20),
+            }}>
+            {item?.title || 'No title'}
+          </Text>
+
+          {/* Review Description */}
+          <Text
+            style={{
+              color: colors.pureBlack,
+              fontSize: fontSize(14),
+              lineHeight: hp(24),
+              fontFamily: fontFamily.poppins400,
+              marginTop: hp(25),
+              marginHorizontal: wp(17),
+            }}>
+            {item?.description ||
+              item?.review ||
+              item?.comment ||
+              item?.reviewText ||
+              'No description yet.'}
+          </Text>
+          {/* Review Images (if any) */}
+          {item?.productImages && item.productImages.length > 0 ? (
             <View
-              key={reply._id}
               style={{
-                marginTop: hp(16),
-                marginHorizontal: wp(17),
-                backgroundColor: '#F7F5FF',
-                borderRadius: wp(12),
-                paddingVertical: hp(15),
-                paddingHorizontal: wp(16),
+                marginTop: hp(12),
+                marginHorizontal: wp(20),
+                flexDirection: 'row',
               }}>
-              <Text
-                style={{
-                  fontSize: fontSize(13),
-                  fontFamily: fontFamily.poppins500,
-                  color: '#000',
-                }}>
-                {reply?.seller?.name}
-              </Text>
-
-              <Text
-                style={{
-                  marginTop: hp(6),
-                  fontSize: fontSize(13),
-                  lineHeight: hp(20),
-                  fontFamily: fontFamily.poppins400,
-                  color: '#444',
-                }}>
-                {reply?.message}
-              </Text>
-
-              <Text
-                style={{
-                  marginTop: hp(10),
-                  fontSize: fontSize(11),
-                  fontFamily: fontFamily.poppins400,
-                  color: '#999',
-                }}>
-                {new Date(reply.createdAt).toDateString()}
-              </Text>
+              {item.productImages.map((img, index) => (
+                <Image
+                  key={index}
+                  source={{uri: img}}
+                  style={{
+                    width: wp(68),
+                    height: hp(78),
+                    borderRadius: wp(8),
+                    marginRight: wp(11),
+                  }}
+                />
+              ))}
             </View>
-          ))}
+          ) : (
+            <Text
+              style={{
+                marginTop: hp(20),
+                fontSize: fontSize(12),
+                color: '#999',
+                fontFamily: fontFamily.poppins400,
+                marginHorizontal: wp(20),
+              }}>
+              No images added in this review
+            </Text>
+          )}
 
-        <View
-          style={{
-            width: '100%',
-            // borderWidth: 0.7,
-            borderWidth: 0.5,
-            marginTop: hp(26),
-            borderColor: '#E7E7E7',
-          }}
-        />
-      </View>
+          {/* User + Rating */}
+
+          {item?.replies?.length > 0 &&
+            item.replies.map(reply => (
+              <View
+                key={reply._id}
+                style={{
+                  marginTop: hp(16),
+                  marginHorizontal: wp(20),
+                  backgroundColor: '#F7F5FF',
+                  borderRadius: wp(12),
+                  paddingVertical: hp(15),
+                  paddingHorizontal: wp(16),
+                }}>
+                <Text
+                  style={{
+                    fontSize: fontSize(13),
+                    fontFamily: fontFamily.poppins500,
+                    color: '#000',
+                  }}>
+                  {reply?.seller?.name}
+                </Text>
+
+                <Text
+                  style={{
+                    marginTop: hp(6),
+                    fontSize: fontSize(13),
+                    lineHeight: hp(20),
+                    fontFamily: fontFamily.poppins400,
+                    color: '#444',
+                  }}>
+                  {reply?.message}
+                </Text>
+
+                <Text
+                  style={{
+                    marginTop: hp(10),
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins400,
+                    color: '#999',
+                  }}>
+                  {new Date(reply.createdAt).toDateString()}
+                </Text>
+              </View>
+            ))}
+
+          <View
+            style={{
+              // width: '100%',
+              // borderWidth: 0.7,
+              height: hp(1),
+              marginTop: hp(26),
+              backgroundColor: '#E7E7E7',
+              marginHorizontal: wp(20),
+            }}
+          />
+        </View>
+      </>
     );
   };
 
@@ -727,7 +732,7 @@ const ProductDetailsScreen = () => {
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
         style={{
-          marginHorizontal: wp(17),
+          marginHorizontal: wp(20),
           height: hp(57),
           flexDirection: 'row',
           alignItems: 'center',
@@ -783,7 +788,7 @@ const ProductDetailsScreen = () => {
                   },
                 })
               }>
-              <BagIcon width={20} height={20} />
+              <NewBag />
 
               {cartCount > 0 && (
                 <View
@@ -835,17 +840,18 @@ const ProductDetailsScreen = () => {
             onPress={handleCartAction}
             // disabled={loading}
             loading={cartLoading}
-            buttonStyle={{width: wp(285), height: hp(50)}}
+            buttonStyle={{width: wp(285), height: hp(50), borderRadius: wp(12)}}
           />
           {/* ADD to wishlist  */}
-          <View style={{width: hp(50), height: hp(50)}}>
-            {/* Background circular image */}
-            {/* <Image
-              source={images.gradientCircleImage}
-              style={{width: '100%', height: '100%'}}
-            /> */}
-
-            <BlueCircleImage />
+          <View
+            style={{
+              width: hp(52),
+              height: hp(52),
+              borderWidth: 1,
+              borderColor: '#EAE7EE',
+              borderRadius: wp(12),
+            }}>
+            {/* <BlueCircleImage /> */}
             <TouchableOpacity
               style={{
                 position: 'absolute',
@@ -877,14 +883,13 @@ const ProductDetailsScreen = () => {
             setSelectedVariant={setSelectedVariant}
           />
         </View>
-
-        <View style={{marginHorizontal: wp(17), marginTop: hp(31)}}>
+        <View style={{marginHorizontal: wp(20), marginTop: hp(31)}}>
           <Text
             style={{
-              color: colors.black,
-              fontSize: fontSize(17),
+              color: '#17151C',
+              fontSize: fontSize(20),
               lineHeight: hp(26),
-              fontFamily: fontFamily.poppins700,
+              fontFamily: fontFamily.poppins600,
             }}>
             {product?.title ?? ''}
           </Text>
@@ -892,106 +897,84 @@ const ProductDetailsScreen = () => {
             numberOfLines={1}
             ellipsizeMode="tail"
             style={{
-              fontSize: fontSize(12),
-              lineHeight: hp(16),
+              fontSize: fontSize(14),
+              // lineHeight: hp(18),
               fontFamily: fontFamily.poppins400,
-              color: '#6B6B6B',
-              marginTop: hp(2),
+              color: '#77727F',
+              marginTop: hp(12),
             }}>
             {product?.description ?? ''}
           </Text>
+
+          {/* review and rating  */}
 
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={scrollToReviews}
             // onPress={handleSubmitReview}
             style={{
-              width: wp(161),
-              height: hp(28),
-              borderColor: '#D2D2D2',
-              borderWidth: 1,
+              width: wp(130),
+              height: hp(29),
+              // borderColor: '#D2D2D2',
+              backgroundColor: '#F1ECFF',
+              // borderWidth: 1,
               borderRadius: wp(16),
-              marginTop: hp(19),
+              marginTop: hp(12),
               flexDirection: 'row',
               alignItems: 'center',
             }}>
             <Text
               style={{
-                fontSize: fontSize(13),
+                fontSize: fontSize(12),
                 fontFamily: fontFamily.poppins400,
-                color: '#5029F3',
-                marginLeft: wp(15),
+                color: '#7147E8',
+                marginLeft: wp(10),
               }}>
               {averageRating ? averageRating.toFixed(1) : '0.0'}
             </Text>
-            {/* <Image
-              source={star_icon}
-              style={{
-                width: hp(15),
-                height: hp(15),
-                marginLeft: wp(7),
-                marginBottom: 2,
-              }}
-            /> */}
 
             <CustomStarIcon
               width={hp(15)}
               height={hp(15)}
-              fill="#5029F3"
-              style={{marginLeft: wp(7), marginBottom: 2}}
-            />
-            <View
-              style={{
-                width: wp(1),
-                height: hp(18),
-                backgroundColor: '#D2D2D2',
-                marginLeft: wp(10),
-              }}
+              fill="#7147E8"
+              style={{marginLeft: wp(7), marginBottom: hp(2)}}
             />
 
             <Text
               style={{
-                color: colors.pureBlack,
-
-                fontFamily: fontFamily.poppins500,
-                marginLeft: wp(14),
-                fontSize: fontSize(13),
+                color: '#7147E8',
+                fontFamily: fontFamily.poppins400,
+                marginLeft: wp(10),
+                fontSize: fontSize(12),
               }}>
               {totalReviews} Ratings
             </Text>
           </TouchableOpacity>
         </View>
+        {/* Price view */}
         <View
           style={{
-            width: '100%',
-            borderColor: '#E7E7E7',
-            borderWidth: 0.5,
-            marginTop: hp(22),
-          }}
-        />
-
-        <View
-          style={{
-            marginHorizontal: wp(17),
-            marginTop: hp(25),
+            marginHorizontal: wp(20),
+            marginTop: hp(28),
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
-                fontSize: fontSize(24),
-                color: 'black',
+                fontSize: fontSize(22),
+                color: '#17151C',
                 lineHeight: hp(32),
-                fontFamily: fontFamily.poppins700,
+                fontFamily: fontFamily.poppins600,
               }}>
               Rs.
               {selectedVariant?.sellingPrice ??
                 product?.variants[0]?.sellingPrice}
             </Text>
+
             <Text
               style={{
-                marginLeft: hp(14),
-                color: '#A4A4A4',
-                fontSize: fontSize(18),
+                marginLeft: hp(8),
+                color: '#77727F',
+                fontSize: fontSize(12),
                 lineHeight: hp(26),
                 fontFamily: fontFamily.poppins400,
               }}>
@@ -999,9 +982,9 @@ const ProductDetailsScreen = () => {
             </Text>
             <Text
               style={{
-                color: '#888',
+                color: '#77727F',
                 textDecorationLine: 'line-through',
-                fontSize: fontSize(18),
+                fontSize: fontSize(12),
                 lineHeight: hp(26),
                 fontFamily: fontFamily.poppins400,
               }}>
@@ -1011,19 +994,20 @@ const ProductDetailsScreen = () => {
 
             <Text
               style={{
-                marginLeft: hp(16),
+                marginLeft: hp(8),
                 color: '#2B9909',
-                fontSize: fontSize(18),
+                fontSize: fontSize(12),
                 lineHeight: hp(24),
-                fontFamily: fontFamily.poppins600,
+                fontFamily: fontFamily.poppins400,
               }}>
               {selectedVariant?.discount ?? product?.variants[0]?.discount}% Off
             </Text>
           </View>
 
+          {/* //Size view */}
           <View
             style={{
-              marginTop: hp(25),
+              marginTop: hp(28),
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -1031,7 +1015,7 @@ const ProductDetailsScreen = () => {
             <Text
               style={{
                 color: colors.pureBlack,
-                fontSize: fontSize(14),
+                fontSize: fontSize(15),
                 lineHeight: hp(20),
                 fontFamily: fontFamily.poppins400,
               }}>
@@ -1040,12 +1024,10 @@ const ProductDetailsScreen = () => {
             <SizeChartComponent />
           </View>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              marginTop: hp(23),
-            }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={{marginTop: hp(15)}}>
             {availableSizes.map(size => (
               <TouchableOpacity
                 key={size}
@@ -1057,181 +1039,221 @@ const ProductDetailsScreen = () => {
                   borderWidth: 1,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  marginRight: 7,
+                  marginRight: wp(20),
                   backgroundColor:
-                    selectedSize === size ? '#F7E7FF' : 'transparent',
-                  borderColor: selectedSize === size ? '#000' : '#D1D1D1',
+                    selectedSize === size ? '#5029F3' : '#FFFFFF',
+                  borderColor:
+                    selectedSize === size ? 'transparent' : '#D1D1D1',
                 }}>
-                <Text style={{color: selectedSize === size ? '#000' : '#000'}}>
+                <Text
+                  style={{
+                    color: selectedSize === size ? '#FFFFFF' : '#000',
+                    fontFamily: fontFamily.poppins400,
+                    fontSize: fontSize(18),
+                  }}>
                   {/* {size} */}
                   {size?.toUpperCase()}
                 </Text>
               </TouchableOpacity>
             ))}
-          </View>
+          </ScrollView>
         </View>
-
-        <View
-          style={{
-            width: '100%',
-            borderWidth: 0.5,
-            borderColor: '#E7E7E7',
-            marginTop: hp(22),
-          }}
-        />
-
-        <View style={{marginHorizontal: 17, marginTop: hp(22)}}>
+        <View style={{marginHorizontal: wp(20), marginTop: hp(32)}}>
           <Text
             style={{
-              color: colors.pureBlack,
-              fontSize: fontSize(17),
+              color: '#17151C',
+              fontSize: fontSize(18),
               lineHeight: hp(26),
-              fontFamily: fontFamily.poppins700,
+              fontFamily: fontFamily.poppins500,
             }}>
             Check Delivery Options
           </Text>
 
-          <Text
-            style={{
-              fontSize: fontSize(12),
-              lineHeight: hp(18),
-              fontFamily: fontFamily.poppins400,
-              color: '#969696',
-              marginTop: hp(5),
-            }}>
-            Please enter PIN code to check delivery time & Pay on Delivery
-            Availability
-          </Text>
-
           <View
             style={{
-              marginTop: hp(23),
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              marginTop: hp(14),
             }}>
-            <TextInput
-              value={pincode}
-              onChangeText={handlePincodeChange}
-              placeholder={'Enter Pincode'}
-              placeholderTextColor={'black'}
+            <View
               style={{
-                width: wp(228),
-                backgroundColor: '#F4F4F4',
-                borderRadius: wp(50),
-                paddingHorizontal: hp(15),
-                fontSize: fontSize(14),
-                color: '#969696',
-                lineHeight: hp(20),
-                fontFamily: fontFamily.poppins500,
-              }}
-              keyboardType="numeric"
-              maxLength={6} // Limit to 6 digits
-            />
+                width: wp(335),
+                borderColor: '#EAE7EE',
+                height: hp(52),
+                borderWidth: 1,
+                borderRadius: wp(12),
+                // paddingHorizontal: hp(15),
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}>
+              <TextInput
+                value={pincode}
+                onChangeText={handlePincodeChange}
+                placeholder={'Enter Pincode'}
+                placeholderTextColor={'#77727F'}
+                style={{
+                  fontSize: fontSize(14),
+                  color: '#17151C',
+                  lineHeight: hp(20),
+                  fontFamily: fontFamily.poppins500,
+                  marginLeft: wp(16),
+                }}
+                keyboardType="numeric"
+                maxLength={6} // Limit to 6 digits
+              />
 
-            <GradientButton
-              onPress={() => {
-                console.log(' === pincode ===> ', pincode);
-              }}
-              title={'Check'}
-              buttonStyle={{
-                width: wp(99),
-                opacity: pincode.length === 6 ? 1 : 0.7,
-              }}
-              disabled={pincode.length !== 6}
-            />
+              <TouchableOpacity
+                style={{
+                  backgroundColor: pincode.length === 6 ? '#7147E8' : '#F1ECFF',
+                  height: hp(35),
+                  width: wp(79),
+                  borderRadius: wp(8),
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginRight: wp(8),
+                  opacity: pincode.length === 6 ? 1 : 0.7,
+                }}
+                onPress={() => {
+                  console.log(' === pincode ===> ', pincode);
+                  console.log('PINCODE =>', pincode);
+                  console.log('LENGTH =>', pincode.length);
+                }}>
+                <Text
+                  style={{
+                    color: pincode.length === 6 ? '#FFFFFF' : '#7147E8',
+                    fontSize: fontSize(12),
+                    fontFamily: fontFamily.poppins400,
+                  }}>
+                  Check
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-
         <View
           style={{
             width: '100%',
-            borderWidth: 0.5,
-            borderColor: '#E7E7E7',
-            marginTop: hp(34),
+            borderWidth: hp(7),
+            borderColor: '#F7F7F7',
+            marginTop: hp(35),
           }}
         />
-
-        <View style={{marginHorizontal: wp(17), marginTop: hp(23)}}>
+        <View style={{marginHorizontal: wp(20), marginTop: hp(28)}}>
           <Text
             style={{
-              color: colors.pureBlack,
-              fontSize: fontSize(17),
+              color: '#17151C',
+              fontSize: fontSize(20),
               lineHeight: hp(26),
-              fontFamily: fontFamily.poppins700,
+              fontFamily: fontFamily.poppins600,
             }}>
             Product Details
           </Text>
-          <View style={{marginTop: hp(24)}}>
-            <RenderHTML
-              contentWidth={width}
-              source={{html: htmlContent || ''}}
-              tagsStyles={{
-                p: {
+        </View>
+        <View style={{marginTop: hp(26), marginHorizontal: wp(20)}}>
+          <RenderHTML
+            contentWidth={width}
+            source={{html: htmlContent || ''}}
+            tagsStyles={{
+              p: {
+                color: '#6B6B6B',
+                fontSize: fontSize(14),
+                lineHeight: hp(22),
+                fontFamily: fontFamily.poppins400,
+                marginTop: 0,
+                marginBottom: hp(3),
+              },
+              ul: {
+                paddingLeft: wp(15),
+                marginBottom: hp(8),
+              },
+              strong: {
+                fontFamily: fontFamily.poppins700,
+                color: '#6B6B6B',
+                fontSize: fontSize(14),
+              },
+              li: {
+                color: '#6B6B6B',
+                fontSize: fontSize(14),
+                lineHeight: hp(22),
+                marginBottom: hp(5),
+                flexDirection: 'row',
+                fontFamily: fontFamily.poppins400,
+                alignItems: 'center',
+              },
+            }}
+            renderersProps={{
+              ul: {
+                markerTextStyle: {
+                  fontSize: fontSize(14),
+                  lineHeight: hp(23),
+                  fontFamily: fontFamily.poppins400,
                   color: '#6B6B6B',
-                  fontSize: fontSize(14),
-                  lineHeight: hp(22),
-                  marginTop: 0,
-                  marginBottom: hp(3),
                 },
-                ul: {
-                  paddingLeft: wp(15),
-                  marginBottom: hp(8),
-                },
-                strong: {
-                  fontFamily: fontFamily.poppins700,
-                  color: '#000',
-                  fontSize: fontSize(14),
-                },
-                li: {
-                  color: '#6B6B6B',
-                  fontSize: fontSize(14),
-                  lineHeight: hp(22),
-                  marginBottom: hp(5),
+              },
+            }}></RenderHTML>
+        </View>
+        <View
+          style={{
+            width: '100%',
+            borderWidth: hp(7),
+            borderColor: '#F7F7F7',
+            marginTop: hp(44),
+          }}
+        />
+        <Text
+          style={{
+            color: colors.pureBlack,
+            fontSize: fontSize(17),
+            lineHeight: hp(26),
+            fontFamily: fontFamily.poppins700,
+            marginTop: hp(31),
+            marginHorizontal: wp(20),
+          }}>
+          Specification
+        </Text>
+        <View style={{marginTop: hp(25), marginHorizontal: wp(20)}}>
+          {/* {product?.specifications?.map((item, index) => {
+           */}
+          {visibleSpecifications?.map((item, index) => {
+            if (index % 2 !== 0) return null;
+
+            const left = product.specifications[index];
+            const right = product.specifications[index + 1];
+
+            return (
+              <View
+                key={index}
+                style={{
                   flexDirection: 'row',
-                  alignItems: 'center',
-                },
-              }}
-              renderersProps={{
-                ul: {
-                  markerTextStyle: {
-                    fontSize: fontSize(13),
-                    lineHeight: hp(23),
-                  },
-                },
-              }}
-            />
-          </View>
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  marginTop: index === 0 ? 0 : hp(25),
+                }}>
+                {/* LEFT ITEM */}
+                <View style={{width: '50%'}}>
+                  <Text
+                    style={{
+                      color: '#6B6B6B',
+                      fontSize: fontSize(12),
+                      lineHeight: hp(16),
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    {left.key.replace(/_/g, ' ')}
+                  </Text>
 
-          <Text
-            style={{
-              color: colors.pureBlack,
-              fontSize: fontSize(17),
-              lineHeight: hp(26),
-              fontFamily: fontFamily.poppins700,
-              marginTop: hp(27),
-            }}>
-            Specification
-          </Text>
+                  <Text
+                    style={{
+                      fontSize: fontSize(14),
+                      lineHeight: hp(18),
+                      fontFamily: fontFamily.poppins400,
+                      color: colors.pureBlack,
+                      marginTop: hp(2),
+                    }}>
+                    {left.value}
+                  </Text>
+                </View>
 
-          <View style={{marginTop: hp(23)}}>
-            {/* {product?.specifications?.map((item, index) => {
-             */}
-            {visibleSpecifications?.map((item, index) => {
-              if (index % 2 !== 0) return null;
-
-              const left = product.specifications[index];
-              const right = product.specifications[index + 1];
-
-              return (
-                <View
-                  key={index}
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    marginTop: index === 0 ? 0 : hp(25),
-                  }}>
-                  {/* LEFT ITEM */}
+                {/* RIGHT ITEM */}
+                {right && (
                   <View style={{width: '50%'}}>
                     <Text
                       style={{
@@ -1240,7 +1262,7 @@ const ProductDetailsScreen = () => {
                         lineHeight: hp(16),
                         fontFamily: fontFamily.poppins400,
                       }}>
-                      {left.key.replace(/_/g, ' ')}
+                      {right.key.replace(/_/g, ' ')}
                     </Text>
 
                     <Text
@@ -1251,39 +1273,14 @@ const ProductDetailsScreen = () => {
                         color: colors.pureBlack,
                         marginTop: hp(2),
                       }}>
-                      {left.value}
+                      {right.value}
                     </Text>
                   </View>
+                )}
+              </View>
+            );
+          })}
 
-                  {/* RIGHT ITEM */}
-                  {right && (
-                    <View style={{width: '50%'}}>
-                      <Text
-                        style={{
-                          color: '#6B6B6B',
-                          fontSize: fontSize(12),
-                          lineHeight: hp(16),
-                          fontFamily: fontFamily.poppins400,
-                        }}>
-                        {right.key.replace(/_/g, ' ')}
-                      </Text>
-
-                      <Text
-                        style={{
-                          fontSize: fontSize(14),
-                          lineHeight: hp(18),
-                          fontFamily: fontFamily.poppins400,
-                          color: colors.pureBlack,
-                          marginTop: hp(2),
-                        }}>
-                        {right.value}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              );
-            })}
-          </View>
           {product?.specifications?.length > 6 && !showAll && (
             <TouchableOpacity
               style={{marginTop: hp(27)}}
@@ -1300,41 +1297,31 @@ const ProductDetailsScreen = () => {
             </TouchableOpacity>
           )}
         </View>
-
         <View
           style={{
             width: '100%',
-            borderWidth: 0.5,
-            borderColor: '#E7E7E7',
-            marginTop: hp(27),
+            borderWidth: hp(7),
+            borderColor: '#F7F7F7',
+            marginTop: hp(30),
           }}
         />
-
+        {/* //seller Info */}
         <View
           style={{
-            marginHorizontal: wp(17),
+            marginHorizontal: wp(20),
             marginTop: hp(22),
           }}>
-          <View>
-            <Text
-              style={{
-                color: '#686868',
-                fontSize: fontSize(12),
-                lineHeight: hp(16),
-                fontFamily: fontFamily.poppins400,
-              }}>
-              Product Code :{' '}
-              <Text
-                style={{
-                  color: colors.pureBlack,
-                  fontFamily: fontFamily.poppins700,
-                }}>
-                {product?.productCode ?? ''}
-              </Text>
-            </Text>
-          </View>
-
-          <View
+          <TouchableOpacity
+            onPress={() => {
+              console.log('STORE DATA BEFORE NAVIGATION =>', storeData);
+              navigation.navigate('MainTabs', {
+                screen: 'SearchStack',
+                params: {
+                  screen: 'SellerProfile',
+                  params: {store: storeData},
+                },
+              });
+            }}
             style={{
               marginTop: hp(10),
               flexDirection: 'row',
@@ -1343,203 +1330,240 @@ const ProductDetailsScreen = () => {
             {/* Icon container */}
             <View
               style={{
-                width: hp(30),
-                height: hp(30),
+                width: hp(42),
+                height: hp(42),
                 borderRadius: wp(50),
-                backgroundColor: '#F8E9FF',
+                backgroundColor: '#F1ECFF',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <SellerShopIcon />
+              <StoreIcon />
             </View>
-
-            <View style={{marginLeft: wp(16)}}>
-              <Text
-                style={{
-                  fontSize: fontSize(14),
-                  lineHeight: hp(18),
-                  fontFamily: fontFamily.poppins700,
-                  color: colors.pureBlack,
-                  top: hp(18),
-                }}>
-                Seller :{'  '}
-                <Text style={{fontFamily: fontFamily.poppins400}}>
-                  {storeData?.name?.charAt(0)?.toUpperCase() +
-                    storeData?.name.slice(1) || 'No Name of store'}
+            <View style={{marginLeft: wp(12)}}>
+              <View style={{marginTop: hp(0)}}>
+                <Text
+                  style={{
+                    fontSize: fontSize(14),
+                    lineHeight: hp(21),
+                    fontFamily: fontFamily.poppins700,
+                    color: colors.pureBlack,
+                  }}>
+                  Seller :{'  '}
+                  <Text style={{fontFamily: fontFamily.poppins400}}>
+                    {storeData?.name?.charAt(0)?.toUpperCase() +
+                      storeData?.name.slice(1) || 'No Name of store'}
+                  </Text>
                 </Text>
-              </Text>
+              </View>
 
-              <View style={{flexDirection: 'row', zIndex: 99, top: 30}}>
-                <TouchableOpacity
-                  onPress={() => {
-                    console.log('STORE DATA BEFORE NAVIGATION =>', storeData);
-                    navigation.navigate('MainTabs', {
-                      screen: 'SearchStack',
-                      params: {
-                        screen: 'SellerProfile',
-                        params: {store: storeData},
-                      },
-                    });
-                  }}
+              <View style={{marginTop: hp(0)}}>
+                <Text
                   style={{
-                    width: wp(95),
-                    height: hp(40),
-                    borderRadius: wp(50),
-                    borderColor: '#CDCDCD',
-                    borderWidth: 1,
-                    backgroundColor: 'white',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                  activeOpacity={0.8}>
+                    color: '#77727F',
+                    fontSize: fontSize(11),
+                    lineHeight: hp(16),
+                    fontFamily: fontFamily.poppins400,
+                  }}>
+                  Product Code :{' '}
                   <Text
                     style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(12),
-                      lineHeight: hp(14),
+                      color: '#77727F',
                       fontFamily: fontFamily.poppins400,
                     }}>
-                    Visit Store
+                    {product?.productCode ?? ''}
                   </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    if (!token) {
-                      navigation.navigate('StartingScreen'); // your login screen
-                      return;
-                    }
-                    navigation.navigate('SendEquiryScreen', {
-                      productId: productId,
-                      // storeId: storeData?.id,
-                      receiverId: storeData?.contact?.id,
-                      storeData,
-                    });
-                  }}
-                  style={{
-                    width: wp(141),
-                    height: hp(40),
-                    borderRadius: wp(50),
-                    borderColor: '#CDCDCD',
-                    borderWidth: 1,
-                    backgroundColor: 'white', // Inner background
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginLeft: hp(15),
-                    flexDirection: 'row',
-                  }}
-                  activeOpacity={0.8}>
-                  <SendEquiry1 />
-                  <Text
-                    style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(12),
-                      lineHeight: hp(14),
-                      fontFamily: fontFamily.poppins400,
-                      marginLeft: hp(10),
-                    }}>
-                    Send Enquiry
-                  </Text>
-                </TouchableOpacity>
+                </Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
-
+        {/* both button  */}
         <View
           style={{
-            width: '100%',
-            borderWidth: 0.5,
-            borderColor: '#E7E7E7',
-            marginTop: hp(55),
-          }}
-        />
-
-        <View
-          ref={reviewsRef}
-          style={{marginHorizontal: 17, marginTop: hp(24)}}>
-          <Text
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginHorizontal: wp(20),
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              if (!token) {
+                navigation.navigate('StartingScreen'); // your login screen
+                return;
+              }
+              navigation.navigate('SendEquiryScreen', {
+                productId: productId,
+                // storeId: storeData?.id,
+                receiverId: storeData?.contact?.id,
+                storeData,
+              });
+            }}
             style={{
-              fontSize: fontSize(17),
-              lineHeight: hp(26),
-              fontFamily: fontFamily.poppins700,
-              color: colors.pureBlack,
+              width: wp(164),
+              height: hp(39),
+              borderColor: '#EAE7EE',
+              borderWidth: hp(1),
+              borderRadius: wp(8),
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp(14),
             }}>
-            Reviews & Ratings
-          </Text>
-
-          <MaskedView
-            maskElement={
-              <Text
-                style={{
-                  fontSize: fontSize(54),
-                  fontFamily: fontFamily.poppins700,
-                  color: 'black',
-                }}>
-                {averageRating ? averageRating.toFixed(1) : '0.0'}
-              </Text>
-            }>
-            <LinearGradient
-              colors={['#5029F3', '#7756FF']}
-              start={{x: 0, y: 0.05}}
-              end={{x: 0.3, y: 0.6}}
+            <Text
               style={{
-                width: wp(200), // Required
-                height: hp(100), // Required
+                fontSize: fontSize(12),
+                // lineHeight: hp(26),
+                fontFamily: fontFamily.poppins400,
+                color: colors.pureBlack,
               }}>
-              <Text
-                style={{
-                  fontSize: fontSize(54),
-                  fontFamily: fontFamily.poppins700,
-                  opacity: 0,
-                }}>
-                {product?.averageRating?.toFixed(1) ?? '0.0'}
-              </Text>
-            </LinearGradient>
-          </MaskedView>
+              Send Enquiry
+            </Text>
+          </TouchableOpacity>
 
-          <View style={{top: hp(-20)}}>
-            <ReviewRatingComponent
-              ratingBreakdown={ratingBreakdown}
-              totalReviews={totalReviews}
-            />
+          <View>
+            <TermAndPolicy />
           </View>
         </View>
-
         <View
           style={{
             width: '100%',
-            // borderWidth: 1,
-            borderWidth: 0.5,
-            borderColor: '#E7E7E7',
+            borderWidth: hp(8),
+            borderColor: '#F7F7F7',
             marginTop: hp(20),
           }}
         />
+        <View
+          ref={reviewsRef}
+          style={{marginHorizontal: wp(17), marginTop: hp(24)}}>
+          <Text
+            style={{
+              fontSize: fontSize(20),
+              lineHeight: hp(26),
+              fontFamily: fontFamily.poppins600,
+              color: '#17151C',
+            }}>
+            Reviews & Ratings
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop: hp(42),
+              alignItems: 'flex-start',
+            }}>
+            {/* Left Side */}
+            <View
+              style={{
+                marginRight: wp(20),
+                // backgroundColor: 'red',
+                height: hp(48),
+              }}>
+              <MaskedView
+                maskElement={
+                  <Text
+                    style={{
+                      fontSize: fontSize(40),
+                      fontFamily: fontFamily.poppins400,
+                      color: 'black',
+                    }}>
+                    {averageRating ? averageRating.toFixed(1) : '0.0'}
+                  </Text>
+                }>
+                <LinearGradient
+                  colors={['#7147E8', '#7756FF']}
+                  start={{x: 0, y: 0.05}}
+                  end={{x: 0.3, y: 0.6}}>
+                  <Text
+                    style={{
+                      fontSize: fontSize(40),
+                      fontFamily: fontFamily.poppins400,
+                      opacity: 0,
+                    }}>
+                    {averageRating ? averageRating.toFixed(1) : '0.0'}
+                  </Text>
+                </LinearGradient>
+              </MaskedView>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginTop: hp(5),
+                }}>
+                <CustomStarIcon
+                  width={hp(15)}
+                  height={hp(15)}
+                  fill="#F4A340"
+                  style={
+                    {
+                      // marginTop: hp(5),
+                    }
+                  }
+                />
+                <CustomStarIcon width={hp(15)} height={hp(15)} fill="#F4A340" />
+                <CustomStarIcon width={hp(15)} height={hp(15)} fill="#F4A340" />
+                <CustomStarIcon width={hp(15)} height={hp(15)} fill="#F4A340" />
+                <CustomStarIcon width={hp(15)} height={hp(15)} fill="#F4A340" />
+              </View>
+              <Text
+                style={{
+                  color: '#77727F',
+                  fontSize: fontSize(11),
+                  fontFamily: fontFamily.poppins400,
+                  marginTop: hp(5),
+                }}>
+                {totalReviews} Ratings
+              </Text>
+            </View>
 
+            {/* Right Side */}
+            <View style={{flex: 1}}>
+              <ReviewRatingComponent
+                ratingBreakdown={ratingBreakdown}
+                totalReviews={totalReviews}
+              />
+            </View>
+          </View>
+        </View>
+        <View
+          style={{
+            borderWidth: 1,
+            borderColor: '#EAE7EE',
+            marginTop: hp(20),
+            marginHorizontal: wp(20),
+          }}
+        />
         <FlatList
-          data={reviews}
+          // data={reviews}
+          data={showAllReviews ? reviews : reviews.slice(0, 2)}
           keyExtractor={item => item._id}
           renderItem={({item}) => <ReviewItem item={item} />}
           scrollEnabled={false}
         />
-
-        <Touchable>
-          <Text
+        {reviews.length > 2 && !showAllReviews && (
+          <TouchableOpacity
+            onPress={() => setShowAllReviews(true)}
             style={{
-              fontSize: fontSize(16),
-              fontFamily: fontFamily.poppins700,
-              lineHeight: hp(24),
-              // color: '#8225AF',
-              color: '#5029F3',
-              textAlign: 'center',
-              marginTop: hp(14),
+              marginHorizontal: wp(20),
+              height: hp(48),
+              borderColor: '#D9CFFF',
+              borderWidth: 1,
+              borderRadius: wp(12),
+              marginTop: hp(20),
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-            View All Reviews
-          </Text>
-        </Touchable>
-
+            <Text
+              style={{
+                fontSize: fontSize(14),
+                fontFamily: fontFamily.poppins500,
+                lineHeight: hp(24),
+                // color: '#8225AF',
+                color: '#7147E8',
+                textAlign: 'center',
+                // marginTop: hp(14),
+              }}>
+              Load all reviews
+            </Text>
+          </TouchableOpacity>
+        )}
         <View style={{height: hp(85)}} />
-
         <View style={{height: hp(30)}} />
       </ScrollView>
     </SafeAreaView>

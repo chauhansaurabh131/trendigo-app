@@ -18,16 +18,26 @@ const CategoryScreen = () => {
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
         style={{
-          height: hp(57),
-          alignItems: 'center',
+          // height: hp(57),
+          // alignItems: 'center',
           justifyContent: 'center',
+          marginLeft: wp(16),
+          marginTop: hp(42),
         }}>
         <Text
           style={{
-            color: colors.pureBlack,
-            fontSize: fontSize(16),
-            lineHeight: hp(24),
-            fontFamily: fontFamily.poppins400,
+            color: '#5029F3',
+            fontSize: fontSize(12),
+            fontFamily: fontFamily.poppins600,
+          }}>
+          SHOP BY COLLECTION
+        </Text>
+        <Text
+          style={{
+            color: '#17151D',
+            fontSize: fontSize(28),
+            fontFamily: fontFamily.poppins700,
+            marginTop: hp(4),
           }}>
           Explore Categories
         </Text>
@@ -36,8 +46,8 @@ const CategoryScreen = () => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
-            marginHorizontal: wp(18),
-            marginTop: hp(17),
+            marginHorizontal: wp(16),
+            marginTop: hp(18),
           }}>
           <TouchableOpacity
             activeOpacity={0.6}
@@ -51,52 +61,20 @@ const CategoryScreen = () => {
             }>
             <View style={{position: 'relative'}}>
               <Image
-                source={images.men_collection_img}
+                source={images.men_category}
                 style={{
                   width: '100%',
-                  height: hp(146),
+                  height: hp(128),
                   resizeMode: 'contain',
-                  borderRadius: wp(12),
+                  // borderRadius: wp(12),
                 }}
               />
-
-              <View
-                style={{
-                  position: 'absolute',
-                  left: wp(36),
-                  right: wp(36),
-                  top: hp(60),
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <Text
-                  style={{
-                    color: colors.white,
-                    fontSize: fontSize(22),
-                    fontFamily: fontFamily.poppins700,
-                  }}>
-                  Men
-                </Text>
-
-                <View
-                  style={{
-                    width: hp(34),
-                    height: hp(34),
-                    borderRadius: hp(34) / 2,
-                    backgroundColor: '#FFFFFF99',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <NavigationArrowIcon stroke="black" />
-                </View>
-              </View>
             </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.6}
-            style={{marginTop: hp(17)}}
+            style={{marginTop: hp(20)}}
             onPress={() =>
               navigation.navigate('MenCategoryScreen', {
                 title: "Women's Collection",
@@ -107,52 +85,19 @@ const CategoryScreen = () => {
             }>
             <View style={{position: 'relative'}}>
               <Image
-                source={images.women_collection_img}
+                source={images.women_category}
                 style={{
                   width: '100%',
-                  height: hp(146),
+                  height: hp(128),
                   resizeMode: 'contain',
-                  borderRadius: wp(12),
                 }}
               />
-
-              <View
-                style={{
-                  position: 'absolute',
-                  left: wp(36),
-                  right: wp(36),
-                  top: hp(60),
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <Text
-                  style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(22),
-                    fontFamily: fontFamily.poppins700,
-                  }}>
-                  Women
-                </Text>
-
-                <View
-                  style={{
-                    width: hp(34),
-                    height: hp(34),
-                    borderRadius: hp(34) / 2,
-                    backgroundColor: '#FFFFFF99',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <NavigationArrowIcon stroke="black" />
-                </View>
-              </View>
             </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.6}
-            style={{marginTop: hp(17)}}
+            style={{marginTop: hp(20)}}
             onPress={() =>
               navigation.navigate('MenCategoryScreen', {
                 title: "Kids's Collection",
@@ -162,52 +107,19 @@ const CategoryScreen = () => {
             }>
             <View style={{position: 'relative'}}>
               <Image
-                source={images.kids_collection_img}
+                source={images.kids_category}
                 style={{
                   width: '100%',
-                  height: hp(146),
+                  height: hp(128),
                   resizeMode: 'contain',
-                  borderRadius: wp(12),
                 }}
               />
-
-              <View
-                style={{
-                  position: 'absolute',
-                  left: wp(36),
-                  right: wp(36),
-                  top: hp(60),
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <Text
-                  style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(22),
-                    fontFamily: fontFamily.poppins700,
-                  }}>
-                  Kids
-                </Text>
-
-                <View
-                  style={{
-                    width: hp(34),
-                    height: hp(34),
-                    borderRadius: hp(34) / 2,
-                    backgroundColor: '#FFFFFF99',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <NavigationArrowIcon stroke="black" />
-                </View>
-              </View>
             </View>
           </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.6}
-            style={{marginTop: hp(17)}}
+            style={{marginTop: hp(20)}}
             onPress={() =>
               navigation.navigate('MenCategoryScreen', {
                 title: 'Beauty Collection',
@@ -217,46 +129,13 @@ const CategoryScreen = () => {
             }>
             <View style={{position: 'relative'}}>
               <Image
-                source={images.beauty_product_img}
+                source={images.beauty_category}
                 style={{
                   width: '100%',
-                  height: hp(146),
+                  height: hp(128),
                   resizeMode: 'contain',
-                  borderRadius: wp(12),
                 }}
               />
-
-              <View
-                style={{
-                  position: 'absolute',
-                  left: wp(36),
-                  right: wp(36),
-                  top: hp(60),
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                }}>
-                <Text
-                  style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(22),
-                    fontFamily: fontFamily.poppins700,
-                  }}>
-                  Beauty
-                </Text>
-
-                <View
-                  style={{
-                    width: hp(34),
-                    height: hp(34),
-                    borderRadius: hp(34) / 2,
-                    backgroundColor: '#FFFFFF99',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <NavigationArrowIcon stroke="black" />
-                </View>
-              </View>
             </View>
           </TouchableOpacity>
         </View>

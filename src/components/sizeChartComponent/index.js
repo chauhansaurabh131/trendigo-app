@@ -9,9 +9,20 @@ import {
   Pressable,
   Image,
 } from 'react-native';
-import {fontFamily, fontSize, hp, isIOS} from '../../utils/helpers';
+import {fontFamily, fontSize, hp, wp, isIOS} from '../../utils/helpers';
 import {colors} from '../../utils/colors';
-import {CancelIcon, images, NavigationArrowIcon} from '../../assets';
+import {
+  CancelIcon,
+  ChartImage,
+  images,
+  MesureButton,
+  MesureStep,
+  NavigationArrowIcon,
+  SizeChart,
+  SizeChartButton,
+  SizeChartText,
+  TitleText,
+} from '../../assets';
 
 const SizeChartComponent = () => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -31,8 +42,15 @@ const SizeChartComponent = () => {
         activeOpacity={0.6}
         onPress={() => setModalVisible(true)}
         style={styles.button}>
-        <Text style={styles.sizeChartText}>Size Chart</Text>
-        <NavigationArrowIcon style={{marginLeft: 10}} />
+        <Text
+          style={{
+            fontSize: fontSize(12),
+            color: '#7147E8',
+            lineHeight: hp(16),
+            fontFamily: fontFamily.poppins500,
+          }}>
+          Size Guide
+        </Text>
       </TouchableOpacity>
 
       <Modal
@@ -52,16 +70,16 @@ const SizeChartComponent = () => {
               }}
               style={{
                 position: 'absolute',
-                right: 10,
-                width: 50,
-                height: 50,
+                right: wp(10),
+                width: hp(50),
+                height: hp(50),
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
               <CancelIcon />
             </TouchableOpacity>
 
-            <View style={{marginHorizontal: 22, marginTop: hp(23)}}>
+            <View style={{marginHorizontal: wp(22), marginTop: hp(23)}}>
               <Text style={styles.modalTitle}>
                 {showMeasure ? 'How to Measure' : 'Size Chart'}
               </Text>
@@ -69,93 +87,31 @@ const SizeChartComponent = () => {
               {/*<View style={styles.separator} />*/}
 
               {showMeasure ? (
-                <View style={{marginTop: hp(25)}}>
-                  <Text
-                    style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
-                    }}>
-                    <Text style={{fontFamily: fontFamily.poppins700}}>
-                      Waist
-                    </Text>{' '}
-                    : Measure the narrowest part above your navel.
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
-                    }}>
-                    <Text style={{fontFamily: fontFamily.poppins700}}>
-                      Shoulder
-                    </Text>{' '}
-                    : Measure across your back from one shoulder tip to the
-                    other.
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
-                    }}>
-                    <Text style={{fontFamily: fontFamily.poppins700}}>
-                      Bust
-                    </Text>{' '}
-                    : Measure around the fullest part of your bust.
-                  </Text>
-
-                  <Text
-                    style={{
-                      color: colors.pureBlack,
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
-                    }}>
-                    <Text style={{fontFamily: fontFamily.poppins700}}>Hip</Text>{' '}
-                    : Measure the widest area below your waist.
-                  </Text>
-
+                <View style={{marginTop: hp(31)}}>
+                  <MesureStep />
                   <View
                     style={{
                       alignItems: 'center',
-                      marginTop: isIOS ? hp(50) : hp(20),
+                      marginTop: isIOS ? hp(50) : hp(13),
                     }}>
-                    <Image
-                      source={images.measureImage}
-                      style={{width: 204, height: 282}}
-                    />
+                    <ChartImage />
                   </View>
                 </View>
               ) : (
                 <>
                   {/* Header Row */}
-                  <View style={styles.separator} />
-                  <View style={styles.row}>
-                    <Text style={styles.headerText}>Size</Text>
-                    <Text style={styles.headerText}>Bust</Text>
-                    <Text style={styles.headerText}>Waist</Text>
+
+                  <View style={{marginTop: hp(31)}}>
+                    <TitleText />
                   </View>
 
-                  <View style={styles.separator} />
+                  <View style={{marginTop: hp(15)}}>
+                    <SizeChart />
+                  </View>
 
-                  {/* Data Rows */}
-                  {sizeData.map((item, index) => (
-                    <View key={index} style={styles.row}>
-                      <Text style={[styles.cellText, {textAlign: 'left'}]}>
-                        {item.size}
-                      </Text>
-                      <Text style={[styles.cellText, {marginRight: 10}]}>
-                        {item.bust}
-                      </Text>
-                      <Text style={[styles.cellText, {textAlign: 'right'}]}>
-                        {item.waist}
-                      </Text>
-                    </View>
-                  ))}
-
-                  <View style={styles.separator} />
+                  <View style={{marginTop: hp(26)}}>
+                    <SizeChartText />
+                  </View>
                 </>
               )}
             </View>
@@ -164,7 +120,7 @@ const SizeChartComponent = () => {
             <View
               style={{
                 position: 'absolute',
-                bottom: 0,
+                bottom: wp(24),
                 alignItems: 'center',
                 alignSelf: 'center',
                 width: '100%',
@@ -172,16 +128,8 @@ const SizeChartComponent = () => {
               <View style={styles.separator} />
               <TouchableOpacity
                 onPress={() => setShowMeasure(prev => !prev)}
-                style={{
-                  // backgroundColor: 'orange',
-                  width: '100%',
-                  alignItems: 'center',
-                  height: 50,
-                  justifyContent: 'center',
-                }}>
-                <Text style={styles.toggleText}>
-                  {showMeasure ? 'Size Chart' : 'How to Measure'}
-                </Text>
+                style={{}}>
+                {showMeasure ? <SizeChartButton /> : <MesureButton />}
               </TouchableOpacity>
             </View>
 
@@ -208,33 +156,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     // paddingHorizontal: 20,
   },
-  button: {
-    width: hp(110),
-    height: hp(28),
-    borderWidth: 1,
-    borderRadius: 50,
-    alignItems: 'center',
-    borderColor: '#CECECE',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  sizeChartText: {
-    fontSize: fontSize(12),
-    color: colors.pureBlack,
-    lineHeight: hp(16),
-    fontFamily: fontFamily.poppins500,
-  },
+
+  sizeChartText: {},
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    width: '90%',
+    // width: '90%',
     backgroundColor: 'white',
-    borderRadius: 10,
-    height: hp(520),
+    borderRadius: wp(10),
+    height: hp(592),
     // paddingBottom: 20,
   },
   modalTitle: {
@@ -243,13 +177,7 @@ const styles = StyleSheet.create({
     color: colors.pureBlack,
     fontFamily: fontFamily.poppins700,
   },
-  separator: {
-    width: '100%',
-    borderBottomWidth: 1,
-    borderColor: '#DBDBDB',
-    marginTop: hp(15),
-    // height: hp(50),
-  },
+  separator: {},
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -295,3 +223,77 @@ const styles = StyleSheet.create({
     color: 'black',
   },
 });
+
+//  <View style={{flexDirection: 'row', zIndex: 99, top: 30}}>
+//                 <TouchableOpacity
+//                   onPress={() => {
+//                     console.log('STORE DATA BEFORE NAVIGATION =>', storeData);
+//                     navigation.navigate('MainTabs', {
+//                       screen: 'SearchStack',
+//                       params: {
+//                         screen: 'SellerProfile',
+//                         params: {store: storeData},
+//                       },
+//                     });
+//                   }}
+//                   style={{
+//                     width: wp(95),
+//                     height: hp(40),
+//                     borderRadius: wp(50),
+//                     borderColor: '#CDCDCD',
+//                     borderWidth: 1,
+//                     backgroundColor: 'white',
+//                     alignItems: 'center',
+//                     justifyContent: 'center',
+//                   }}
+//                   activeOpacity={0.8}>
+//                   <Text
+//                     style={{
+//                       color: colors.pureBlack,
+//                       fontSize: fontSize(12),
+//                       lineHeight: hp(14),
+//                       fontFamily: fontFamily.poppins400,
+//                     }}>
+//                     Visit Store
+//                   </Text>
+//                 </TouchableOpacity>
+
+//                 <TouchableOpacity
+//                   onPress={() => {
+//                     if (!token) {
+//                       navigation.navigate('StartingScreen'); // your login screen
+//                       return;
+//                     }
+//                     navigation.navigate('SendEquiryScreen', {
+//                       productId: productId,
+//                       // storeId: storeData?.id,
+//                       receiverId: storeData?.contact?.id,
+//                       storeData,
+//                     });
+//                   }}
+//                   style={{
+//                     width: wp(141),
+//                     height: hp(40),
+//                     borderRadius: wp(50),
+//                     borderColor: '#CDCDCD',
+//                     borderWidth: 1,
+//                     backgroundColor: 'white', // Inner background
+//                     alignItems: 'center',
+//                     justifyContent: 'center',
+//                     marginLeft: hp(15),
+//                     flexDirection: 'row',
+//                   }}
+//                   activeOpacity={0.8}>
+//                   <SendEquiry1 />
+//                   <Text
+//                     style={{
+//                       color: colors.pureBlack,
+//                       fontSize: fontSize(12),
+//                       lineHeight: hp(14),
+//                       fontFamily: fontFamily.poppins400,
+//                       marginLeft: hp(10),
+//                     }}>
+//                     Send Enquiry
+//                   </Text>
+//                 </TouchableOpacity>
+//               </View>

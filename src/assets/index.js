@@ -77,9 +77,27 @@ import BlueBagIcon from './svgIcons/blue_bag_icon.svg';
 import RevewsIcon from './svgIcons/revews_icon.svg';
 import IconChat from './svgIcons/icon_chat.svg';
 import SaveIcon from './svgIcons/save_icon.svg';
+import TitleText from './svgIcons/title_text.svg';
+import SizeChart from './svgIcons/size_chart.svg';
+import SizeChartText from './svgIcons/size_chart_text.svg';
+import MesureButton from './svgIcons/mesure_button.svg';
+import SizeChartButton from './svgIcons/size_chart_button.svg';
+import MesureStep from './svgIcons/mesure_step.svg';
+import ChartImage from './svgIcons/chart_image.svg';
+import NewBag from './svgIcons/new_bag.svg';
+import StoreIcon from './svgIcons/store_icon.svg';
 export {
   Icon,
+  MesureStep,
+  NewBag,
+  StoreIcon,
+  ChartImage,
   BlueStar,
+  SizeChartText,
+  SizeChartButton,
+  SizeChart,
+  MesureButton,
+  TitleText,
   UserIcon,
   SaveIcon,
   IconChat,
@@ -247,4 +265,8 @@ export const images = {
   viral_man_image: require('./images/viral_man_image1.png'),
   viral_image1: require('./images/viral_image11.png'),
   full_image: require('./images/full1_image.png'),
+  men_category: require('./images/men_category1.png'),
+  women_category: require('./images/women_category1.png'),
+  kids_category: require('./images/kids_category1.png'),
+  beauty_category: require('./images/beauty_category1.png'),
 };
