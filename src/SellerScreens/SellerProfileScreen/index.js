@@ -12,14 +12,18 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   BackIcon,
   ProfileIcon,
+  SellerAlert,
   SellerProfile,
   SmallTrulyBag,
+  StoreIcon,
+  UserIcon,
 } from '../../assets';
 import {colors} from '../../utils/colors';
 import {fontSize, fontFamily, hp, wp} from '../../utils/helpers';
 import DashboardComponent from '../../SellerComponents/DashboardComponent';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {logout} from '../../redux/actions/sellerAuthActions';
+import AdminScreen from '../AdminScreen';
 
 const SellerProfileScreen = () => {
   const dispatch = useDispatch();
@@ -136,8 +140,8 @@ const SellerProfileScreen = () => {
           style={{
             height: hp(100),
             width: hp(100),
-            borderRadius: wp(50),
-            backgroundColor: '#F7E7FF',
+            borderRadius: wp(60),
+            backgroundColor: '#EFEBFF',
             alignSelf: 'center',
             marginTop: hp(23),
             alignItems: 'center',
@@ -149,7 +153,7 @@ const SellerProfileScreen = () => {
               color: colors.black,
               fontFamily: fontFamily.poppins600,
             }}>
-            {businessInitials || 'N/A'}
+            {businessInitials || <StoreIcon width={37.52} height={33.46} />}
           </Text>
         </View>
 
@@ -160,7 +164,7 @@ const SellerProfileScreen = () => {
               color: colors.black,
               fontFamily: fontFamily.poppins600,
             }}>
-            {sellerData?.data?.seller?.businessName || 'N/A'}
+            {sellerData?.data?.seller?.businessName}
           </Text>
 
           <Text
@@ -220,7 +224,12 @@ const SellerProfileScreen = () => {
               Privacy Policy
             </Text>
           </View>
-          <View>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('AdminScreen', {
+                selectedTab: 'admin',
+              })
+            }>
             <Text
               style={{
                 fontSize: fontSize(15),
@@ -230,7 +239,7 @@ const SellerProfileScreen = () => {
               }}>
               Chat with Trulybag
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
         <View
           style={{

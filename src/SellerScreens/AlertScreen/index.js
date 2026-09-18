@@ -1,11 +1,12 @@
 import React from 'react';
-import {SafeAreaView, Text} from 'react-native';
+import {FlatList, SafeAreaView, Text} from 'react-native';
 import {View} from 'react-native';
-import {SmallTrulyBag} from '../../assets';
+import {AlertIcon, BlueBagIcon, SmallTrulyBag} from '../../assets';
 import {fontFamily, fontSize, hp} from '../../utils/helpers';
+import {colors} from '../../utils/colors';
 const AlertScreen = () => {
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
         style={{
           width: '100%',
@@ -30,6 +31,34 @@ const AlertScreen = () => {
           height: hp(1),
           backgroundColor: '#E2E2E2',
         }}
+      />
+
+      <FlatList
+        // data={data}
+        // keyExtractor={(item, index) => index.toString()}
+        // renderItem={renderItem}
+        // // scrollEnabled={false}
+        contentContainerStyle={{paddingBottom: hp(20), flexGrow: 1}}
+        // showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <AlertIcon />
+            <Text
+              style={{
+                fontSize: fontSize(16),
+                fontFamily: fontFamily.poppins400,
+                color: colors.pureBlack,
+                marginTop: hp(20),
+              }}>
+              No Notification Found
+            </Text>
+          </View>
+        )}
       />
     </SafeAreaView>
   );

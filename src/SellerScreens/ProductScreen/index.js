@@ -210,7 +210,7 @@ const ProductScreen = () => {
                   }}
                   style={styles.image}
                 />
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => console.log('Save Icon Click')}
                   style={{
                     position: 'absolute',
@@ -225,7 +225,7 @@ const ProductScreen = () => {
                   <View style={{alignItems: 'center'}}>
                     <BlueSaveIcon />
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
               <View style={styles.content}>
                 <Text numberOfLines={1} style={styles.title}>

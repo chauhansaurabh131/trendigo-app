@@ -85,6 +85,7 @@ import SizeChartButton from './svgIcons/size_chart_button.svg';
 import MesureStep from './svgIcons/mesure_step.svg';
 import ChartImage from './svgIcons/chart_image.svg';
 import NewBag from './svgIcons/new_bag.svg';
+import AlertIcon from './svgIcons/alert_icon.svg';
 import StoreIcon from './svgIcons/store_icon.svg';
 export {
   Icon,
@@ -172,6 +173,7 @@ export {
   MapIcon,
   CrossIcon,
   SellerHome,
+  AlertIcon,
   ThreeDotsIcon,
   WhiteArrow,
   SellerMessages,

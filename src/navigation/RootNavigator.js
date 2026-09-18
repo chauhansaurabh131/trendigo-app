@@ -41,6 +41,8 @@ import CancelOrderDetailsScreen from '../SellerScreens/CancelOrderDetailsScreen/
 import ViralTrendsScreen from '../screens/ViralTrendsScreen/index.js';
 import ReelsVideoScreen from '../screens/ReelsVideoScreen/index.js';
 import BrandsScreen from '../screens/brandsScreen/index.js';
+import AdminScreen from '../SellerScreens/AdminScreen/index.js';
+import NotificationScreen from '../SellerScreens/Notificationscreen/index.js';
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
@@ -249,6 +251,8 @@ const RootNavigator = () => {
         name="CancelOrderDetails"
         component={CancelOrderDetailsScreen}
       />
+      <Stack.Screen name="AdminScreen" component={AdminScreen} />
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
     </Stack.Navigator>
   );
 };

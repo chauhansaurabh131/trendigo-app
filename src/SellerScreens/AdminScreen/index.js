@@ -13,7 +13,7 @@ import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {ChatShareIcon, Icon, images} from '../../assets';
 import {colors} from '../../utils/colors';
 import {useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {connectSocket, getSocket} from '../../socket/socket';
 import {useDispatch, useSelector} from 'react-redux';
@@ -147,6 +147,8 @@ const AdminScreen = ({selectedTab, setSelectedTab}) => {
   const [query, setQuery] = useState('');
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const route = useRoute();
+  const currentTab = selectedTab || route?.params?.selectedTab || 'admin';
   // Example chat data
   useEffect(() => {
     dispatch(getSellerConversationsRequest());
@@ -287,19 +289,23 @@ const AdminScreen = ({selectedTab, setSelectedTab}) => {
               alignItems: 'center',
             }}>
             <TouchableOpacity
-              onPress={() => setSelectedTab('customer')}
+              onPress={() => {
+                if (setSelectedTab) {
+                  setSelectedTab('customer');
+                } else navigation.navigate('NotificationScreen');
+              }}
               style={{
                 width: wp(94),
                 height: hp(30),
                 borderRadius: wp(25),
                 backgroundColor:
-                  selectedTab === 'customer' ? '#5029F4' : 'transparent',
+                  currentTab === 'customer' ? '#5029F4' : 'transparent',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
               <Text
                 style={{
-                  color: selectedTab === 'customer' ? '#FFF' : '#000',
+                  color: currentTab === 'customer' ? '#FFF' : '#000',
                   fontFamily: fontFamily.poppins400,
                   fontSize: fontSize(12),
                 }}>
@@ -314,13 +320,13 @@ const AdminScreen = ({selectedTab, setSelectedTab}) => {
                 height: hp(30),
                 borderRadius: wp(25),
                 backgroundColor:
-                  selectedTab === 'admin' ? '#5029F4' : 'transparent',
+                  currentTab === 'admin' ? '#5029F4' : 'transparent',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
               <Text
                 style={{
-                  color: selectedTab === 'admin' ? '#FFF' : '#000',
+                  color: currentTab === 'admin' ? '#FFF' : '#000',
                   fontFamily: fontFamily.poppins400,
                   fontSize: fontSize(12),
                 }}>

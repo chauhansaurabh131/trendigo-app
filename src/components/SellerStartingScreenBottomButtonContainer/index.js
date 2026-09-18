@@ -13,6 +13,7 @@ import {
   ToastAndroid,
   TouchableOpacity,
   View,
+  Modal,
 } from 'react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import RBSheet from 'react-native-raw-bottom-sheet';
@@ -39,6 +40,7 @@ const Touchable =
 const SellerStartingScreenBottomButtonComponent = forwardRef((props, ref) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const [showNoticeModal, setShowNoticeModal] = useState(false);
   const [mobileNumber, setMobileNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(60);
@@ -423,6 +425,14 @@ const SellerStartingScreenBottomButtonComponent = forwardRef((props, ref) => {
     }
   }, [resetPasswordError]);
 
+  const setupSteps = [
+    'Store information',
+    'Business details',
+    'Bank account',
+    'Shipping settings',
+    'Policies',
+    'Product listings',
+  ];
   return (
     <GestureHandlerRootView>
       {/* First Bottom Sheet */}
@@ -560,7 +570,8 @@ const SellerStartingScreenBottomButtonComponent = forwardRef((props, ref) => {
             }}
           />
 
-          <View
+          <TouchableOpacity
+            onPress={() => setShowNoticeModal(true)}
             style={{
               marginTop: hp(27),
               borderWidth: 1,
@@ -579,7 +590,7 @@ const SellerStartingScreenBottomButtonComponent = forwardRef((props, ref) => {
               }}>
               Become Seller on Trulybag
             </Text>
-          </View>
+          </TouchableOpacity>
         </View>
       </RBSheet>
 
@@ -872,6 +883,115 @@ const SellerStartingScreenBottomButtonComponent = forwardRef((props, ref) => {
           </View>
         </View>
       </RBSheet>
+
+      <Modal visible={showNoticeModal} transparent={true} animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              width: wp(340),
+              backgroundColor: '#FFFFFF',
+              borderRadius: wp(18),
+              // paddingHorizontal: wp(28),
+              // paddingTop: hp(26),
+              paddingBottom: hp(24),
+            }}>
+            <View style={{marginHorizontal: wp(28), marginTop: hp(26)}}>
+              <View>
+                <Text
+                  style={{
+                    fontSize: fontSize(16),
+                    fontFamily: fontFamily.poppins500,
+                    color: '#000000',
+                  }}>
+                  Store Management Notice
+                </Text>
+              </View>
+
+              <View style={{width: wp(289), marginTop: hp(18)}}>
+                <Text
+                  style={{
+                    fontSize: fontSize(13),
+                    color: '#000000',
+                  }}>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.poppins400,
+                    }}>
+                    Your store profile can only be managed from the{' '}
+                  </Text>
+                  <Text
+                    style={{
+                      fontFamily: fontFamily.poppins600,
+                      lineHeight: hp(19),
+                    }}>
+                    the Trulybag Seller Web Portal.
+                  </Text>
+                </Text>
+              </View>
+
+              <View style={{width: wp(289), marginTop: hp(18)}}>
+                <Text
+                  style={{
+                    fontSize: fontSize(13),
+                    color: '#000000',
+                    fontFamily: fontFamily.poppins400,
+                    lineHeight: hp(19),
+                  }}>
+                  You can use the mobile app to receive and manage orders, chat
+                  with customers, and track your business, but to edit your:
+                </Text>
+              </View>
+
+              <View style={{width: wp(289), marginTop: hp(18)}}>
+                {setupSteps.map((item, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: 'row',
+                      marginBottom: hp(1),
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: fontSize(13),
+                        fontFamily: fontFamily.poppins400,
+                        marginRight: wp(8),
+                        color: '#000000',
+                      }}>
+                      •
+                    </Text>
+
+                    <Text
+                      style={{
+                        fontSize: fontSize(13),
+                        color: '#000000',
+                        fontFamily: fontFamily.poppins400,
+                      }}>
+                      {item}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              <View style={{marginTop: hp(23)}}>
+                <GradientButton
+                  title={'Okay'}
+                  onPress={() => {
+                    // notificationSheetRef.current?.close();
+                    setShowNoticeModal(false);
+
+                    dispatch(sellerLoginReset()); // reset sellerData
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </GestureHandlerRootView>
   );
 });

@@ -8,11 +8,15 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {fontFamily, fontSize, hp, wp} from '../../../utils/helpers';
-import {images, TabIcon} from '../../../assets';
+import {BlueBagIcon, images, TabIcon} from '../../../assets';
 import {useNavigation} from '@react-navigation/native';
+import GradientButton from '../../../components/gradientButton';
+import {colors} from '../../../utils/colors';
 const NewOrderScreen = () => {
   const navigation = useNavigation();
-  const data = [1, 2, 3, 4, 5];
+  const data = [
+    // 1, 2, 3, 4, 5
+  ];
   const renderItem = () => (
     <View
       style={{
@@ -157,14 +161,33 @@ const NewOrderScreen = () => {
     </View>
   );
   return (
-    <SafeAreaView>
+    <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <FlatList
         data={data}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderItem}
         // scrollEnabled={false}
-        contentContainerStyle={{paddingBottom: hp(20)}}
+        contentContainerStyle={{paddingBottom: hp(20), flexGrow: 1}}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <BlueBagIcon />
+            <Text
+              style={{
+                fontSize: fontSize(16),
+                fontFamily: fontFamily.poppins400,
+                color: colors.pureBlack,
+                marginTop: hp(20),
+              }}>
+              No Order Found
+            </Text>
+          </View>
+        )}
       />
     </SafeAreaView>
   );
