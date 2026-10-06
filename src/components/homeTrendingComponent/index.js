@@ -8,6 +8,7 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import {
   images,
@@ -17,6 +18,14 @@ import {
   GradientFullFillLike,
   BlueSaveIcon,
   SavedFiledIcon,
+  Sort,
+  FilterIcon,
+  DropArrow,
+  AddCart,
+  WhiteIcon,
+  NewAddIcon,
+  NewAddCartIcon,
+  NewRemoveCartIcon,
 } from '../../assets'; // Add your heart icon, star icon, etc.
 import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {colors} from '../../utils/colors';
@@ -32,6 +41,8 @@ import {
   REMOVE_WISHLIST_REQUEST,
   WISHLIST_REQUEST,
 } from '../../redux/actions/wishlistActions';
+import HomeFilterComponent from '../HomeFilterComponent';
+import {GET_CART_REQUEST} from '../../redux/actions/cartActions';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -39,7 +50,7 @@ const HomeTrendingComponent = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [localWishlist, setLocalWishlist] = useState([]);
-
+  const [selectedFilter, setSelectedFilter] = useState(null);
   const token = useSelector(state => state.auth.token);
   console.log('Auth Token in HomeTrendingComponent:', token);
   // redux store
@@ -72,19 +83,125 @@ const HomeTrendingComponent = () => {
       setLocalWishlist([]);
     }
   }, [token]);
+
+  const {cartLoading, cartData, error, success} = useSelector(
+    state => state.addToCard,
+  );
+  const cartCount = cartData?.productDetailList?.length || 0;
+  console.log('HOME CART COUNT =>', cartCount);
+  useEffect(() => {
+    if (token) {
+      console.log('CALLING CART API FROM PRODUCT DETAILS');
+
+      dispatch({
+        type: GET_CART_REQUEST,
+        token: token,
+      });
+    }
+  }, [token]);
+
+  const EMPTY_ARRAY = [];
+
+  const cartItems = useSelector(
+    state => state.addToCard?.cartData?.productDetailList || EMPTY_ARRAY,
+  );
+
+  const addressList = useSelector(state => state.addresses?.list || []);
+  const deliveryAddressId = addressList[0]?.id;
+
+  console.log('ADDRESS LIST ', addressList);
+  console.log('DELIVERY ID ', deliveryAddressId);
+  // Add to Card Function
+  const handleAddToCart = (item, mainVariant) => {
+    if (!token) {
+      navigation.navigate('StartingScreen', {
+        redirectTo: 'BagStack',
+      });
+      return;
+    }
+
+    const payload = {
+      productDetailList: [
+        {
+          productId: item._id,
+          variants: mainVariant?._id || mainVariant?.id,
+          quantity: 1,
+        },
+      ],
+      deliveryAddress: deliveryAddressId,
+    };
+
+    console.log('ADD TO CART PAYLOAD =>', payload);
+
+    dispatch({
+      type: 'ADD_TO_CART_REQUEST',
+      payload,
+      token,
+    });
+    ToastAndroid.show('Added to Cart', ToastAndroid.SHORT);
+  };
+
+  const handleRemoveFromCart = cartItem => {
+    dispatch({
+      type: 'REMOVE_CART_REQUEST',
+      payload: {
+        cartId: cartData?.id,
+        itemId: cartItem?._id,
+      },
+      token,
+    });
+    ToastAndroid.show('Removed from Cart', ToastAndroid.SHORT);
+  };
+  // const handleCartAction = () => {
+  //   if (isAddedToCart) {
+  //     handleRemoveFromCart();
+  //   } else {
+  //     handleAddToCart();
+  //   }
+  // };
+
+  const handleCartAction = (item, mainVariant, cartItem) => {
+    if (!token) {
+      navigation.navigate('StartingScreen', {
+        redirectTo: 'BagStack',
+      });
+      return;
+    }
+
+    if (cartItem) {
+      handleRemoveFromCart(cartItem);
+    } else {
+      handleAddToCart(item, mainVariant);
+    }
+  };
+
+  // useEffect(() => {
+  //   if (success) {
+  //     ToastAndroid.show('Cart Updated Successfully', ToastAndroid.SHORT);
+  //   }
+
+  //   if (error) {
+  //     ToastAndroid.show(error, ToastAndroid.SHORT);
+  //   }
+  // }, [success, error]);
   return (
     <SafeAreaView>
-      <Text
+      {/* <Text
         style={{
           paddingHorizontal: wp(10),
-          fontSize: fontSize(16),
+          fontSize: fontSize(18),
           color: colors.pureBlack,
           fontFamily: fontFamily.poppins700,
-          marginBottom: hp(22),
+          marginBottom: hp(20),
           marginLeft: hp(5),
         }}>
         Trending
-      </Text>
+      </Text> */}
+
+      {/* <View>
+        <HomeFilterComponent />
+      </View> */}
+
       <FlatList
         data={products}
         keyExtractor={item => item._id}
@@ -129,6 +246,13 @@ const HomeTrendingComponent = () => {
           );
           const imageUrl = mainImage?.imageUrl;
 
+          const cartItem = cartItems.find(
+            cart =>
+              cart?.productId?._id === item._id ||
+              cart?.productId?.id === item._id,
+          );
+
+          const isAddedToCart = !!cartItem;
           return (
             // <TouchableOpacity
             //   style={styles.card}
@@ -137,18 +261,18 @@ const HomeTrendingComponent = () => {
             //     navigation.navigate('ProductDetails', {product: item});
             //   }}
 
-            <TouchableOpacity
-              style={styles.card}
-              activeOpacity={0.6}
-              onPress={() => {
-                navigation.navigate('ProductDetails', {
-                  productId: item._id,
-                });
-              }}>
-              <Image
-                source={imageUrl ? {uri: imageUrl} : images.trending_one}
-                style={styles.image}
-              />
+            <View style={styles.card} activeOpacity={0.6}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('ProductDetails', {
+                    productId: item._id,
+                  });
+                }}>
+                <Image
+                  source={imageUrl ? {uri: imageUrl} : images.trending_one}
+                  style={styles.image}
+                />
+              </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.heartButton}
@@ -238,43 +362,85 @@ const HomeTrendingComponent = () => {
                   )}
                 </View>
               </TouchableOpacity>
-              <View style={styles.content}>
-                <Text
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                  style={styles.title}>
-                  {item.title}
-                </Text>
 
-                <View style={styles.priceRow}>
-                  <Text style={styles.price}>
-                    Rs. {mainVariant?.sellingPrice || '000'}
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('ProductDetails', {
+                    productId: item._id,
+                  });
+                }}>
+                <View style={styles.content}>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={styles.title}>
+                    {item.title}
                   </Text>
-                  <Text style={styles.mrp}>
-                    MRP {mainVariant?.price || '000'}
-                  </Text>
-                  <Text style={styles.discount}>
-                    {mainVariant?.discount
-                      ? `${mainVariant.discount}% Off`
-                      : ''}
-                  </Text>
+
+                  <View style={styles.priceRow}>
+                    <Text style={styles.price}>
+                      ₹{mainVariant?.sellingPrice || '000'}
+                    </Text>
+
+                    <Text style={styles.mrp}>
+                      ₹{mainVariant?.price || '000'}
+                    </Text>
+                    <Text style={styles.discount}>
+                      {mainVariant?.discount
+                        ? `${mainVariant.discount}% Off`
+                        : ''}
+                    </Text>
+                  </View>
                 </View>
 
+                <View>
+                  <View
+                    style={{
+                      backgroundColor: '#F1F5F9',
+                      height: hp(1),
+                      // width: '100%',
+                      marginHorizontal: wp(10),
+                      marginTop: hp(8),
+                    }}
+                  />
+                </View>
+              </TouchableOpacity>
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginHorizontal: wp(10),
+                }}>
                 <View style={styles.ratingRow}>
                   <View style={styles.ratingBox}>
                     <Text style={styles.ratingText}>
-                      {item.averageRating ? item.averageRating.toFixed(1) : '0'}
+                      {item.averageRating
+                        ? item.averageRating.toFixed(1)
+                        : '0.0'}
                     </Text>
 
-                    <StarIcon style={{top: -1, width: hp(9), height: hp(8)}} />
+                    <WhiteIcon />
                   </View>
 
-                  <Text style={styles.reviews}>
-                    {item.totalReviews ? `(${item.totalReviews})` : '(00)'}
-                  </Text>
+                  <View
+                    style={{
+                      width: hp(16),
+                      height: hp(15),
+                      // backgroundColor: 'red',
+                    }}>
+                    <Text style={styles.reviews}>
+                      {item.totalReviews ? `${item.totalReviews}` : '00'}
+                    </Text>
+                  </View>
                 </View>
+                <TouchableOpacity
+                  onPress={() => handleCartAction(item, mainVariant, cartItem)}>
+                  {isAddedToCart ? <NewRemoveCartIcon /> : <NewAddCartIcon />}
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
+            </View>
           );
         }}
       />
@@ -306,67 +472,72 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: wp(14),
   },
   content: {
-    padding: wp(10),
+    marginTop: wp(4),
+    paddingLeft: wp(10),
   },
   title: {
     fontSize: fontSize(10),
-    fontFamily: fontFamily.poppins400,
-    lineHeight: hp(14),
-    color: colors.black,
+    fontFamily: fontFamily.poppins500,
+    // lineHeight: hp(14),
+    color: '#64748B',
   },
   priceRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp(6),
-    justifyContent: 'space-between',
+    marginTop: hp(5),
+    // justifyContent: 'space-between',
   },
   price: {
     marginRight: wp(6),
-    fontSize: fontSize(12),
+    fontSize: fontSize(14),
     fontFamily: fontFamily.poppins700,
     lineHeight: hp(16),
-    color: colors.black,
+    color: '#0F172A',
   },
   mrp: {
-    fontSize: fontSize(10),
-    color: '#A5A5A5',
+    fontSize: fontSize(11),
+    color: '#94A3B8',
     textDecorationLine: 'line-through',
     marginRight: wp(6),
-    fontFamily: fontFamily.poppins500,
+    fontFamily: fontFamily.poppins400,
     lineHeight: hp(14),
   },
   discount: {
-    fontSize: fontSize(10),
+    fontSize: fontSize(11),
     color: '#2B9909',
-    fontFamily: fontFamily.poppins600,
+    fontFamily: fontFamily.poppins700,
     lineHeight: hp(14),
   },
   ratingRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp(6),
+    justifyContent: 'space-between',
+    marginTop: hp(8),
+    marginBottom: hp(10),
   },
   ratingBox: {
     backgroundColor: '#5029F3',
-    paddingHorizontal: wp(5),
-    borderRadius: wp(16),
-    width: hp(42),
-    height: hp(18),
+    paddingHorizontal: wp(6),
+    borderRadius: wp(4),
+    // width: hp(40),
+    height: hp(15),
     justifyContent: 'center',
     flexDirection: 'row',
     alignItems: 'center',
   },
   ratingText: {
     color: '#fff',
-    fontSize: fontSize(9),
-    fontFamily: fontFamily.poppins500,
-    marginRight: hp(5),
+    fontSize: fontSize(10),
+    fontFamily: fontFamily.poppins700,
+    marginRight: hp(3),
+    textAlignVertical: 'center',
+    // includeFontPadding: false,
   },
   reviews: {
     fontSize: fontSize(10),
-    color: colors.pureBlack,
-    fontFamily: fontFamily.poppins500,
-    marginLeft: hp(12),
+    color: '#94A3B8',
+    fontFamily: fontFamily.poppins700,
+    marginLeft: hp(6),
   },
   heartButton: {
     position: 'absolute',

@@ -30,6 +30,13 @@ import {
   ChatIcon,
   ColorBagIcon,
   BagIcon,
+  ShoppingBag,
+  ColorShoppingBag,
+  ReelsIcon,
+  SellerHome,
+  FilledCategoryIcon,
+  EmptyCategoryIcon,
+  NewSearch,
 } from '../assets';
 
 // Utils
@@ -37,6 +44,7 @@ import {fontFamily, fontSize, hp, isIOS, wp} from '../utils/helpers';
 import RevewsScreen from '../screens/revewsScreen';
 import SellerProfileScreen from '../screens/sellerProfileScreen';
 import {GET_CART_REQUEST} from '../redux/actions/cartActions';
+import ViralTrendsScreen from '../screens/ViralTrendsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -57,7 +65,7 @@ const GradientText = ({text}) => (
       </Text>
     }>
     <LinearGradient
-      colors={['#0F52BA', '#8225AF']}
+      colors={['#5029F3', '#5029F3']}
       start={{x: 0, y: 0}}
       end={{x: 1, y: 1.2}}>
       <Text
@@ -86,6 +94,7 @@ const HomeStackScreen = () => {
       <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
       <Stack.Screen name="WishlistScreen" component={WishlistScreen} />
       <Stack.Screen name="ReviewsScreen" component={RevewsScreen} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
     </Stack.Navigator>
   );
 };
@@ -105,13 +114,13 @@ const CategoryStackScreen = () => (
 
 const ChatStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="ChatScreen" component={ChatScreen} />
+    <Stack.Screen name="ViralTrendsScreen" component={ViralTrendsScreen} />
   </Stack.Navigator>
 );
 
 const BagStackScreen = () => (
   <Stack.Navigator screenOptions={{headerShown: false}}>
-    <Stack.Screen name="BagScreen" component={BagScreen} />
+    <Stack.Screen name="My Order" component={MyOrderScreen} />
   </Stack.Navigator>
 );
 
@@ -167,10 +176,11 @@ const MainTabNavigator = () => {
               childRouteName === 'SellerProfile')) ||
           (route.name === 'CategoryStack' &&
             (childRouteName === '' || childRouteName === 'CategoryScreen')) ||
-          (route.name === 'ChatStack' &&
-            (childRouteName === '' || childRouteName === 'ChatScreen')) ||
-          (route.name === 'BagStack' &&
-            (childRouteName === '' || childRouteName === 'BagScreen'));
+          (route.name === 'ReelsStack' &&
+            (childRouteName === '' ||
+              childRouteName === 'ViralTrendsScreen')) ||
+          (route.name === 'My Order' &&
+            (childRouteName === '' || childRouteName === 'My Order'));
 
         return {
           headerShown: false,
@@ -178,7 +188,7 @@ const MainTabNavigator = () => {
           tabBarStyle: {
             height:
               keyboardVisible ||
-              (route.name === 'BagStack' &&
+              (route.name === 'My Order' &&
                 (childRouteName === 'BagScreen' || childRouteName === ''))
                 ? 0
                 : isIOS
@@ -187,8 +197,8 @@ const MainTabNavigator = () => {
 
             display:
               keyboardVisible ||
-              (route.name === 'BagStack' &&
-                (childRouteName === 'BagScreen' || childRouteName === ''))
+              (route.name === 'My Order' &&
+                (childRouteName === 'My Order' || childRouteName === ''))
                 ? 'none'
                 : 'flex',
 
@@ -206,25 +216,27 @@ const MainTabNavigator = () => {
             let IconComponent;
             switch (route.name) {
               case 'HomeStack':
-                IconComponent =
-                  focused && isMainScreen ? ColorHomeIcon : HomeIcon;
+                IconComponent = focused && isMainScreen ? SellerHome : HomeIcon;
                 break;
               case 'SearchStack':
-                IconComponent =
-                  focused && isMainScreen ? ColorSearchIcon : SearchIcon;
+                IconComponent = IconComponent = NewSearch;
                 break;
 
               case 'CategoryStack':
                 IconComponent =
-                  focused && isMainScreen ? ColorCategoryIcon : CategoryIcon;
+                  focused && isMainScreen
+                    ? FilledCategoryIcon
+                    : EmptyCategoryIcon;
                 break;
-              case 'ChatStack':
-                IconComponent =
-                  focused && isMainScreen ? ColorChatIcon : ChatIcon;
+              // case 'ReelsStack':
+              //   IconComponent = focused && isMainScreen ? ReelsIcon : ReelsIcon;
+              //   break;
+              case 'ReelsStack':
+                IconComponent = ReelsIcon;
                 break;
-              case 'BagStack':
+              case 'My Order':
                 IconComponent =
-                  focused && isMainScreen ? ColorBagIcon : BagIcon;
+                  focused && isMainScreen ? ColorShoppingBag : ShoppingBag;
                 break;
               default:
                 IconComponent = HomeIcon;
@@ -240,32 +252,8 @@ const MainTabNavigator = () => {
                 <IconComponent
                   width={sizeStyle.width}
                   height={sizeStyle.height}
+                  color={focused && isMainScreen ? '#5029F4' : '#73707A'}
                 />
-
-                {route.name === 'BagStack' && cartCount > 0 && (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      right: wp(-13),
-                      top: wp(-12),
-                      backgroundColor: '#5029F3',
-                      borderRadius: wp(20),
-                      width: hp(18),
-                      height: hp(18),
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      paddingHorizontal: wp(3),
-                    }}>
-                    <Text
-                      style={{
-                        color: '#fff',
-                        fontSize: fontSize(10),
-                        fontFamily: fontFamily.poppins400,
-                      }}>
-                      {cartCount}
-                    </Text>
-                  </View>
-                )}
               </View>
             );
           },
@@ -300,8 +288,8 @@ const MainTabNavigator = () => {
       />
       <Tab.Screen name="SearchStack" component={SearchStackScreen} />
       <Tab.Screen name="CategoryStack" component={CategoryStackScreen} />
-      <Tab.Screen name="ChatStack" component={ChatStackScreen} />
-      <Tab.Screen name="BagStack" component={BagStackScreen} />
+      <Tab.Screen name="ReelsStack" component={ViralTrendsScreen} />
+      <Tab.Screen name="My Order" component={MyOrderScreen} />
     </Tab.Navigator>
   );
 };

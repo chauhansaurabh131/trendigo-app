@@ -122,7 +122,7 @@ const ProfileScreen = () => {
             </View>
             <Text style={styles.boxLabel}>Account</Text>
           </TouchableOpacity>
-
+          {/* 
           <TouchableOpacity
             style={styles.boxWrapper}
             onPress={() => navigation.navigate('MyOrderScreen')}>
@@ -133,7 +133,7 @@ const ProfileScreen = () => {
               />
             </View>
             <Text style={styles.boxLabel}>My Orders</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             style={styles.boxWrapper}
@@ -181,6 +181,20 @@ const ProfileScreen = () => {
               <Image source={images.revews_icon} style={styles.boxImage} />
             </View>
             <Text style={styles.boxLabel}>My Revews</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.boxWrapper}
+            // onPress={() => navigation.navigate('ChatScreen')}>
+            onPress={() =>
+              navigation.navigate('HomeStack', {
+                screen: 'ChatScreen',
+              })
+            }>
+            <View style={[styles.box, {backgroundColor: '#FFF6F6'}]}>
+              <Image source={images.revews_icon} style={styles.boxImage} />
+            </View>
+            <Text style={styles.boxLabel}>Chat with Seller</Text>
           </TouchableOpacity>
         </View>
 

@@ -21,7 +21,7 @@ const TermAndPolicy = () => {
         }}>
         <Text
           style={{
-            fontSize: fontSize(12),
+            fontSize: fontSize(13),
             // lineHeight: hp(26),
             fontFamily: fontFamily.poppins400,
             color: colors.pureBlack,

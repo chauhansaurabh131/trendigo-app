@@ -1,5 +1,12 @@
 import React from 'react';
-import {FlatList, Image, SafeAreaView, Text, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {colors} from '../../../utils/colors';
 import {useState} from 'react';
 import {
@@ -12,37 +19,64 @@ import {
 } from '../../../utils/helpers';
 import {
   BlueBagIcon,
+  BlueRight,
+  BuyButton,
+  Deliverd,
+  EarnDiscount,
   EmptyBag,
   images,
   NavigationArrowIcon,
+  ReelsUi,
+  ReturnButton,
 } from '../../../assets';
 import RatingStatComponent from '../../../components/ratingStarComponent';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import GradientButton from '../../../components/gradientButton';
-
+import {launchImageLibrary} from 'react-native-image-picker';
 DeliveredScreen = () => {
   const navigation = useNavigation();
   const [rating, setRating] = useState(0);
 
+  const selectVideo = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'video',
+        selectionLimit: 1,
+      },
+      response => {
+        if (response.didCancel) {
+          return;
+        }
+
+        if (response.assets?.length > 0) {
+          const video = response.assets[0];
+
+          navigation.navigate('VideoPreviewScreen', {
+            videoUri: video.uri,
+          });
+        }
+      },
+    );
+  };
   const product = [
-    // {
-    //   _id: '1',
-    //   title: 'Men graphic Black T-shirt',
-    //   image: images.trending_one,
-    //   size: 'M',
-    //   color: 'Black',
-    //   qty: 1,
-    //   deliveryDate: 'Monday , 19 Dec. 2024',
-    // },
-    // {
-    //   _id: '2',
-    //   title: 'Men graphic Black T-shirt',
-    //   image: images.trending_two,
-    //   size: '32',
-    //   color: 'Blue',
-    //   qty: 2,
-    //   deliveryDate: 'Monday , 19 Dec. 2024',
-    // },
+    {
+      _id: '1',
+      title: 'Men graphic Black T-shirt',
+      image: images.trending_one,
+      size: 'M',
+      color: 'Black',
+      qty: 1,
+      deliveryDate: '10 Dec 2024',
+    },
+    {
+      _id: '2',
+      title: 'Men graphic Black T-shirt',
+      image: images.trending_two,
+      size: '32',
+      color: 'Blue',
+      qty: 2,
+      deliveryDate: '10 Dec 2024',
+    },
   ];
   // const product = [
   //   // {
@@ -73,144 +107,218 @@ DeliveredScreen = () => {
       <View
         style={{
           width: '100%',
-          height: hp(385),
+          // height: hp(385),
           borderWidth: 1,
           borderColor: '#E8E8E8',
-          borderRadius: 14,
-          paddingHorizontal: 13,
+          borderRadius: wp(14),
+          marginBottom: hp(19),
         }}>
-        <Text
+        <View
           style={{
-            marginTop: hp(13),
-            color: '#2B9909',
-            fontSize: fontSize(12),
-            lineHeight: hp(16),
-            fontFamily: fontFamily.poppins500,
+            flexDirection: 'row',
+            // alignItems: 'flex-start',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: hp(12),
+            marginHorizontal: wp(16),
           }}>
-          Delivered On :{' '}
-          <Text
+          <View
             style={{
-              color: '#64748B',
-              fontSize: fontSize(12),
-              fontFamily: fontFamily.poppins400,
+              flexDirection: 'row',
+              // alignItems: 'flex-start',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}>
-            {' '}
-            {item.deliveryDate}{' '}
-          </Text>
-        </Text>
+            <Deliverd />
 
-        {/* <View
-            style={{
-              width: '97%',
-              height: 1,
-              marginTop: hp(12),
-              marginBottom: hp(18),
-              backgroundColor: '#E8E8E8',
-            }}
-          /> */}
+            <Text
+              style={{
+                color: '#64748B',
+                fontSize: fontSize(12),
+                fontFamily: fontFamily.poppins400,
+                marginLeft: wp(8),
+              }}>
+              {' '}
+              {item.deliveryDate}{' '}
+            </Text>
+          </View>
+
+          <View>
+            <Text
+              style={{
+                // width: 40,
+                color: '#94A3B8',
+                fontSize: fontSize(11),
+                fontFamily: fontFamily.poppins500,
+              }}>
+              #ORD-98248
+            </Text>
+          </View>
+        </View>
+
+        <View
+          style={{
+            width: '100%',
+            height: hp(1),
+            marginTop: hp(13),
+            backgroundColor: '#F1F5F9',
+          }}
+        />
 
         <View
           style={{
             flexDirection: 'row',
-            // backgroundColor: '#861818',
-            marginTop: hp(28),
+            marginTop: hp(16),
+            marginHorizontal: wp(16),
           }}>
           <Image
             source={item.image}
             // source={product.image}
-            style={{width: wp(93), height: hp(112)}}
-            borderRadius={8}
+            style={{width: hp(80), height: hp(96)}}
+            borderRadius={12}
           />
 
-          <View style={{marginHorizontal: wp(23)}}>
+          <View style={{marginLeft: wp(14)}}>
             <Text
               style={{
-                fontSize: fontSize(15),
-                fontFamily: fontFamily.poppins600,
-                color: colors.pureBlack,
+                fontSize: fontSize(14),
+                fontFamily: fontFamily.poppins700,
+                color: '#0F172A',
               }}>
               {item.title}
-              {'\n'}
-              <Text>{/* {product.title} */}</Text>
             </Text>
 
-            <View style={{marginTop: isIOS ? hp(15) : hp(7)}}>
-              <View style={{flexDirection: 'row'}}>
+            <View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  gap: wp(8),
+                  alignItems: 'center',
+                  marginTop: hp(4),
+                }}>
                 <Text
                   style={{
-                    width: 40,
-                    color: '#64748B',
+                    fontSize: fontSize(14),
+                    fontFamily: fontFamily.poppins700,
+                    color: '#0F172A',
+                  }}>
+                  $64.00
+                </Text>
+
+                <Text
+                  style={{
                     fontSize: fontSize(12),
                     fontFamily: fontFamily.poppins400,
+                    color: '#94A3B8',
+                  }}>
+                  $64.00
+                </Text>
+
+                <Text
+                  style={{
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins700,
+                    color: '#059669',
+                  }}>
+                  28% OFF
+                </Text>
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                // justifyContent: 'space-between',
+                gap: wp(5),
+                marginTop: isIOS ? hp(15) : hp(7),
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: hp(55),
+                  height: hp(23),
+                  backgroundColor: '#F1F5F9',
+                  borderRadius: wp(6),
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    // width: 40,
+                    color: '#334155',
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins500,
                   }}>
                   Size
                 </Text>
                 <Text
                   style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(12),
+                    color: '#0F172A',
+                    fontSize: fontSize(11),
                     fontFamily: fontFamily.poppins600,
                   }}>
                   {' '}
                   :{' '}
                 </Text>
+
                 <Text
                   style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins600,
+                    color: '#0F172A',
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins700,
                   }}>
                   {' '}
-                  {/* S{' '} */}
-                  <Text> {item.size}</Text>
+                  {item.size}{' '}
                 </Text>
               </View>
 
-              <View style={{flexDirection: 'row'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: hp(76),
+                  height: hp(23),
+                  backgroundColor: '#F0F9FF',
+                  borderRadius: wp(6),
+                  justifyContent: 'center',
+                }}>
+                <View
+                  style={{
+                    width: hp(8),
+                    height: hp(8),
+                    borderRadius: wp(8),
+                    backgroundColor: '#38BDF8',
+                  }}
+                />
                 <Text
                   style={{
-                    width: 40,
+                    color: '#075985',
+                    lineHeight: hp(18),
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins500,
+                    marginLeft: wp(4),
+                  }}>
+                  {' '}
+                  {item.color}{' '}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  width: hp(47),
+                  height: hp(23),
+                  backgroundColor: '#F1F5F9',
+                  borderRadius: wp(6),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={{
+                    // width: 40,
                     color: '#64748B',
                     fontSize: fontSize(12),
                     lineHeight: hp(18),
                     fontFamily: fontFamily.poppins400,
-                  }}>
-                  Color
-                </Text>
-                <Text
-                  style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins600,
-                    lineHeight: hp(18),
-                  }}>
-                  {' '}
-                  :{' '}
-                </Text>
-                <Text
-                  style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins600,
-                    lineHeight: hp(18),
-                  }}>
-                  {' '}
-                  <Text> {item.color}</Text>
-                </Text>
-
-                {/* <View style={{marginLeft: wp(56)}}>
-                    <NavigationArrowIcon stroke="#1F1F1F" />
-                  </View> */}
-              </View>
-
-              <View style={{flexDirection: 'row'}}>
-                <Text
-                  style={{
-                    width: 40,
-                    color: '#64748B',
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins400,
-                    lineHeight: hp(18),
                   }}>
                   Qty
                 </Text>
@@ -218,8 +326,8 @@ DeliveredScreen = () => {
                   style={{
                     color: colors.pureBlack,
                     fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins600,
                     lineHeight: hp(18),
+                    fontFamily: fontFamily.poppins600,
                   }}>
                   {' '}
                   :{' '}
@@ -228,101 +336,168 @@ DeliveredScreen = () => {
                   style={{
                     color: colors.pureBlack,
                     fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins600,
                     lineHeight: hp(18),
+                    fontFamily: fontFamily.poppins600,
                   }}>
                   {' '}
-                  {/* 1  */}
-                  <Text>{item.qty}</Text>
+                  {item.qty}{' '}
                 </Text>
               </View>
             </View>
           </View>
-          <View
-            style={{
-              alignSelf: 'center',
-              marginLeft: wp(30),
-            }}>
-            {/* <NavigationArrowIcon stroke="#ACACAC" /> */}
-          </View>
         </View>
+
         <View
           style={{
-            // width: '97%',
-            height: 1,
-            marginTop: hp(29),
-            backgroundColor: '#E8E8E8',
-            marginBottom: hp(15),
-            marginHorizontal: -13, // 🔥 important
+            // width: '100%',
+            height: hp(1),
+            marginTop: hp(12),
+            backgroundColor: '#E2E8F0',
+            marginHorizontal: wp(16),
+            borderStyle: 'dashed',
           }}
         />
+
         <View
           style={{
-            // alignItmes: 'center',
+            flexDirection: 'row',
             alignItems: 'center',
-            marginTop: hp(13),
-            // justifyContent:'center'
+            justifyContent: 'space-between',
+            marginHorizontal: wp(16),
+            marginTop: hp(21),
           }}>
-          <Text
-            style={{
-              fontSize: fontSize(14),
-              // lineHeight: hp(14),
-              fontFamily: fontFamily.poppins500,
-              color: '#475569',
-            }}>
-            Rate & Review to{' '}
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View
+              style={{
+                width: hp(8),
+                height: hp(8),
+                borderRadius: wp(8),
+                backgroundColor: '#38BDF8',
+              }}
+            />
             <Text
               style={{
-                color: '#9333EA',
-                fontSize: fontSize(14),
+                fontSize: fontSize(12),
+                // lineHeight: hp(14),
                 fontFamily: fontFamily.poppins500,
+                color: '#334155',
+                marginLeft: wp(6),
               }}>
-              {' '}
-              Get More Discounts
+              Rate your experience
             </Text>
-          </Text>
+          </View>
+
+          <View style={{}}>
+            <Image
+              source={images.earn_discount}
+              style={{width: wp(98), height: hp(21), resizeMode: 'contain'}}
+            />
+          </View>
         </View>
+
         <View
           style={{
-            marginTop: hp(15),
+            marginTop: hp(26),
             marginBottom: hp(20),
             alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            height: hp(54),
+            borderWidth: 1,
+            borderColor: '#F1F5F9',
+            borderRadius: wp(12),
+            backgroundColor: '#F8FAFCCC',
+            marginHorizontal: wp(16),
           }}>
-          {/* <RatingStatComponent /> */}
           <RatingStatComponent
             value={rating}
             onRatingChange={value => setRating(value)}
           />
-          {/* {productId && <RatingStatComponent productId={productId} />} */}
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('ReviewRating', {
+                product: product,
+                rating: rating,
+              })
+            }
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <View>
+              <Text
+                style={{
+                  fontSize: fontSize(12),
+                  fontFamily: fontFamily.poppins700,
+                  color: '#6D28D9',
+                  marginLeft: wp(7),
+                  marginRight: wp(9),
+                }}>
+                Write Review
+              </Text>
+            </View>
+            <BlueRight />
+          </TouchableOpacity>
         </View>
 
-        <Touchable
-          onPress={() =>
-            navigation.navigate('ReviewRating', {
-              product: product,
-              rating: rating,
-            })
-          }
-          activeOpacity={0.6}
+        <TouchableOpacity onPress={selectVideo} style={{alignItems: 'center'}}>
+          <ReelsUi />
+        </TouchableOpacity>
+
+        <View
           style={{
-            width: '97%',
-            borderWidth: 1,
-            borderColor: '#9333EA',
-            height: hp(48),
-            // marginBottom: hp(21),
-            borderRadius: 50,
+            flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'center',
+            marginHorizontal: wp(16),
+            justifyContent: 'space-evenly',
+            marginTop: hp(15),
+          }}>
+          <TouchableOpacity>
+            <ReturnButton />
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <BuyButton />
+          </TouchableOpacity>
+        </View>
+
+        <View
+          style={{
+            // width: '100%',
+            height: hp(1),
+            marginTop: hp(16),
+            backgroundColor: '#F1F5F9E5',
+            marginHorizontal: wp(16),
+          }}
+        />
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: hp(14),
+            marginBottom: hp(16),
+            marginHorizontal: wp(16),
           }}>
           <Text
             style={{
-              color: '#9333EA',
-              fontSize: fontSize(15),
-              fontFamily: fontFamily.poppins600,
+              // width: 40,
+              color: '#94A3B8',
+              fontSize: fontSize(11),
+              fontFamily: fontFamily.poppins500,
             }}>
-            Tell us more
+            Standard Express Delivery
           </Text>
-        </Touchable>
+
+          <Text
+            style={{
+              color: '#5B13EC',
+              fontSize: fontSize(11),
+              fontFamily: fontFamily.poppins700,
+            }}>
+            Download Receipt
+          </Text>
+        </View>
       </View>
     );
   };

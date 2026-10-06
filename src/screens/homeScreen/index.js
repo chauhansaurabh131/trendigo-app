@@ -4,8 +4,11 @@ import {colors} from '../../utils/colors';
 import {
   ColorTrendiGo,
   GradientColorSearchIcon,
+  NewAdd,
+  NewAddIcon,
   NewLogo,
   ProfileIcon,
+  ProfileNewIcon,
   SmallTrulyBag,
   TrulyBag,
 } from '../../assets';
@@ -21,16 +24,33 @@ import RecentlyViewComponent from '../../components/recentlyViewComponent';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchUserRequest} from '../../redux/actions/userActions';
+import {GET_CART_REQUEST} from '../../redux/actions/cartActions';
+import HomeFilterComponent from '../../components/HomeFilterComponent';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
 
-  const {user, loading} = useSelector(state => state.user);
-
+  const {user} = useSelector(state => state.user);
+  const token = useSelector(state => state.auth.token);
+  const {loading, cartData, error} = useSelector(state => state.addToCard);
+  const cartCount = cartData?.productDetailList?.length || 0;
   useEffect(() => {
     dispatch(fetchUserRequest());
   }, []);
+
+  console.log('TAB CART COUNT =>', cartCount);
+
+  useEffect(() => {
+    if (token) {
+      console.log('ALLING CART API FROM PRODUCT DETAILS');
+
+      dispatch({
+        type: GET_CART_REQUEST,
+        token: token,
+      });
+    }
+  }, [token]);
 
   console.log('PROFILE PIC IN HOMESCREEN', user?.profilePic);
   return (
@@ -41,14 +61,51 @@ const HomeScreen = () => {
           marginTop: hp(19),
           marginHorizontal: hp(17),
           justifyContent: 'space-between',
+          flexDirection: 'row',
+          alignItems: 'center',
         }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}>
-          <NewLogo />
+        <NewLogo />
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('BagScreen')}
+            style={{
+              width: hp(38),
+              height: hp(38),
+              borderRadius: wp(35),
+              borderColor: '#E2E8F0CC',
+              borderWidth: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#FFFFFF',
+              marginRight: wp(16),
+            }}>
+            <NewAdd />
+            {cartCount > 0 && (
+              <View
+                style={{
+                  position: 'absolute',
+                  right: wp(-4),
+                  // top: wp(-12),
+                  bottom: wp(-6),
+                  backgroundColor: '#5932EA',
+                  borderRadius: wp(30),
+                  width: hp(18),
+                  height: hp(18),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  // paddingHorizontal: wp(3),
+                }}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: fontSize(9),
+                    fontFamily: fontFamily.poppins700,
+                  }}>
+                  {cartCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
 
           <TouchableOpacity
             activeOpacity={0.6}
@@ -60,58 +117,63 @@ const HomeScreen = () => {
               <Image
                 source={{uri: user.profilePic}}
                 style={{
-                  width: hp(24),
-                  height: hp(24),
+                  width: hp(38),
+                  height: hp(38),
                   borderRadius: wp(20),
                 }}
               />
             ) : (
               // Not Logged In
-              <ProfileIcon />
+              <ProfileNewIcon />
             )}
           </TouchableOpacity>
         </View>
+      </View>
 
-        <View
+      <View
+        activeOpacity={0.6}
+        style={{
+          marginTop: hp(11),
+          // width: '100%',
+          height: hp(38),
+          borderRadius: wp(16),
+          marginHorizontal: hp(17),
+          backgroundColor: '#FFFFFF',
+          borderColor: '#E2E8F0CC',
+          borderWidth: 1,
+          marginBottom: hp(12),
+          justifyContent: 'center',
+          paddingHorizontal: hp(16),
+        }}>
+        <Touchable
+          style={{flexDirection: 'row', alignItems: 'center'}}
           activeOpacity={0.6}
-          style={{
-            marginTop: hp(23),
-            width: '100%',
-            height: hp(40),
-            borderRadius: wp(25),
-            backgroundColor: '#F7F7F7',
-            marginBottom: hp(12),
-            justifyContent: 'center',
-            paddingHorizontal: hp(15),
-          }}>
-          <Touchable
-            style={{flexDirection: 'row', alignItems: 'center'}}
-            activeOpacity={0.6}
-            onPress={() => navigation.navigate('SearchStack')}>
-            <GradientColorSearchIcon width={hp(16)} height={hp(16)} />
-            <Text
-              style={{
-                marginLeft: hp(15),
-                fontSize: fontSize(14),
-                lineHeight: hp(20),
-                fontFamily: fontFamily.poppins400,
-                color: '#979797',
-              }}>
-              Search for Products
-            </Text>
-          </Touchable>
-        </View>
+          onPress={() => navigation.navigate('SearchStack')}>
+          <GradientColorSearchIcon width={hp(12)} height={hp(12)} />
+          <Text
+            style={{
+              marginLeft: hp(11),
+              fontSize: fontSize(12),
+              lineHeight: hp(20),
+              fontFamily: fontFamily.poppins500,
+              color: '#94A3B8',
+            }}>
+            Search Product, brands
+          </Text>
+        </Touchable>
       </View>
 
       {/* Scrollable content */}
-      <FlatList
+      {/* <FlatList
         data={[{}]} // dummy data
         keyExtractor={(_, index) => index.toString()}
         renderItem={null}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <>
-            <HomeHeaderAddBannersComponent />
+            <View style={{marginTop: hp(5)}}>
+              <HomeHeaderAddBannersComponent />
+            </View>
             <View style={{marginTop: hp(25)}}>
               <HomeAllProductCategoryComponent />
             </View>
@@ -129,19 +191,64 @@ const HomeScreen = () => {
               <HomeTrendingComponent />
             </View>
 
-            <View style={{marginTop: hp(28)}}>
-              <ViralTrendyComponet />
-            </View>
-
-            <View style={{marginTop: hp(47)}}>
-              <ShopByBrandsComponent />
-            </View>
-
-            <View style={{marginTop: hp(35.17), marginHorizontal: wp(0)}}>
-              <RecentlyViewComponent />
-            </View>
+         
           </>
         }
+      /> */}
+
+      <FlatList
+        data={[{type: 'filter'}, {type: 'products'}]}
+        keyExtractor={item => item.type}
+        showsVerticalScrollIndicator={false}
+        ListHeaderComponent={
+          <>
+            <View style={{marginTop: hp(5)}}>
+              <HomeHeaderAddBannersComponent />
+            </View>
+
+            <View style={{marginTop: hp(25)}}>
+              <HomeAllProductCategoryComponent />
+            </View>
+
+            <View style={{marginTop: hp(28)}}>
+              <LatestTrendyComponet />
+            </View>
+
+            <Text
+              style={{
+                paddingHorizontal: wp(10),
+                fontSize: fontSize(18),
+                color: colors.pureBlack,
+                fontFamily: fontFamily.poppins700,
+                marginTop: hp(35),
+                marginBottom: hp(20),
+                marginLeft: hp(5),
+              }}>
+              Trending
+            </Text>
+          </>
+        }
+        stickyHeaderIndices={[1]}
+        renderItem={({item}) => {
+          if (item.type === 'filter') {
+            return (
+              <View
+                style={{
+                  backgroundColor: colors.white,
+                  zIndex: 100,
+                  elevation: 5,
+                }}>
+                <HomeFilterComponent />
+              </View>
+            );
+          }
+
+          if (item.type === 'products') {
+            return <HomeTrendingComponent />;
+          }
+
+          return null;
+        }}
       />
     </SafeAreaView>
   );

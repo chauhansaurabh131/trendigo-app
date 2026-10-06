@@ -27,9 +27,12 @@ import {
   GradientFullFillLike,
   GradientLikeIcon,
   images,
+  NewAdd,
   NewBag,
   SavedFiledIcon,
   SearchFilterIcon,
+  SearchIcon,
+  SearchNew,
   SellerShopIcon,
   SendEquiry,
   SendEquiry1,
@@ -531,28 +534,27 @@ const ProductDetailsScreen = () => {
                 <UserIcon width={14} height={14} />
               </View>
             )}
-            <Text
-              style={{
-                marginLeft: wp(11),
-                color: colors.pureBlack,
-                fontSize: fontSize(14),
-                lineHeight: hp(18),
-                fontFamily: fontFamily.poppins500,
-              }}>
-              {item?.user?.name || 'No Name'}
-            </Text>
+            <View style={{marginLeft: wp(10)}}>
+              <Text
+                style={{
+                  color: colors.pureBlack,
+                  fontSize: fontSize(14),
+                  lineHeight: hp(18),
+                  fontFamily: fontFamily.poppins500,
+                }}>
+                {item?.user?.name || 'No Name'}
+              </Text>
 
-            <Text
-              style={{
-                marginLeft: wp(12),
-                fontSize: fontSize(10),
-                lineHeight: hp(24),
-                fontFamily: fontFamily.poppins400,
-                color: '#C1C1C1',
-                top: hp(1),
-              }}>
-              {item?.createdAt ? new Date(item.createdAt).toDateString() : ''}
-            </Text>
+              <Text
+                style={{
+                  fontSize: fontSize(11),
+                  // lineHeight: hp(24),
+                  fontFamily: fontFamily.poppins500,
+                  color: '#C1C1C1',
+                }}>
+                {item?.createdAt ? new Date(item.createdAt).toDateString() : ''}
+              </Text>
+            </View>
           </View>
 
           {/* Rating */}
@@ -563,10 +565,9 @@ const ProductDetailsScreen = () => {
             }}>
             <Text
               style={{
-                fontSize: fontSize(14),
+                fontSize: fontSize(13),
                 lineHeight: hp(24),
-                fontFamily: fontFamily.poppins700,
-                // color: '#8225AF',
+                fontFamily: fontFamily.poppins400,
                 color: '#5029F3',
                 top: hp(2),
               }}>
@@ -580,6 +581,7 @@ const ProductDetailsScreen = () => {
             />
           </View>
         </View>
+
         <View style={{marginTop: hp(24)}}>
           {/* Review Title */}
           <Text
@@ -600,7 +602,7 @@ const ProductDetailsScreen = () => {
               fontSize: fontSize(14),
               lineHeight: hp(24),
               fontFamily: fontFamily.poppins400,
-              marginTop: hp(25),
+              marginTop: hp(15),
               marginHorizontal: wp(17),
             }}>
             {item?.description ||
@@ -609,6 +611,7 @@ const ProductDetailsScreen = () => {
               item?.reviewText ||
               'No description yet.'}
           </Text>
+
           {/* Review Images (if any) */}
           {item?.productImages && item.productImages.length > 0 ? (
             <View
@@ -635,8 +638,8 @@ const ProductDetailsScreen = () => {
               style={{
                 marginTop: hp(20),
                 fontSize: fontSize(12),
-                color: '#999',
-                fontFamily: fontFamily.poppins400,
+                color: '#C1C1C1',
+                fontFamily: fontFamily.poppins500,
                 marginHorizontal: wp(20),
               }}>
               No images added in this review
@@ -659,7 +662,7 @@ const ProductDetailsScreen = () => {
                 }}>
                 <Text
                   style={{
-                    fontSize: fontSize(13),
+                    fontSize: fontSize(14),
                     fontFamily: fontFamily.poppins500,
                     color: '#000',
                   }}>
@@ -669,10 +672,10 @@ const ProductDetailsScreen = () => {
                 <Text
                   style={{
                     marginTop: hp(6),
-                    fontSize: fontSize(13),
+                    fontSize: fontSize(14),
                     lineHeight: hp(20),
                     fontFamily: fontFamily.poppins400,
-                    color: '#444',
+                    color: '#000000',
                   }}>
                   {reply?.message}
                 </Text>
@@ -680,9 +683,9 @@ const ProductDetailsScreen = () => {
                 <Text
                   style={{
                     marginTop: hp(10),
-                    fontSize: fontSize(11),
+                    fontSize: fontSize(13),
                     fontFamily: fontFamily.poppins400,
-                    color: '#999',
+                    color: '#C1C1C1',
                   }}>
                   {new Date(reply.createdAt).toDateString()}
                 </Text>
@@ -732,14 +735,15 @@ const ProductDetailsScreen = () => {
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <View
         style={{
-          marginHorizontal: wp(20),
+          marginLeft: wp(17),
+          marginRight: wp(25),
           height: hp(57),
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between', // spreads left and right
         }}>
         {/* Left Side - Back Icon */}
-        <Touchable
+        <TouchableOpacity
           onPress={() => {
             navigation.goBack();
           }}
@@ -749,72 +753,61 @@ const ProductDetailsScreen = () => {
             justifyContent: 'center',
           }}>
           <BackIcon />
-        </Touchable>
+        </TouchableOpacity>
 
         {/* Right Side - Search & Bag Icons */}
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <Touchable
+          <TouchableOpacity
             onPress={() =>
               navigation.navigate('MainTabs', {
                 screen: 'SearchStack',
               })
             }
             style={{
-              width: hp(50),
-              height: hp(50),
-              justifyContent: 'center',
-              alignItems: 'center',
+              marginRight: wp(14),
             }}>
-            <SearchFilterIcon />
-          </Touchable>
+            <SearchNew />
+          </TouchableOpacity>
 
-          <View>
-            <Touchable
-              style={{
-                marginLeft: wp(10),
-                width: hp(50),
-                height: hp(50),
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              onPress={() =>
-                navigation.navigate('MainTabs', {
-                  screen: 'BagStack',
-                  params: {
-                    screen: 'BagScreen',
-                    params: {
-                      product: product,
-                    },
-                  },
-                })
-              }>
-              <NewBag />
-
-              {cartCount > 0 && (
-                <View
+          <TouchableOpacity
+            onPress={() => navigation.navigate('BagScreen')}
+            style={{
+              width: hp(38),
+              height: hp(38),
+              borderRadius: wp(35),
+              borderColor: '#E2E8F0CC',
+              borderWidth: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#FFFFFF',
+            }}>
+            <NewAdd />
+            {cartCount > 0 && (
+              <View
+                style={{
+                  position: 'absolute',
+                  right: wp(-4),
+                  // top: wp(-12),
+                  bottom: wp(-6),
+                  backgroundColor: '#5932EA',
+                  borderRadius: wp(30),
+                  width: hp(18),
+                  height: hp(18),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  // paddingHorizontal: wp(3),
+                }}>
+                <Text
                   style={{
-                    position: 'absolute',
-                    right: wp(5),
-                    top: hp(5),
-                    backgroundColor: '#5029F3',
-                    borderRadius: wp(20),
-                    width: hp(18),
-                    height: hp(18),
-                    justifyContent: 'center',
-                    alignItems: 'center',
+                    color: '#fff',
+                    fontSize: fontSize(9),
+                    fontFamily: fontFamily.poppins700,
                   }}>
-                  <Text
-                    style={{
-                      color: '#fff',
-                      fontSize: fontSize(10),
-                      fontFamily: fontFamily.poppins400,
-                    }}>
-                    {cartCount ?? '0'}
-                  </Text>
-                </View>
-              )}
-            </Touchable>
-          </View>
+                  {cartCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -960,7 +953,7 @@ const ProductDetailsScreen = () => {
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text
               style={{
-                fontSize: fontSize(22),
+                fontSize: fontSize(23),
                 color: '#17151C',
                 lineHeight: hp(32),
                 fontFamily: fontFamily.poppins600,
@@ -974,7 +967,7 @@ const ProductDetailsScreen = () => {
               style={{
                 marginLeft: hp(8),
                 color: '#77727F',
-                fontSize: fontSize(12),
+                fontSize: fontSize(13),
                 lineHeight: hp(26),
                 fontFamily: fontFamily.poppins400,
               }}>
@@ -984,7 +977,7 @@ const ProductDetailsScreen = () => {
               style={{
                 color: '#77727F',
                 textDecorationLine: 'line-through',
-                fontSize: fontSize(12),
+                fontSize: fontSize(13),
                 lineHeight: hp(26),
                 fontFamily: fontFamily.poppins400,
               }}>
@@ -996,7 +989,7 @@ const ProductDetailsScreen = () => {
               style={{
                 marginLeft: hp(8),
                 color: '#2B9909',
-                fontSize: fontSize(12),
+                fontSize: fontSize(13),
                 lineHeight: hp(24),
                 fontFamily: fontFamily.poppins400,
               }}>
@@ -1120,8 +1113,8 @@ const ProductDetailsScreen = () => {
                 <Text
                   style={{
                     color: pincode.length === 6 ? '#FFFFFF' : '#7147E8',
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins400,
+                    fontSize: fontSize(13),
+                    fontFamily: fontFamily.poppins500,
                   }}>
                   Check
                 </Text>
@@ -1360,7 +1353,7 @@ const ProductDetailsScreen = () => {
                 <Text
                   style={{
                     color: '#77727F',
-                    fontSize: fontSize(11),
+                    fontSize: fontSize(12),
                     lineHeight: hp(16),
                     fontFamily: fontFamily.poppins400,
                   }}>
@@ -1409,7 +1402,7 @@ const ProductDetailsScreen = () => {
             }}>
             <Text
               style={{
-                fontSize: fontSize(12),
+                fontSize: fontSize(13),
                 // lineHeight: hp(26),
                 fontFamily: fontFamily.poppins400,
                 color: colors.pureBlack,
@@ -1459,7 +1452,7 @@ const ProductDetailsScreen = () => {
                 maskElement={
                   <Text
                     style={{
-                      fontSize: fontSize(40),
+                      fontSize: fontSize(42),
                       fontFamily: fontFamily.poppins400,
                       color: 'black',
                     }}>
@@ -1472,7 +1465,7 @@ const ProductDetailsScreen = () => {
                   end={{x: 0.3, y: 0.6}}>
                   <Text
                     style={{
-                      fontSize: fontSize(40),
+                      fontSize: fontSize(42),
                       fontFamily: fontFamily.poppins400,
                       opacity: 0,
                     }}>
@@ -1551,7 +1544,7 @@ const ProductDetailsScreen = () => {
             }}>
             <Text
               style={{
-                fontSize: fontSize(14),
+                fontSize: fontSize(15),
                 fontFamily: fontFamily.poppins500,
                 lineHeight: hp(24),
                 // color: '#8225AF',

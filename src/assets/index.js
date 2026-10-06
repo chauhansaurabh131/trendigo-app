@@ -87,10 +87,123 @@ import ChartImage from './svgIcons/chart_image.svg';
 import NewBag from './svgIcons/new_bag.svg';
 import AlertIcon from './svgIcons/alert_icon.svg';
 import StoreIcon from './svgIcons/store_icon.svg';
+import SortIcon from './svgIcons/short_icon.svg';
+import GenderIcon from './svgIcons/gender_icon.svg';
+import CategoriesIcon from './svgIcons/categories_icon.svg';
+import Sort from './svgIcons/sort.svg';
+import FilterIcon from './svgIcons/filter_icon.svg';
+import DropArrow from './svgIcons/drop_arrow.svg';
+import AddCart from './svgIcons/add_cart.svg';
+import WhiteIcon from './svgIcons/white_icon.svg';
+import ProfileNewIcon from './svgIcons/profile_new_icon.svg';
+import NewAddIcon from './svgIcons/new_add_icon.svg';
+import NewAdd from './svgIcons/new_add.svg';
+import SearchNew from './svgIcons/search_new.svg';
+import ShoppingBag from './svgIcons/shopping-bag.svg';
+import ColorShoppingBag from './svgIcons/color_shopping_bag.svg';
+import PackingProgress from './svgIcons/packing_progress.svg';
+import Deliverd from './svgIcons/Deliverd.svg';
+import BlueRight from './svgIcons/blue_right.svg';
+import ReelsUi from './svgIcons/reels_ui.svg';
+import BuyButton from './svgIcons/buy_button.svg';
+import ReturnButton from './svgIcons/return_button.svg';
+import CancelView from './svgIcons/cancel_view.svg';
+import ReasonIcon from './svgIcons/reason_icon.svg';
+import RefundIcon from './svgIcons/refund_icon.svg';
+import PickUpIcon from './svgIcons/pick_up-icon.svg';
+import VisibiltyIcon from './svgIcons/visibility_icon.svg';
+import PublicIcon from './svgIcons/public_icon.svg';
+import WithoutFiled from './svgIcons/without_filled.svg';
+import NewBackIcon from './svgIcons/new_back_icon.svg';
+import NewEditIcon from './svgIcons/new_edit_icon.svg';
+import DeleteIcon from './svgIcons/delete_icon.svg';
+import GreySort from './svgIcons/grey_sort.svg';
+import GreySearchIcon from './svgIcons/grey_search_icon.svg';
+import NewAddCartIcon from './svgIcons/new_add_cart_icon.svg';
+import NewRemoveCartIcon from './svgIcons/new_remove_cart_icon.svg';
+import RelevenceView from './svgIcons/relevence_view.svg';
+import TrendigView from './svgIcons/trendig_view.svg';
+import RelevenceIcon from './svgIcons/relevence_iconsvg.svg';
+import RoundView from './svgIcons/round_view.svg';
+import DefaultViw from './svgIcons/default_viw.svg';
+import TrendigIcon from './svgIcons/trendig_icon.svg';
+import HotIcon from './svgIcons/hot_icon.svg';
+import FiledRound from './svgIcons/filed_round.svg';
+import PriceIcon from './svgIcons/price_icon.svg';
+import ArrivalsIcon from './svgIcons/arrivals_icon.svg';
+import NewIcon from './svgIcons/new_icon.svg';
+import CloseButton from './svgIcons/close_button.svg';
+import ApplyFilterButton from './svgIcons/apply_filter_icon.svg';
+import BlueInput from './svgIcons/blue_input.svg';
+import EmptyInput from './svgIcons/empty_input.svg';
+import WomenGender from './svgIcons/women_gender.svg';
+import MaleIcon from './svgIcons/male_icon.svg';
+import AllGendersIcon from './svgIcons/all_genders_icon.svg';
+import KidsIcon from './svgIcons/kids_icon.svg';
+import WomenIcon from './svgIcons/women_icon.svg';
+import NewSort from './svgIcons/new_sort.svg';
+import NewGender from './svgIcons/new_gender.svg';
+import ReelsIcon from './svgIcons/reels_icon.svg';
+import FilledCategoryIcon from './svgIcons/filled_category_icon.svg';
+import EmptyCategoryIcon from './svgIcons/empty_category_icon.svg';
+import NewSearch from './svgIcons/new_search.svg';
 export {
   Icon,
+  RelevenceView,
+  NewSearch,
+  MaleIcon,
+  ReelsIcon,
+  NewSort,
+  NewGender,
+  WomenIcon,
+  KidsIcon,
+  AllGendersIcon,
+  BlueInput,
+  EmptyInput,
+  ArrivalsIcon,
+  WomenGender,
+  ApplyFilterButton,
+  CloseButton,
+  NewIcon,
+  RelevenceIcon,
+  PriceIcon,
+  DefaultViw,
+  RoundView,
+  HotIcon,
+  TrendigView,
+  TrendigIcon,
+  WithoutFiled,
+  PickUpIcon,
+  NewRemoveCartIcon,
+  NewAddCartIcon,
+  DeleteIcon,
+  NewEditIcon,
+  GreySearchIcon,
+  NewBackIcon,
+  VisibiltyIcon,
+  BuyButton,
+  RefundIcon,
+  PublicIcon,
+  CancelView,
+  ReasonIcon,
+  ReturnButton,
+  Deliverd,
+  ReelsUi,
+  ProfileNewIcon,
+  PackingProgress,
+  ColorShoppingBag,
+  ShoppingBag,
+  SearchNew,
+  NewAdd,
+  NewAddIcon,
+  DropArrow,
+  WhiteIcon,
+  AddCart,
   MesureStep,
+  FilterIcon,
   NewBag,
+  Sort,
+  GreySort,
   StoreIcon,
   ChartImage,
   BlueStar,
@@ -174,9 +287,16 @@ export {
   CrossIcon,
   SellerHome,
   AlertIcon,
+  BlueRight,
   ThreeDotsIcon,
   WhiteArrow,
   SellerMessages,
+  SortIcon,
+  GenderIcon,
+  FiledRound,
+  CategoriesIcon,
+  EmptyCategoryIcon,
+  FilledCategoryIcon,
 };
 
 export const images = {
@@ -193,6 +313,7 @@ export const images = {
   image_one: require('./images/image_one.png'),
   image_two: require('./images/image_two.png'),
   image_three: require('./images/image_three.png'),
+  hot_image: require('./images/hot_image1.png'),
   image_four: require('./images/image_four.png'),
   image_five: require('./images/image_five.png'),
   image_six: require('./images/image_six.png'),
@@ -271,4 +392,10 @@ export const images = {
   women_category: require('./images/women_category1.png'),
   kids_category: require('./images/kids_category1.png'),
   beauty_category: require('./images/beauty_category1.png'),
+  cate_men: require('./images/cate_men1.png'),
+  beauty_image: require('./images/beauty_image1.png'),
+  kids_image: require('./images/kids_image1.png'),
+  image_new: require('./images/image_new1.png'),
+  earn_discount: require('./images/earn_discount1.png'),
+  women_cate_image: require('./images/women_cate_image1.png'),
 };

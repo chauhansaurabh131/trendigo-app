@@ -43,6 +43,9 @@ import ReelsVideoScreen from '../screens/ReelsVideoScreen/index.js';
 import BrandsScreen from '../screens/brandsScreen/index.js';
 import AdminScreen from '../SellerScreens/AdminScreen/index.js';
 import NotificationScreen from '../SellerScreens/Notificationscreen/index.js';
+import BagScreen from '../screens/bagScreen/index.js';
+import VideoPreviewScreen from '../screens/VideoPreviewScreen.js/index.js';
+import ChatScreen from '../screens/chatScreen/index.js';
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
@@ -221,6 +224,9 @@ const RootNavigator = () => {
       <Stack.Screen name="ViralTrends" component={ViralTrendsScreen} />
       <Stack.Screen name="ReelsScreen" component={ReelsVideoScreen} />
       <Stack.Screen name="BrandsScreen" component={BrandsScreen} />
+      <Stack.Screen name="BagScreen" component={BagScreen} />
+      <Stack.Screen name="VideoPreviewScreen" component={VideoPreviewScreen} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
 
       {/* Seller Screens */}
       <Stack.Screen name="HomeScreen" component={HomeScreen} />

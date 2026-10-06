@@ -43,6 +43,7 @@ import {StyleSheet} from 'react-native';
 import TopBrandComponent from '../../components/topBrandComponent';
 import {ActivityIndicator} from 'react-native';
 import arrow_back from '../../assets/images/arrow_back.png';
+import HomeFilterComponent from '../../components/HomeFilterComponent';
 const screenWidth = Dimensions.get('window').width;
 const cardWidth = (screenWidth - 40) / 2;
 
@@ -269,13 +270,17 @@ const SearchResultScreen = () => {
         <View
           activeOpacity={0.6}
           style={{
-            marginTop: hp(9),
-            width: '100%',
-            height: hp(40),
-            borderRadius: wp(25),
-            backgroundColor: '#F7F7F7',
+            marginTop: hp(11),
+            // width: '100%',
+            height: hp(38),
+            borderRadius: wp(16),
+            // marginHorizontal: hp(17),
+            backgroundColor: '#FFFFFF',
+            borderColor: '#E2E8F0CC',
+            borderWidth: 1,
+            // marginBottom: hp(12),
             justifyContent: 'center',
-            paddingHorizontal: hp(15),
+            paddingHorizontal: hp(16),
           }}>
           <TouchableOpacity
             style={{flexDirection: 'row', alignItems: 'center'}}
@@ -289,15 +294,15 @@ const SearchResultScreen = () => {
                 },
               });
             }}>
-            <GradientColorSearchIcon width={hp(16)} height={hp(16)} />
+            <GradientColorSearchIcon width={hp(12)} height={hp(12)} />
             <Text
               style={{
                 flex: 1,
                 marginLeft: hp(11),
-                fontSize: fontSize(14),
+                fontSize: fontSize(12),
                 lineHeight: hp(20),
-                fontFamily: fontFamily.poppins400,
-                color: '#979797',
+                fontFamily: fontFamily.poppins500,
+                color: '#94A3B8',
                 textAlignVertical: 'center',
                 paddingVertical: 0,
               }}>
@@ -315,71 +320,11 @@ const SearchResultScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <View>
-        {/* TABS */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingHorizontal: wp(17),
-            marginTop: hp(22),
-            marginBottom: hp(20),
-          }}>
-          {tabs.map((tab, index) => {
-            const isActive = activeTab === tab;
 
-            return (
-              <TouchableOpacity
-                key={index}
-                onPress={() => setActiveTab(tab)}
-                style={{marginRight: wp(12)}}>
-                {isActive ? (
-                  <LinearGradient
-                    // colors={['#8225AF', '#0F52BA']}
-                    colors={['#5029F3', '#7756FF']}
-                    start={{x: 0, y: 0}}
-                    end={{x: 1, y: 0}}
-                    style={{
-                      width: wp(94),
-                      height: hp(30),
-                      borderRadius: wp(24),
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        color: '#fff',
-                        fontFamily: fontFamily.poppins400,
-                        fontSize: fontSize(13),
-                      }}>
-                      {tab}
-                    </Text>
-                  </LinearGradient>
-                ) : (
-                  <View
-                    style={{
-                      backgroundColor: '#F7F7F7',
-                      width: wp(94),
-                      height: hp(30),
-                      borderRadius: wp(24),
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    <Text
-                      style={{
-                        color: '#000',
-                        fontFamily: fontFamily.poppins400,
-                        fontSize: fontSize(13),
-                      }}>
-                      {tab}
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+      <View style={{marginTop: hp(19)}}>
+        <HomeFilterComponent />
       </View>
+
       <FlatList
         // data={products}
         data={products || []}
@@ -389,7 +334,7 @@ const SearchResultScreen = () => {
           paddingHorizontal: wp(10),
         }}
         contentContainerStyle={{
-          paddingBottom: hp(60),
+          // paddingBottom: hp(60),
           flexGrow: 1,
         }}
         numColumns={2}
@@ -433,9 +378,9 @@ const SearchResultScreen = () => {
                 }}>
                 <Text
                   style={{
-                    color: 'grey',
-                    fontSize: fontSize(18),
-                    fontFamily: fontFamily.poppins500,
+                    color: '#000000',
+                    fontSize: fontSize(16),
+                    fontFamily: fontFamily.poppins400,
                   }}>
                   No products found
                 </Text>

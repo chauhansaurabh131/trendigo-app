@@ -29,32 +29,32 @@ const OrderDetailsScreen = () => {
   const navigation = useNavigation();
 
   const orderDetails = [
-    // {
-    //   id: '1',
-    //   deliveryDate: 'Monday, 19 Dec. 2024',
-    //   image: image_icon,
-    //   title: 'Designer Traditional Dress',
-    //   size: 'S',
-    //   color: 'Sky Blue',
-    //   qty: '01',
-    //   totalPaid: 'Rs. 180.00',
-    //   paidBy: 'Mastercard (**** 4242)',
-    //   paidDate: '02-02-2025, 10:30:10',
-    //   orderId: 'BGS08975201',
-    // },
-    // {
-    //   id: '2',
-    //   deliveryDate: 'Tuesday, 20 Dec. 2024',
-    //   image: image_icon,
-    //   title: 'Men Graphic Black T-Shirt',
-    //   size: 'M',
-    //   color: 'Black',
-    //   qty: '02',
-    //   totalPaid: 'Rs. 250.00',
-    //   paidBy: 'UPI',
-    //   paidDate: '03-02-2025, 12:20:10',
-    //   orderId: 'BGS08975202',
-    // },
+    {
+      id: '1',
+      deliveryDate: 'Monday, 19 Dec. 2024',
+      image: image_icon,
+      title: 'Designer Traditional Dress',
+      size: 'S',
+      color: 'Sky Blue',
+      qty: '01',
+      totalPaid: 'Rs. 180.00',
+      paidBy: 'Mastercard (**** 4242)',
+      paidDate: '02-02-2025, 10:30:10',
+      orderId: 'BGS08975201',
+    },
+    {
+      id: '2',
+      deliveryDate: 'Tuesday, 20 Dec. 2024',
+      image: image_icon,
+      title: 'Men Graphic Black T-Shirt',
+      size: 'M',
+      color: 'Black',
+      qty: '02',
+      totalPaid: 'Rs. 250.00',
+      paidBy: 'UPI',
+      paidDate: '03-02-2025, 12:20:10',
+      orderId: 'BGS08975202',
+    },
   ];
   const renderItem = ({item}) => {
     return (

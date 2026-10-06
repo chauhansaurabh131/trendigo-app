@@ -11,6 +11,7 @@ import {
   UniIcon,
 } from '../../assets';
 import {useNavigation} from '@react-navigation/native';
+import {colors} from '../../utils/colors';
 const ShopByBrandsComponent = () => {
   const navigation = useNavigation();
   const brands = [
@@ -29,10 +30,12 @@ const ShopByBrandsComponent = () => {
       <TouchableOpacity
         onPress={() => navigation.navigate('BrandsScreen')}
         style={{
-          width: hp(105.68),
-          height: hp(65.08),
+          width: hp(106),
+          height: hp(80),
           borderRadius: wp(14),
-          backgroundColor: '#F8F8F8',
+          borderColor: '#E2E8F0CC',
+          backgroundColor: colors.white,
+          borderWidth: 1,
           alignItems: 'center',
           justifyContent: 'center',
           // marginBottom: hp(13),
@@ -85,6 +88,7 @@ const ShopByBrandsComponent = () => {
         data={brands}
         renderItem={renderItem}
         keyExtractor={item => item.id}
+        scrollEnabled={false}
         numColumns={3}
         columnWrapperStyle={{
           justifyContent: 'space-between',

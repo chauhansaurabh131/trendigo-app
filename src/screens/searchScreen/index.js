@@ -66,33 +66,37 @@ const SearchScreen = () => {
         <View
           activeOpacity={0.6}
           style={{
-            marginTop: hp(9),
-            width: '100%',
-            height: hp(40),
-            borderRadius: wp(25),
-            backgroundColor: '#F7F7F7',
+            marginTop: hp(11),
+            // width: '100%',
+            height: hp(38),
+            borderRadius: wp(16),
+            // marginHorizontal: hp(17),
+            backgroundColor: '#FFFFFF',
+            borderColor: '#E2E8F0CC',
+            borderWidth: 1,
+            marginBottom: hp(12),
             justifyContent: 'center',
-            paddingHorizontal: hp(15),
+            paddingHorizontal: hp(16),
           }}>
           <Touchable
             style={{flexDirection: 'row', alignItems: 'center'}}
             activeOpacity={0.6}
             // onPress={() => navigation.navigate('SearchStack')}
           >
-            <GradientColorSearchIcon width={hp(16)} height={hp(16)} />
+            <GradientColorSearchIcon width={hp(12)} height={hp(12)} />
             <TextInput
               style={{
                 flex: 1,
-                marginLeft: hp(11),
-                fontSize: fontSize(14),
+                marginLeft: hp(7),
+                fontSize: fontSize(12),
                 lineHeight: hp(20),
-                fontFamily: fontFamily.poppins400,
-                color: '#979797',
+                fontFamily: fontFamily.poppins500,
+                color: '#000',
                 textAlignVertical: 'center',
                 paddingVertical: 0,
               }}
-              placeholder="Search for Products"
-              placeholderTextColor={'#000'}
+              placeholder=" Search Product, brands"
+              placeholderTextColor={'#94A3B8'}
               value={searchText}
               returnKeyType="search"
               onFocus={() => setIsFocused(true)}

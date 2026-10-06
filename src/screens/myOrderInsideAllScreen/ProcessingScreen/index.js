@@ -21,6 +21,8 @@ import {
   EmptyBag,
   images,
   NavigationArrowIcon,
+  PackingProgress,
+  TrackIcon,
   UserIcon,
 } from '../../../assets';
 import {useNavigation} from '@react-navigation/native';
@@ -28,26 +30,42 @@ import GradientButton from '../../../components/gradientButton';
 
 const ProcessingScreen = () => {
   const navigation = useNavigation();
-  const orderData = [
-    // {
-    //   id: '1',
-    //   image: images.trending_one,
-    //   title: 'Designer Traditional Dress',
-    //   size: 'S',
-    //   color: 'Sky Blue',
-    //   qty: 1,
-    //   deliveryDate: 'Monday , 19 Dec. 2024',
-    // },
-    // {
-    //   id: '2',
-    //   image: images.trending_two,
-    //   title: 'Designer Traditional Dress',
-    //   size: 'XXL',
-    //   color: 'Purple',
-    //   qty: 1,
-    //   deliveryDate: 'Tuesday , 20 Dec. 2024',
-    // },
+
+  const shippingMessages = [
+    'Free Express Shipping',
+    'Dispatch in ~18 hours',
+    'Ships Within 24 Hours',
+    'Fast Delivery Available',
+    'Priority Shipping',
+    'Express Dispatch',
+    'Free Delivery',
+    'Estimated Dispatch Today',
+    'Same Day Dispatch',
+    'Quick Shipping Available',
   ];
+  const orderData = [
+    {
+      id: '1',
+      image: images.trending_one,
+      title: 'Designer Traditional Dress',
+      size: 'S',
+      color: 'Sky Blue',
+      qty: 1,
+      deliveryDate: 'Monday , 19 Dec. 2024',
+      shippingText: 'Free Express Shipping',
+    },
+    {
+      id: '2',
+      image: images.trending_two,
+      title: 'Designer Traditional Dress',
+      size: 'XXL',
+      color: 'Purple',
+      qty: 1,
+      deliveryDate: 'Tuesday , 20 Dec. 2024',
+      shippingText: 'Dispatch in ~18 hours',
+    },
+  ];
+
   const renderItem = ({item}) => {
     return (
       <View
@@ -57,53 +75,37 @@ const ProcessingScreen = () => {
           borderColor: '#E8E8E8',
           borderRadius: wp(14),
           paddingHorizontal: wp(13),
-          marginBottom: hp(15),
+          marginBottom: hp(20),
+          paddingVertical: hp(20),
         }}>
         <View
           style={{
             flexDirection: 'row',
-            alignItems: 'flex-start',
-            marginTop: hp(14),
+            // alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            // marginTop: hp(17),
           }}>
-          {/* Green Dot */}
-          <View
-            style={{
-              width: wp(6),
-              height: wp(6),
-              backgroundColor: '#2B9909',
-              borderRadius: wp(3),
-              marginTop: hp(6),
-              marginRight: 8,
-            }}
-          />
-
           {/* Delivery Text */}
+
+          <PackingProgress />
+
           <Text
             style={{
-              color: '#2B9909',
-              fontSize: fontSize(12),
-              lineHeight: hp(16),
+              // width: 40,
+              color: '#94A3B8',
+              fontSize: fontSize(11),
               fontFamily: fontFamily.poppins500,
             }}>
-            Expected Delivery On :
-            <Text
-              style={{
-                color: colors.pureBlack,
-                fontFamily: fontFamily.poppins400,
-                fontSize: fontSize(12),
-              }}>
-              {' '}
-              {item.deliveryDate}
-            </Text>
+            #ORD-98248
           </Text>
         </View>
         <View
           style={{
             width: '97%',
-            height: 1,
+            height: hp(1),
             marginTop: hp(12),
-            marginBottom: hp(18),
-            backgroundColor: '#E8E8E8',
+            marginBottom: hp(16),
+            backgroundColor: '#F1F5F9',
           }}
         />
 
@@ -114,89 +116,145 @@ const ProcessingScreen = () => {
           }}>
           <Image
             source={item.image}
-            style={{width: wp(73), height: hp(88)}}
-            borderRadius={8}
+            style={{width: hp(80), height: hp(96)}}
+            borderRadius={12}
           />
 
-          <View style={{marginHorizontal: wp(23)}}>
+          <View style={{marginLeft: wp(14)}}>
             <Text
               style={{
-                fontSize: fontSize(16),
-                fontFamily: fontFamily.poppins600,
-                color: colors.pureBlack,
+                fontSize: fontSize(14),
+                fontFamily: fontFamily.poppins700,
+                color: '#0F172A',
               }}>
               {item.title}
             </Text>
 
-            <View style={{marginTop: isIOS ? hp(15) : hp(7)}}>
-              <View style={{flexDirection: 'row'}}>
+            <View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  gap: wp(8),
+                  alignItems: 'center',
+                  marginTop: hp(4),
+                }}>
                 <Text
                   style={{
-                    width: 40,
-                    color: '#64748B',
+                    fontSize: fontSize(14),
+                    fontFamily: fontFamily.poppins700,
+                    color: '#0F172A',
+                  }}>
+                  $64.00
+                </Text>
+
+                <Text
+                  style={{
                     fontSize: fontSize(12),
                     fontFamily: fontFamily.poppins400,
+                    color: '#94A3B8',
+                  }}>
+                  $64.00
+                </Text>
+
+                <Text
+                  style={{
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins700,
+                    color: '#059669',
+                  }}>
+                  28% OFF
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginTop: isIOS ? hp(15) : hp(7),
+              }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: hp(55),
+                  height: hp(23),
+                  backgroundColor: '#F1F5F9',
+                  borderRadius: wp(6),
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    // width: 40,
+                    color: '#334155',
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins500,
                   }}>
                   Size
                 </Text>
                 <Text
                   style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(12),
+                    color: '#0F172A',
+                    fontSize: fontSize(11),
                     fontFamily: fontFamily.poppins600,
                   }}>
                   {' '}
                   :{' '}
                 </Text>
+
                 <Text
                   style={{
-                    color: colors.pureBlack,
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins600,
+                    color: '#0F172A',
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins700,
                   }}>
                   {' '}
                   {item.size}{' '}
                 </Text>
               </View>
 
-              <View style={{flexDirection: 'row'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  width: hp(76),
+                  height: hp(23),
+                  backgroundColor: '#F0F9FF',
+                  borderRadius: wp(6),
+                  justifyContent: 'center',
+                }}>
+                <View
+                  style={{
+                    width: hp(8),
+                    height: hp(8),
+                    borderRadius: wp(8),
+                    backgroundColor: '#38BDF8',
+                  }}
+                />
                 <Text
                   style={{
-                    width: 40,
-                    color: '#64748B',
-                    fontSize: fontSize(12),
+                    color: '#075985',
                     lineHeight: hp(18),
-                    fontFamily: fontFamily.poppins400,
-                  }}>
-                  Color
-                </Text>
-                <Text
-                  style={{
-                    color: colors.pureBlack,
-                    lineHeight: hp(13),
-                    lineHeight: hp(18),
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins600,
-                  }}>
-                  {' '}
-                  :{' '}
-                </Text>
-                <Text
-                  style={{
-                    color: colors.pureBlack,
-                    lineHeight: hp(18),
-                    fontSize: fontSize(12),
-                    fontFamily: fontFamily.poppins600,
+                    fontSize: fontSize(11),
+                    fontFamily: fontFamily.poppins500,
+                    marginLeft: wp(4),
                   }}>
                   {' '}
                   {item.color}{' '}
                 </Text>
               </View>
-
-              <View style={{flexDirection: 'row'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  width: hp(47),
+                  height: hp(23),
+                  backgroundColor: '#F1F5F9',
+                  borderRadius: wp(6),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
                 <Text
                   style={{
-                    width: 40,
+                    // width: 40,
                     color: '#64748B',
                     fontSize: fontSize(12),
                     lineHeight: hp(18),
@@ -227,39 +285,95 @@ const ProcessingScreen = () => {
               </View>
             </View>
           </View>
-
-          <View
-            style={{
-              alignSelf: 'center',
-              marginLeft: wp(70),
-            }}>
-            {/* <NavigationArrowIcon stroke="black" /> */}
-          </View>
         </View>
 
         <View
           style={{
             // width: '100%',
-            height: 1,
+            height: hp(1),
             marginTop: hp(19),
-            backgroundColor: '#E8E8E8',
-            marginHorizontal: -13, // 🔥 important
+            backgroundColor: '#F1F5F9E5',
           }}
         />
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('OrderDetails')}
-          style={{marginTop: hp(10), marginBottom: hp(10)}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: hp(16),
+          }}>
           <Text
             style={{
-              textAlign: 'center',
-              color: colors.pureBlack,
+              // textAlign: 'center',
+              color: '#64748B',
               fontSize: fontSize(11),
               fontFamily: fontFamily.poppins500,
             }}>
-            Track Order
+            Expected Delivery:
           </Text>
-        </TouchableOpacity>
+
+          <Text
+            style={{
+              // textAlign: 'center',
+              color: '#4C0FC4',
+              fontSize: fontSize(10),
+              fontFamily: fontFamily.poppins700,
+            }}>
+            Mon, 19 Dec 2024
+          </Text>
+        </View>
+
+        <View style={{marginTop: hp(18)}}>
+          <GradientButton
+            icon={<TrackIcon />}
+            title={'Track Order'}
+            textStyle={{
+              fontSize: fontSize(12),
+              fontFamily: fontFamily.poppins700,
+            }}
+            buttonStyle={{height: hp(40)}}
+            onPress={() => navigation.navigate('OrderDetails')}
+          />
+        </View>
+
+        <View
+          style={{
+            // width: '100%',
+            height: hp(1),
+            marginTop: hp(16),
+            backgroundColor: '#F1F5F9E5',
+          }}
+        />
+
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: hp(14),
+          }}>
+          <Text
+            style={{
+              // width: 40,
+              color:
+                item.shippingText === 'Free Express Shipping'
+                  ? '#059669'
+                  : '#5B13EC',
+              fontSize: fontSize(11),
+              fontFamily: fontFamily.poppins500,
+            }}>
+            {item.shippingText}
+          </Text>
+
+          <Text
+            style={{
+              color: '#5B13EC',
+              fontSize: fontSize(11),
+              fontFamily: fontFamily.poppins700,
+            }}>
+            Download Receipt
+          </Text>
+        </View>
       </View>
     );
   };

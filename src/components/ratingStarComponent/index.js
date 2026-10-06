@@ -81,7 +81,7 @@ const Star = ({filled, onPress, isLast}) => {
           width: STAR_SIZE.width,
           height: STAR_SIZE.height,
           marginRight: isLast ? 0 : hp(10),
-          tintColor: filled ? '#9333EA' : '#CBD5E1', // ⭐ color change
+          tintColor: filled ? '#7C3AED' : '#CBD5E1',
         }}
       />
     </Pressable>

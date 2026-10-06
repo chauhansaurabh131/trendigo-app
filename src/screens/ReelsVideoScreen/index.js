@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {
   EyeIcon,
@@ -19,10 +20,13 @@ import {fontFamily, fontSize, hp, wp} from '../../utils/helpers';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {Dimensions} from 'react-native';
 import Video from 'react-native-video';
+import LinearGradient from 'react-native-linear-gradient';
 const ReelsVideoScreen = () => {
   const navigation = useNavigation();
   const [liked, setLiked] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(selectedIndex);
+  const videoRefs = useRef({});
+  const [videoProgress, setVideoProgress] = useState({});
+  const [videoDurations, setVideoDurations] = useState({});
   const route = useRoute();
 
   const {videos, selectedId} = route.params;
@@ -32,120 +36,223 @@ const ReelsVideoScreen = () => {
   const selectedIndex = videos.findIndex(
     item => String(item.id) === String(selectedId),
   );
+
+  const [currentIndex, setCurrentIndex] = useState(selectedIndex);
   const [pausedVideoId, setPausedVideoId] = useState(null);
+
+  // const onViewableItemsChanged = useRef(({viewableItems}) => {
+  //   if (viewableItems.length > 0) {
+  //     setCurrentIndex(viewableItems[0].index);
+  //     setPausedVideoId(null);
+  //   }
+  // }).current;
 
   const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
       setCurrentIndex(viewableItems[0].index);
-      setPausedVideoId(null);
     }
   }).current;
-  const renderItem = ({item, index}) => (
-    <View style={{width, height}}>
-      <TouchableOpacity
-        activeOpacity={1}
-        style={{flex: 1}}
-        onPress={() => setPausedVideoId(item.id)}>
-        <Video
-          source={item.video}
-          style={{width, height}}
-          resizeMode="cover"
-          repeat
-          paused={pausedVideoId === item.id || currentIndex !== index}
-        />
-      </TouchableOpacity>
+  const renderItem = ({item, index}) => {
+    const currentProgress = videoProgress[item.id] || 0;
 
-      {/* Top Header */}
-      <View
-        style={{
-          position: 'absolute',
-          top: hp(24),
-          left: wp(24),
+    const currentDuration = videoDurations[item.id] || 1;
+    const percentage = Math.min(
+      ((videoProgress[item.id] || 0) / (videoDurations[item.id] || 1)) * 100,
+      100,
+    );
 
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <WhiteArrow />
-        </TouchableOpacity>
-
-        <Text
-          style={{
-            color: '#fff',
-            fontSize: fontSize(18),
-            fontFamily: fontFamily.poppins500,
-            marginLeft: wp(30),
+    return (
+      <View style={{width, height}}>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={{flex: 1}}
+          onPress={() => {
+            setPausedVideoId(prev => (prev === item.id ? null : item.id));
           }}>
-          {item.category}
-        </Text>
-      </View>
-
-      <View style={{position: 'absolute', right: wp(29), bottom: hp(151)}}>
-        <TouchableOpacity onPress={() => setLiked(!liked)}>
-          {liked ? (
-            <HeartIcon />
-          ) : (
-            <WhiteHeartIcon /> // white heart
-          )}
+          <Video
+            ref={ref => {
+              if (ref) {
+                videoRefs.current[item.id] = ref;
+              }
+            }}
+            progressUpdateInterval={600}
+            source={item.video}
+            style={{width, height}}
+            resizeMode="cover"
+            // repeat={false}
+            paused={pausedVideoId === item.id || currentIndex !== index}
+            onLoad={data => {
+              setVideoDurations(prev => ({
+                ...prev,
+                [item.id]: data.duration,
+              }));
+            }}
+            onProgress={data => {
+              console.log(
+                'Current:',
+                data.currentTime,
+                'Duration:',
+                videoDurations[item.id],
+              );
+              if (currentIndex === index) {
+                setVideoProgress(prev => ({
+                  ...prev,
+                  [item.id]: data.currentTime,
+                }));
+              }
+            }}
+            onEnd={() => {
+              setVideoProgress(prev => ({
+                ...prev,
+                [item.id]: videoDurations[item.id],
+              }));
+            }}
+          />
         </TouchableOpacity>
-        <View>
-          <Text
-            style={{
-              color: '#fff',
-              fontSize: fontSize(12),
-              fontFamily: fontFamily.poppins400,
-              // marginLeft: wp(30),
-              textAlign: 'center',
-              marginTop: hp(4),
-            }}>
-            {item.likes}
-          </Text>
-        </View>
-      </View>
 
-      <View style={{position: 'absolute', right: wp(29), bottom: hp(85)}}>
-        <TouchableOpacity>
-          <EyeIcon />
-        </TouchableOpacity>
-        <View>
-          <Text
-            style={{
-              color: '#fff',
-              fontSize: fontSize(12),
-              fontFamily: fontFamily.poppins400,
-              // marginLeft: wp(30),
-              // marginTop: hp(2),
-              textAlign: 'center',
-            }}>
-            {item.views}
-          </Text>
-        </View>
-      </View>
+        {/* Top Header */}
+        <View
+          style={{
+            position: 'absolute',
+            top: hp(24),
+            left: wp(24),
 
-      <View style={{position: 'absolute', left: wp(37), bottom: hp(35)}}>
-        <View>
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <WhiteArrow />
+          </TouchableOpacity>
+
           <Text
             style={{
               color: '#fff',
-              fontSize: fontSize(16),
-              fontFamily: fontFamily.poppins700,
+              fontSize: fontSize(18),
+              fontFamily: fontFamily.poppins500,
+              marginLeft: wp(30),
             }}>
-            {item.title}
+            {item.category}
           </Text>
         </View>
-        <View>
-          <Text
+
+        <LinearGradient
+          colors={['#00000000', '#000000']}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            width: '100%',
+            height: hp(213),
+          }}>
+          <View style={{position: 'absolute', right: wp(29), bottom: hp(151)}}>
+            <TouchableOpacity onPress={() => setLiked(!liked)}>
+              {liked ? (
+                <HeartIcon />
+              ) : (
+                <WhiteHeartIcon /> // white heart
+              )}
+            </TouchableOpacity>
+            <View>
+              <Text
+                style={{
+                  color: '#fff',
+                  fontSize: fontSize(12),
+                  fontFamily: fontFamily.poppins400,
+                  // marginLeft: wp(30),
+                  textAlign: 'center',
+                  marginTop: hp(4),
+                }}>
+                {item.likes}
+              </Text>
+            </View>
+          </View>
+
+          <View style={{position: 'absolute', right: wp(29), bottom: hp(85)}}>
+            <TouchableOpacity>
+              <EyeIcon />
+            </TouchableOpacity>
+            <View>
+              <Text
+                style={{
+                  color: '#fff',
+                  fontSize: fontSize(12),
+                  fontFamily: fontFamily.poppins400,
+                  // marginLeft: wp(30),
+                  // marginTop: hp(2),
+                  textAlign: 'center',
+                }}>
+                {item.views}
+              </Text>
+            </View>
+          </View>
+
+          <View style={{position: 'absolute', left: wp(37), bottom: hp(35)}}>
+            <View>
+              <Text
+                style={{
+                  color: '#fff',
+                  fontSize: fontSize(16),
+                  fontFamily: fontFamily.poppins700,
+                }}>
+                {item.title}
+              </Text>
+            </View>
+            <View>
+              <Text
+                style={{
+                  color: '#fff',
+                  fontSize: fontSize(16),
+                  fontFamily: fontFamily.poppins400,
+                }}>
+                {item.description}
+              </Text>
+            </View>
+          </View>
+        </LinearGradient>
+        <TouchableWithoutFeedback
+          activeOpacity={1}
+          onPress={event => {
+            const touchX = event.nativeEvent.locationX;
+
+            const seekPercentage = touchX / width;
+
+            const seekTime = seekPercentage * (videoDurations[item.id] || 0);
+
+            videoRefs.current[item.id]?.seek(seekTime);
+
+            setVideoProgress(prev => ({
+              ...prev,
+              [item.id]: seekTime,
+            }));
+
+            // resume video
+            setPausedVideoId(null);
+          }}
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            justifyContent: 'center',
+          }}>
+          <View
             style={{
-              color: '#fff',
-              fontSize: fontSize(16),
-              fontFamily: fontFamily.poppins400,
+              height: hp(4),
+              backgroundColor: 'grey',
+              borderRadius: wp(10),
             }}>
-            {item.description}
-          </Text>
-        </View>
+            <View
+              style={{
+                width: `${percentage}%`,
+                height: '100%',
+                backgroundColor: colors.white,
+                borderRadius: wp(10),
+              }}
+            />
+          </View>
+        </TouchableWithoutFeedback>
       </View>
-    </View>
-  );
+    );
+  };
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: colors.white}}>
       <FlatList
