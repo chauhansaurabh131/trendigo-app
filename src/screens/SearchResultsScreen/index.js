@@ -129,22 +129,19 @@ const SearchResultScreen = () => {
       });
 
     return (
-      <TouchableOpacity
-        style={styles.card}
-        activeOpacity={0.6}
-        // onPress={() => {
-        //   navigation.navigate('ProductDetails', {product: item});
-        // }}
-
-        onPress={() => {
-          console.log('SEARCH RESULT PRODUCT ID =>', item?._id);
-          navigation.navigate('ProductDetails', {
-            productId: item?._id,
-          });
-        }}>
-        {/* <Image source={item.image} style={styles.image} /> */}
-        <Image source={{uri: productImage}} style={styles.image} />
-
+      <View>
+        <TouchableOpacity
+          style={styles.card}
+          activeOpacity={0.6}
+          onPress={() => {
+            console.log('SEARCH RESULT PRODUCT ID =>', item?._id);
+            navigation.navigate('ProductDetails', {
+              productId: item?._id,
+            });
+          }}>
+          {/* <Image source={item.image} style={styles.image} /> */}
+          <Image source={{uri: productImage}} style={styles.image} />
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.heartButton}
           onPress={() => {
@@ -255,7 +252,7 @@ const SearchResultScreen = () => {
             <TouchableOpacity style={styles.heartButton}></TouchableOpacity>
           </View>
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 
